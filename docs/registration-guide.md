@@ -96,16 +96,69 @@ Complete all required fields in the metadata:
 
 Create a signature to prove sequencer ownership:
 
+#### Option A: Using HTML Signature Tool (Recommended)
+
+The easiest way to generate signatures is using the provided HTML tool:
+
+1. **Start a local server** (required for MetaMask connection):
+   ```bash
+   # Option 1: Using Python (if installed)
+   cd src/sign
+   python3 -m http.server 8000
+   # Then open: http://localhost:8000
+
+   # Option 2: Using Node.js npx
+   cd src/sign
+   npx http-server -p 8000
+   # Then open: http://localhost:8000
+
+   ```
+
+2. **Open the signature tool**:
+   ```bash
+   # Open in your browser
+   open http://localhost:8000
+   ```
+
+3. **Connect your MetaMask wallet**:
+   - Click "Connect Wallet" button
+   - Select your sequencer account in MetaMask
+   - Ensure you're on the correct network
+
+4. **Fill in the form**:
+   - **Operation**: Select "register" (for new) or "update" (for existing)
+   - **L1 Chain ID**: Enter the L1 chain ID (e.g., 11155111 for Sepolia)
+   - **L2 Chain ID**: Enter your L2 rollup chain ID
+   - **SystemConfig Address**: Enter your SystemConfig contract address
+
+5. **Generate signature**:
+   - Review the message preview
+   - Click "Sign Message"
+   - Approve the signature request in MetaMask
+   - Copy the generated signature from the result box
+
+6. **Add to metadata**:
+   - Copy the signature and signedBy address
+   - Paste into your metadata file's `metadata` section
+
+> **⚠️ Important**: Direct file opening (`file://`) doesn't work with MetaMask due to browser security policies. You must use a local server.
+
+#### Option B: Manual Signature Generation
+
+If you prefer programmatic generation:
+
 ```javascript
 // Message format for NEW REGISTRATION
 const registerMessage = `Tokamak Rollup Registry
-Chain ID: ${chainId}
+L1 Chain ID: ${l1ChainId}
+L2 Chain ID: ${l2ChainId}
 Operation: register
 SystemConfig: ${systemConfig.toLowerCase()}`;
 
 // Message format for UPDATES
 const updateMessage = `Tokamak Rollup Registry
-Chain ID: ${chainId}
+L1 Chain ID: ${l1ChainId}
+L2 Chain ID: ${l2ChainId}
 Operation: update
 SystemConfig: ${systemConfig.toLowerCase()}`;
 

@@ -1,5 +1,6 @@
 {
-  "chainId": 11155111,
+  "l1ChainId": 11155111,
+  "l2ChainId": 111551153248,
   "name": "Poseidon",
   "description": "Thanos L2 rollup deployed with Tokamak SDK (Sepolia testnet)",
   "logo": "https://example.com/logo.png",
@@ -137,7 +138,7 @@
     "version": "1.0.0",
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2025-01-06T10:00:00Z",
-    "signature": "0x8922c05efe4a173dc9b9d606ba79de474599322fe3b8daf4893d46777e446c1c537e048fab50a235c21847c9e0618799e9020dbde2f9d24388946d7335fa4def1c",
+    "signature": "0x8f7d0a2d8a5c36a38f7af6eb3f07e7eebd775ffeb1948c2f9cdbff60fe035bf5763cce24b7d981f3c2f438dc44beaf0bcd8c3fa8936a540813e314b617a2c7cb1c",
     "signedBy": "0xa65E838e5665f03aa082bed8fA0C0221c35BB61b"
   }
 }

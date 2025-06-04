@@ -177,8 +177,12 @@
         </div>
 
         <div class="form-group">
-            <label for="chainId">Chain ID:</label>
-            <input type="number" id="chainId" placeholder="Enter chain ID (1 for Mainnet, 11155111 for Sepolia)">
+            <label for="l1ChainId">L1 Chain ID:</label>
+            <input type="number" id="l1ChainId" placeholder="Enter L1 chain ID (1 for Mainnet, 11155111 for Sepolia)">
+        </div>
+        <div class="form-group">
+            <label for="l2ChainId">L2 Chain ID:</label>
+            <input type="number" id="l2ChainId" placeholder="Enter L2 chain ID (e.g., 17001)">
         </div>
         <div class="form-group">
             <label for="systemConfig">SystemConfig Address:</label>
@@ -207,27 +211,14 @@
         let currentAccount = null;
         let isConnecting = false;
 
-        function loadPoseidonPreset() {
-            document.getElementById('chainId').value = '17001';
-            document.getElementById('systemConfig').value = '0x019f1b6c356b6581b5a4a3aa6f9b5e4ab1a8a3f8';
-            document.getElementById('operation').value = 'register';
-            updateMessagePreview();
-        }
-
-        function clearForm() {
-            document.getElementById('chainId').value = '';
-            document.getElementById('systemConfig').value = '';
-            document.getElementById('operation').value = 'register';
-            updateMessagePreview();
-        }
-
         function updateMessagePreview() {
-            const chainId = document.getElementById('chainId').value;
+            const l1ChainId = document.getElementById('l1ChainId').value;
+            const l2ChainId = document.getElementById('l2ChainId').value;
             const systemConfig = document.getElementById('systemConfig').value;
             const operation = document.getElementById('operation').value;
 
-            if (chainId && systemConfig && operation) {
-                const message = `Tokamak Rollup Registry\nChain ID: ${chainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}`;
+            if (l1ChainId && l2ChainId && systemConfig && operation) {
+                const message = `Tokamak Rollup Registry\nL1 Chain ID: ${l1ChainId}\nL2 Chain ID: ${l2ChainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}`;
                 document.getElementById('messagePreview').textContent = message;
             } else {
                 document.getElementById('messagePreview').textContent = 'Fill in the fields above to see the message';
@@ -290,9 +281,9 @@
         async function connectWallet() {
             console.log('Connect wallet button clicked!');
 
-            // MetaMask 설치 확인
+            // Check MetaMask installation
             if (typeof window.ethereum === 'undefined') {
-                alert('MetaMask가 설치되지 않았습니다. 먼저 MetaMask를 설치해주세요.');
+                alert('MetaMask is not installed. Please install MetaMask first.');
                 window.open('https://metamask.io/download/', '_blank');
                 return;
             }
@@ -300,7 +291,7 @@
             console.log('MetaMask detected');
 
             try {
-                // 계정 연결 요청
+                // Request account connection
                 console.log('Requesting account access...');
                 const accounts = await window.ethereum.request({
                     method: 'eth_requestAccounts'
@@ -319,21 +310,21 @@
                     document.getElementById('connectButton').style.backgroundColor = '#28a745';
                 } else {
                     console.error('No accounts returned');
-                    alert('계정을 찾을 수 없습니다. MetaMask에서 계정을 확인해주세요.');
+                    alert('No accounts found. Please check your accounts in MetaMask.');
                 }
             } catch (error) {
                 console.error('Error connecting wallet:', error);
                 if (error.code === 4001) {
-                    alert('사용자가 연결을 거부했습니다.');
+                    alert('User rejected the connection request.');
                 } else if (error.code === -32002) {
-                    alert('이미 연결 요청이 진행 중입니다. MetaMask 팝업을 확인해주세요.');
+                    alert('Connection request is already in progress. Please check your MetaMask popup.');
                 } else {
-                    alert('지갑 연결에 실패했습니다: ' + error.message);
+                    alert('Failed to connect wallet: ' + error.message);
                 }
             }
         }
 
-        // 페이지 로드 시 MetaMask 상태 확인
+        // Check MetaMask status on page load
         async function checkWalletConnection() {
             console.log('Checking wallet connection...');
 
@@ -365,11 +356,12 @@
         }
 
         async function signMessage() {
-            const chainId = document.getElementById('chainId').value;
+            const l1ChainId = document.getElementById('l1ChainId').value;
+            const l2ChainId = document.getElementById('l2ChainId').value;
             const systemConfig = document.getElementById('systemConfig').value;
             const operation = document.getElementById('operation').value;
 
-            if (!chainId || !systemConfig || !operation) {
+            if (!l1ChainId || !l2ChainId || !systemConfig || !operation) {
                 alert('Please fill in all fields');
                 return;
             }
@@ -379,7 +371,7 @@
                 return;
             }
 
-            const message = `Tokamak Rollup Registry\nChain ID: ${chainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}`;
+            const message = `Tokamak Rollup Registry\nL1 Chain ID: ${l1ChainId}\nL2 Chain ID: ${l2ChainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}`;
 
             try {
                 const signature = await window.ethereum.request({
@@ -406,7 +398,7 @@
             }
         }
 
-        // 페이지 로드 시 실행
+        // Page load initialization
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded, initializing...');
             checkWalletConnection();
@@ -448,7 +440,8 @@
             connectWallet();
         });
         document.getElementById('signButton').addEventListener('click', signMessage);
-        document.getElementById('chainId').addEventListener('input', updateMessagePreview);
+        document.getElementById('l1ChainId').addEventListener('input', updateMessagePreview);
+        document.getElementById('l2ChainId').addEventListener('input', updateMessagePreview);
         document.getElementById('systemConfig').addEventListener('input', updateMessagePreview);
         document.getElementById('operation').addEventListener('change', updateMessagePreview);
     </script>

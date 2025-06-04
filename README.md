@@ -64,9 +64,13 @@ data/
   mainnet/           # Mainnet rollup metadata
   sepolia/           # Sepolia testnet rollup metadata
 docs/                # Documentation
-schemas/             # JSON schemas
+schemas/             # JSON schemas and TypeScript types
+src/                 # Source utilities
+  sign/              # HTML signers for metadata
+  utils/             # Validation utilities and RPC config
 scripts/             # CLI tools and utilities
 tests/               # Test files
+validators/          # Core validation logic
 .github/workflows/   # GitHub Actions workflows
 ```
 
@@ -134,7 +138,6 @@ echo "SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com" >> .env
 
 ## 📞 Support
 
-- **Community**: [Tokamak Network Discord](https://discord.gg/tokamak-network)
 - **Bug Reports**: [GitHub Issues](https://github.com/tokamak-network/tokamak-rollup-metadata-repository/issues)
 - **Documentation**: See [docs/](docs/) directory
 - **Questions**: Check [FAQ](docs/faq.md) or create a discussion
@@ -148,13 +151,3 @@ echo "SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com" >> .env
 ## 📄 License
 
 MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🚀 Ecosystem Integration
-
-This repository enables integration with:
-
-- **Staking V2**: Rollup information display and candidate tracking
-- **Bridge Interfaces**: Automatic network detection and configuration
-- **Wallets**: Withdrawal monitoring and network switching
-- **Explorers**: Enhanced rollup information display
-- **Analytics Tools**: Comprehensive rollup data for ecosystem analysis
