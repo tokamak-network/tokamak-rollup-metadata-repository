@@ -9,7 +9,8 @@ describe('Debug Validation', () => {
 
   test('debug schema validation errors', () => {
     const validMetadata = {
-      chainId: 17001,
+      l1ChainId: 11155111, // Sepolia
+      l2ChainId: 17001, // L2 chain ID
       name: "Test L2",
       description: "Test description",
       rollupType: "optimistic",
@@ -47,7 +48,7 @@ describe('Debug Validation', () => {
       },
       metadata: {
         version: "1.0.0",
-        signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234",
+        signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
         signedBy: "0x1234567890123456789012345678901234567890"
       }
     };

@@ -68,12 +68,13 @@ const LAYER2_MANAGER_ABI = [
 const rollupMetadataSchema = {
   type: 'object',
   required: [
-    'chainId', 'name', 'description', 'rollupType', 'stack',
+    'l1ChainId', 'l2ChainId', 'name', 'description', 'rollupType', 'stack',
     'rpcUrl', 'nativeToken', 'status', 'createdAt', 'lastUpdated', 'l1Contracts', 'l2Contracts',
     'bridges', 'explorers', 'sequencer', 'staking', 'networkConfig', 'metadata'
   ],
   properties: {
-    chainId: { type: 'number', minimum: 1 },
+    l1ChainId: { type: 'number', minimum: 1 }, // L1 chain ID
+    l2ChainId: { type: 'number', minimum: 1 }, // L2 chain ID
     name: { type: 'string', minLength: 1 },
     description: { type: 'string', minLength: 1 },
     logo: { type: 'string', format: 'uri' },
@@ -554,7 +555,7 @@ export class RollupMetadataValidator {
       }
 
       // Reconstruct message for signature verification with dynamic operation
-      const message = `Tokamak Rollup Registry\nChain ID: ${metadata.chainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.systemConfig.toLowerCase()}`;
+      const message = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.systemConfig.toLowerCase()}`;
 
       const recoveredAddress = ethers.verifyMessage(
         message,
@@ -696,7 +697,7 @@ export class RollupMetadataValidator {
 
     // 8. Network chainId consistency validation
     if (networkFromPath) {
-      const chainIdConsistencyResult = this.validateNetworkChainIdConsistency(networkFromPath, metadata.chainId);
+      const chainIdConsistencyResult = this.validateNetworkChainIdConsistency(networkFromPath, metadata.l1ChainId);
       if (!chainIdConsistencyResult.valid) {
         errors.push(chainIdConsistencyResult.error!);
       }
@@ -772,7 +773,8 @@ export class RollupMetadataValidator {
 
       // Define immutable fields that cannot be changed during updates
       const immutableFields = [
-        { path: 'chainId', name: 'Chain ID' },
+        { path: 'l1ChainId', name: 'L1 Chain ID' },
+        { path: 'l2ChainId', name: 'L2 Chain ID' },
         { path: 'l1Contracts.systemConfig', name: 'SystemConfig address' },
         { path: 'rollupType', name: 'Rollup type' },
         { path: 'stack.name', name: 'Stack name' },

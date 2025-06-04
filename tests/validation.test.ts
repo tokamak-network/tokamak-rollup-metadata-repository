@@ -11,7 +11,8 @@ describe('RollupMetadataValidator', () => {
   describe('Schema Validation', () => {
     test('should validate valid metadata schema', () => {
       const validMetadata: Partial<L2RollupMetadata> = {
-        chainId: 17001,
+        l1ChainId: 11155111, // Sepolia
+        l2ChainId: 17001, // L2 chain ID
         name: "Test L2",
         description: "Test description",
         rollupType: "optimistic",
@@ -60,7 +61,8 @@ describe('RollupMetadataValidator', () => {
 
     test('should validate supportResources structure', () => {
       const metadataWithSupport: Partial<L2RollupMetadata> = {
-        chainId: 17001,
+        l1ChainId: 11155111, // Sepolia
+        l2ChainId: 17001, // L2 chain ID
         name: "Test L2",
         description: "Test description",
         rollupType: "optimistic",
@@ -256,7 +258,8 @@ describe('RollupMetadataValidator', () => {
 
     test('should skip validation for ETH native tokens', async () => {
       const metadata: L2RollupMetadata = {
-        chainId: 17001,
+        l1ChainId: 11155111, // Sepolia
+        l2ChainId: 17001, // L2 chain ID
         name: "Test L2",
         description: "Test description",
         rollupType: "optimistic",
@@ -291,7 +294,8 @@ describe('RollupMetadataValidator', () => {
 
     test('should validate ERC20 native token address against SystemConfig', async () => {
       const metadata: L2RollupMetadata = {
-        chainId: 17001,
+        l1ChainId: 11155111, // Sepolia
+        l2ChainId: 17001, // L2 chain ID
         name: "Test L2",
         description: "Test description",
         rollupType: "optimistic",
@@ -329,7 +333,8 @@ describe('RollupMetadataValidator', () => {
     test('should return error when RPC provider not set', async () => {
       const testValidator = new RollupMetadataValidator();
       const metadata: L2RollupMetadata = {
-        chainId: 17001,
+        l1ChainId: 11155111, // Sepolia
+        l2ChainId: 17001, // L2 chain ID
         name: "Test L2",
         description: "Test description",
         rollupType: "optimistic",
@@ -366,7 +371,8 @@ describe('RollupMetadataValidator', () => {
 
     test('should handle missing l1Address for ERC20 tokens gracefully', async () => {
       const metadata: L2RollupMetadata = {
-        chainId: 17001,
+        l1ChainId: 11155111, // Sepolia
+        l2ChainId: 17001, // L2 chain ID
         name: "Test L2",
         description: "Test description",
         rollupType: "optimistic",
@@ -505,7 +511,8 @@ describe('RollupMetadataValidator', () => {
     const testFilePath = './test-existing-rollup.json';
 
     const existingMetadata: L2RollupMetadata = {
-      chainId: 17001,
+      l1ChainId: 11155111, // Sepolia
+      l2ChainId: 17001, // L2 chain ID
       name: "Original L2",
       description: "Original description",
       rollupType: "optimistic",
@@ -578,12 +585,14 @@ describe('RollupMetadataValidator', () => {
     test('should fail when chainId is changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
-        chainId: 17002
+        l1ChainId: 11155112,
+        l2ChainId: 17002
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Immutable field 'Chain ID' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes("Immutable field 'L1 Chain ID' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes("Immutable field 'L2 Chain ID' cannot be changed"))).toBe(true);
     });
 
     test('should fail when systemConfig address is changed', () => {
@@ -666,15 +675,17 @@ describe('RollupMetadataValidator', () => {
     test('should handle multiple immutable field violations', () => {
       const updatedMetadata = {
         ...existingMetadata,
-        chainId: 17002,
+        l1ChainId: 11155112,
+        l2ChainId: 17002,
         rollupType: "zk" as const,
         createdAt: "2025-01-02T00:00:00Z"
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors).toHaveLength(3);
-      expect(result.errors.some(error => error.includes("Chain ID"))).toBe(true);
+      expect(result.errors).toHaveLength(4); // Now 4 errors: L1 chain ID, L2 chain ID, rollupType, createdAt
+      expect(result.errors.some(error => error.includes("L1 Chain ID"))).toBe(true);
+      expect(result.errors.some(error => error.includes("L2 Chain ID"))).toBe(true);
       expect(result.errors.some(error => error.includes("Rollup type"))).toBe(true);
       expect(result.errors.some(error => error.includes("Creation timestamp"))).toBe(true);
     });

@@ -9,7 +9,8 @@ export type RollupStatus = 'active' | 'inactive' | 'maintenance' | 'deprecated' 
 
 export interface L2RollupMetadata {
   // Basic information
-  chainId: number;
+  l1ChainId: number; // L1 chain ID (1: mainnet, 11155111: sepolia, etc.)
+  l2ChainId: number; // L2 chain ID (rollup's own chain ID)
   name: string;
   description: string;
   logo?: string;
