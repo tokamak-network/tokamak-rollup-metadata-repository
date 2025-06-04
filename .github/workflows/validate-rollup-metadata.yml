@@ -6,10 +6,6 @@ on:
     paths:
       - 'data/**/*.json'
 
-env:
-  MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
-  SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -72,35 +68,6 @@ jobs:
 
         echo "✅ PR title format is correct."
 
-    - name: Validate RPC URL configuration
-      if: steps.changed-files.outputs.any_changed == 'true'
-      run: |
-        # 변경된 파일에서 네트워크 추출
-        changed_file="${{ steps.changed-files.outputs.all_changed_files }}"
-        echo "Changed file: $changed_file"
-
-        if [[ "$changed_file" == *"/mainnet/"* ]]; then
-          network="mainnet"
-          if [ -z "$MAINNET_RPC_URL" ]; then
-            echo "❌ Error: MAINNET_RPC_URL secret is not configured"
-            exit 1
-          fi
-          echo "✅ Mainnet RPC URL is configured"
-        elif [[ "$changed_file" == *"/sepolia/"* ]]; then
-          network="sepolia"
-          if [ -z "$SEPOLIA_RPC_URL" ]; then
-            echo "❌ Error: SEPOLIA_RPC_URL secret is not configured"
-            exit 1
-          fi
-          echo "✅ Sepolia RPC URL is configured"
-        else
-          echo "❌ Error: Cannot determine network from file path: $changed_file"
-          echo "File should be in data/mainnet/ or data/sepolia/ directory"
-          exit 1
-        fi
-
-        echo "network=$network" >> $GITHUB_OUTPUT
-
     - name: Validate rollup metadata with onchain verification
       if: steps.changed-files.outputs.any_changed == 'true'
       run: |
@@ -110,19 +77,32 @@ jobs:
         PR_TITLE="${{ github.event.pull_request.title }}"
         echo "PR Title: $PR_TITLE"
 
-        # 변경된 파일들에 대해 검증 실행
+        # Extract operation type from PR title for display
+        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
+          OPERATION="register"
+        elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
+          OPERATION="update"
+        else
+          echo "❌ Error: Could not extract operation type from PR title"
+          exit 1
+        fi
+
+        echo "Operation type: $OPERATION"
+
+        # 변경된 파일들에 대해 통합 검증 실행
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo ""
           echo "📋 Validating $file..."
           echo "  ├── JSON schema validation"
           echo "  ├── Contract address format validation"
           echo "  ├── OnChain SystemConfig.unsafeBlockSigner() verification"
-          echo "  ├── Sequencer signature verification"
+          echo "  ├── Sequencer signature verification ($OPERATION)"
           echo "  ├── PR title consistency validation"
+          echo "  ├── File existence and immutable fields validation"
           echo "  └── Metadata integrity validation"
           echo ""
 
-          # TypeScript 검증 스크립트 실행
+          # 통합 검증 스크립트 실행
           npm run validate -- --pr-title "$PR_TITLE" "$file"
 
           if [ $? -eq 0 ]; then
@@ -169,10 +149,14 @@ jobs:
             message += '- ✅ **OnChain SystemConfig.unsafeBlockSigner() verification**\n';
             message += '- ✅ Sequencer signature verification with onchain sequencer address\n';
             message += '- ✅ Contract address format validation\n';
-            message += '- ✅ Network configuration validation\n';
-            message += '- ✅ PR title format validation\n';
-            message += '- ✅ Single file change enforcement\n';
-            message += '- ✅ Metadata consistency validation\n\n';
+            message += '- ✅ PR title format and consistency validation\n';
+            message += '- ✅ Filename validation (SystemConfig address match)\n';
+            message += '- ✅ Network and chainId consistency validation\n';
+            message += '- ✅ File existence validation (register vs update)\n';
+            message += '- ✅ Immutable fields protection (for updates)\n';
+            message += '- ✅ Native token address verification (ERC20)\n';
+            message += '- ✅ Staking registration validation (if candidate)\n';
+            message += '- ✅ Single file change enforcement\n\n';
             message += '**Note**: The sequencer address in your metadata was verified against the actual `SystemConfig.unsafeBlockSigner()` function on the blockchain. This ensures only legitimate sequencers can register their rollups.\n';
           } else {
             message += '❌ **Validation failed.** Please check the errors above and fix them.\n\n';
@@ -182,8 +166,11 @@ jobs:
             message += '- Invalid JSON format or missing required fields\n';
             message += '- SystemConfig address mismatch between PR title and metadata\n';
             message += '- Incorrect PR title format\n';
-            message += '- Multiple files changed in one PR\n';
-            message += '- Network configuration errors\n\n';
+            message += '- Filename doesn\'t match SystemConfig address\n';
+            message += '- Network/chainId inconsistency\n';
+            message += '- File existence issues (register vs update operations)\n';
+            message += '- Immutable field changes in updates\n';
+            message += '- Multiple files changed in one PR\n\n';
             message += '### Onchain Verification:\n';
             message += 'This repository uses **real onchain verification** by calling `SystemConfig.unsafeBlockSigner()` to ensure only legitimate L2 sequencers can register their rollup metadata.\n';
           }

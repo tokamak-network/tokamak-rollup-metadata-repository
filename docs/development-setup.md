@@ -32,7 +32,7 @@ cd tokamak-rollup-metadata-repository
 npm install
 
 # Test validation (works immediately!)
-npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
+npm run validate -- data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
 
 > 💡 **Ready to go!** No environment setup required - validation works with public RPCs
@@ -42,13 +42,18 @@ npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
 ### Validation Commands
 
 ```bash
-# Complete validation
-npm run validate <file>
+# Complete validation (integrated)
+npm run validate -- <file>
+npm run validate -- data/sepolia/0x1234567890123456789012345678901234567890.json
 
-# Individual validation steps
-npm run validate:schema <file>       # Schema validation only
-npm run validate:onchain <file>      # On-chain validation only
-npm run validate:signature <file>    # Signature validation only
+# Complete validation with PR title (for GitHub Actions)
+npm run validate -- --pr-title "[Rollup] sepolia - 12345 - Example L2" <file>
+
+# Individual validation commands (for development/testing)
+npm run validate:schema <file>
+npm run validate:onchain <file>
+npm run validate:signature:register <file>
+npm run validate:signature:update <file>
 ```
 
 ### Testing
@@ -57,18 +62,21 @@ npm run validate:signature <file>    # Signature validation only
 # Run all tests
 npm test
 
-# Run tests in watch mode
-npm run test:watch
+# Run linting
+npm run lint
+
+# Build TypeScript
+npm run build
 ```
 
 ### Example Usage
 
 ```bash
 # Validate a specific file
-npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
+npm run validate -- data/sepolia/0x1234567890123456789012345678901234567890.json
 
-# Validate all files in a directory
-npm run validate data/sepolia/*.json
+# Validate another existing file
+npm run validate -- data/sepolia/0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9.json
 ```
 
 ## 📁 Project Structure
@@ -76,13 +84,13 @@ npm run validate data/sepolia/*.json
 ```
 tokamak-rollup-metadata-repository/
 ├── data/                       # Metadata files
-│   ├── mainnet/
-│   └── sepolia/
+│   └── sepolia/               # Sepolia testnet metadata
 ├── docs/                       # Documentation
 ├── schemas/                    # JSON schemas
 ├── src/                        # Source utilities
 │   ├── sign/                   # HTML signature tool
 │   └── utils/                  # Validation utilities
+├── scripts/                    # Validation scripts
 ├── tests/                      # Test files
 ├── validators/                 # Core validation logic
 └── README.md
