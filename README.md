@@ -74,52 +74,36 @@ validators/          # Core validation logic
 .github/workflows/   # GitHub Actions workflows
 ```
 
-## 🔍 Validation Process
+## 🔍 Validation
 
-The repository uses multi-layered validation:
+Local validation ensures data integrity before submission:
 
-1. **Schema Validation**: JSON structure and field validation
-2. **On-Chain Verification**: SystemConfig contract and sequencer verification
-3. **Signature Verification**: Cryptographic proof of sequencer authority
-4. **Business Logic Validation**: File naming and directory structure validation
-5. **Security Checks**: Malicious content and URL validation
+```bash
+# Complete validation (recommended)
+npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
+
+# Individual validation steps
+npm run validate:schema <file>                # Schema validation only
+npm run validate:onchain <file>               # On-chain validation only
+npm run validate:signature:register <file>    # Signature validation (register operation)
+npm run validate:signature:update <file>      # Signature validation (update operation)
+```
+
+**Available Commands:**
+- `npm run validate` - Complete validation (all steps)
+- `npm run validate:schema` - JSON schema validation
+- `npm run validate:onchain` - Contract existence and sequencer verification
+- `npm run validate:signature:register` - Cryptographic signature verification for register operations
+- `npm run validate:signature:update` - Cryptographic signature verification for update operations
 
 ## 🛠️ Development Tools
 
-### Available Commands
-
+### Build and Test
 ```bash
-# Validation commands
-npm run validate <file>              # Complete validation
-npm run validate:schema <file>       # Schema validation only
-npm run validate:onchain <file>      # On-chain validation only
-npm run validate:signature <file>    # Signature validation only
-
-# Utility commands
-npm run create:metadata             # Interactive metadata creator
-npm run validate:all                # Validate all metadata files
-npm test                           # Run test suite
+npm run build     # Compile TypeScript
+npm run test      # Run test suite
+npm run lint      # Check code style
 ```
-
-### Environment Setup (Optional)
-
-**For higher rate limits or custom RPCs:**
-
-```bash
-# Create environment file
-echo "MAINNET_RPC_URL=https://eth.llamarpc.com" > .env
-echo "SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com" >> .env
-
-# Or manually create .env file with:
-# MAINNET_RPC_URL=https://eth.llamarpc.com
-# SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
-
-# For production (higher rate limits):
-# MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR_PROJECT_ID
-# SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
-```
-
-> 💡 **Quick Start**: Public RPCs work immediately without setup - perfect for testing!
 
 ## 🤝 Contributing
 

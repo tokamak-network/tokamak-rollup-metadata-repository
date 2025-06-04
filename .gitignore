@@ -3,6 +3,8 @@
 .vscode
 # Dependencies
 node_modules/
+backup/
+
 
 # Logs
 *.log

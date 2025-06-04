@@ -30,11 +30,9 @@ cd tokamak-rollup-metadata-repository
 
 # Install dependencies
 npm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env file to add your RPC URLs
 ```
+
+> 💡 **No additional setup required!** The system uses public RPCs by default.
 
 ### Step 2: Verify On-Chain Information
 

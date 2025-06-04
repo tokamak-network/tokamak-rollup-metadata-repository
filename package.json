@@ -7,7 +7,11 @@
     "build": "tsc",
     "test": "jest",
     "lint": "eslint **/*.ts",
-    "validate": "ts-node scripts/validate-metadata.ts"
+    "validate": "ts-node scripts/validate.ts",
+    "validate:schema": "ts-node scripts/validate-schema.ts",
+    "validate:onchain": "ts-node scripts/validate-onchain.ts",
+    "validate:signature:register": "ts-node scripts/validate-signature.ts --operation register",
+    "validate:signature:update": "ts-node scripts/validate-signature.ts --operation update"
   },
   "keywords": [
     "tokamak",
