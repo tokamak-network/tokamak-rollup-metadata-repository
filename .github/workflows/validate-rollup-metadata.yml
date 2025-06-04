@@ -1,0 +1,199 @@
+name: Validate Rollup Metadata
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'data/**/*.json'
+
+env:
+  MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
+  SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v40
+      with:
+        files: |
+          data/**/*.json
+
+    - name: Check if only one rollup file was changed
+      if: steps.changed-files.outputs.any_changed == 'true'
+      run: |
+        file_count=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | wc -w)
+        if [ $file_count -ne 1 ]; then
+          echo "❌ Error: Only one rollup metadata file should be changed per PR. Found $file_count files."
+          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+          exit 1
+        fi
+        echo "✅ Only one rollup metadata file was changed."
+
+    - name: Validate PR title format
+      run: |
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        echo "PR Title: $PR_TITLE"
+
+        # PR 제목 형식: [Rollup] <network> <systemConfig_address> - <rollup_name> 또는 [Update] <network> <systemConfig_address> - <rollup_name>
+        if [[ ! "$PR_TITLE" =~ ^\[(Rollup|Update)\]\ (mainnet|sepolia)\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
+          echo "❌ Error: PR title must follow format:"
+          echo "   [Rollup] <network> <systemConfig_address> - <rollup_name> (for new rollups)"
+          echo "   [Update] <network> <systemConfig_address> - <rollup_name> (for updates)"
+          echo "   Example: [Rollup] sepolia 0x5678901234567890123456789012345678901234 - Example L2"
+          echo "   Example: [Update] mainnet 0x1234567890123456789012345678901234567890 - Updated L2"
+          echo "   Your title: $PR_TITLE"
+          exit 1
+        fi
+
+        # Extract operation type for later use
+        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
+          echo "operation=register" >> $GITHUB_OUTPUT
+        elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
+          echo "operation=update" >> $GITHUB_OUTPUT
+        fi
+
+        echo "✅ PR title format is correct."
+
+    - name: Validate RPC URL configuration
+      if: steps.changed-files.outputs.any_changed == 'true'
+      run: |
+        # 변경된 파일에서 네트워크 추출
+        changed_file="${{ steps.changed-files.outputs.all_changed_files }}"
+        echo "Changed file: $changed_file"
+
+        if [[ "$changed_file" == *"/mainnet/"* ]]; then
+          network="mainnet"
+          if [ -z "$MAINNET_RPC_URL" ]; then
+            echo "❌ Error: MAINNET_RPC_URL secret is not configured"
+            exit 1
+          fi
+          echo "✅ Mainnet RPC URL is configured"
+        elif [[ "$changed_file" == *"/sepolia/"* ]]; then
+          network="sepolia"
+          if [ -z "$SEPOLIA_RPC_URL" ]; then
+            echo "❌ Error: SEPOLIA_RPC_URL secret is not configured"
+            exit 1
+          fi
+          echo "✅ Sepolia RPC URL is configured"
+        else
+          echo "❌ Error: Cannot determine network from file path: $changed_file"
+          echo "File should be in data/mainnet/ or data/sepolia/ directory"
+          exit 1
+        fi
+
+        echo "network=$network" >> $GITHUB_OUTPUT
+
+    - name: Validate rollup metadata with onchain verification
+      if: steps.changed-files.outputs.any_changed == 'true'
+      run: |
+        echo "🔍 Starting comprehensive rollup metadata validation..."
+        echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        echo "PR Title: $PR_TITLE"
+
+        # 변경된 파일들에 대해 검증 실행
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo ""
+          echo "📋 Validating $file..."
+          echo "  ├── JSON schema validation"
+          echo "  ├── Contract address format validation"
+          echo "  ├── OnChain SystemConfig.unsafeBlockSigner() verification"
+          echo "  ├── Sequencer signature verification"
+          echo "  ├── PR title consistency validation"
+          echo "  └── Metadata integrity validation"
+          echo ""
+
+          # TypeScript 검증 스크립트 실행
+          npm run validate -- --pr-title "$PR_TITLE" "$file"
+
+          if [ $? -eq 0 ]; then
+            echo "✅ All validations passed for $file"
+          else
+            echo "❌ Validation failed for $file"
+            exit 1
+          fi
+        done
+
+        echo ""
+        echo "🎉 All rollup metadata validations completed successfully!"
+
+    - name: Comment on PR
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          // 기존 봇 댓글 삭제
+          for (const comment of comments) {
+            if (comment.user.login === 'github-actions[bot]' && comment.body.includes('Rollup Metadata Validation')) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+              });
+            }
+          }
+
+          // 검증 결과에 따른 댓글 작성
+          const conclusion = '${{ job.status }}';
+          let message = '## 🤖 Rollup Metadata Validation Results\n\n';
+
+          if (conclusion === 'success') {
+            message += '✅ **All validations passed!** Your rollup metadata is ready to be merged.\n\n';
+            message += '### What was validated:\n';
+            message += '- ✅ JSON schema validation\n';
+            message += '- ✅ **OnChain SystemConfig.unsafeBlockSigner() verification**\n';
+            message += '- ✅ Sequencer signature verification with onchain sequencer address\n';
+            message += '- ✅ Contract address format validation\n';
+            message += '- ✅ Network configuration validation\n';
+            message += '- ✅ PR title format validation\n';
+            message += '- ✅ Single file change enforcement\n';
+            message += '- ✅ Metadata consistency validation\n\n';
+            message += '**Note**: The sequencer address in your metadata was verified against the actual `SystemConfig.unsafeBlockSigner()` function on the blockchain. This ensures only legitimate sequencers can register their rollups.\n';
+          } else {
+            message += '❌ **Validation failed.** Please check the errors above and fix them.\n\n';
+            message += '### Common issues:\n';
+            message += '- **Invalid sequencer address**: The sequencer address in metadata doesn\'t match `SystemConfig.unsafeBlockSigner()`\n';
+            message += '- **Invalid signature**: The signature was not created by the actual onchain sequencer\n';
+            message += '- Invalid JSON format or missing required fields\n';
+            message += '- SystemConfig address mismatch between PR title and metadata\n';
+            message += '- Incorrect PR title format\n';
+            message += '- Multiple files changed in one PR\n';
+            message += '- Network configuration errors\n\n';
+            message += '### Onchain Verification:\n';
+            message += 'This repository uses **real onchain verification** by calling `SystemConfig.unsafeBlockSigner()` to ensure only legitimate L2 sequencers can register their rollup metadata.\n';
+          }
+
+          message += '\n### Need help?\n';
+          message += 'Check our [documentation](../README.md) for detailed validation requirements and onchain verification process.';
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: message
+          });

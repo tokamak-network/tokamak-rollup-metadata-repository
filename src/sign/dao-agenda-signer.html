@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAO Agenda Signature</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #signatureResult {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            display: none;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .signature-text {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .wallet-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
+        .wallet-address {
+            font-family: monospace;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>DAO Agenda Signature</h1>
+    <div class="container">
+        <div class="wallet-info">
+            <h3>Connected Wallet</h3>
+            <p>Address: <span id="walletAddress" class="wallet-address">Not connected</span></p>
+        </div>
+        <div class="form-group">
+            <label for="agendaId">Agenda ID:</label>
+            <input type="text" id="agendaId" placeholder="Enter agenda ID">
+        </div>
+        <div class="form-group">
+            <label for="transactionHash">Transaction Hash:</label>
+            <input type="text" id="transactionHash" placeholder="Enter transaction hash">
+        </div>
+        <button id="signButton" disabled>Sign Message</button>
+        <button id="connectButton">Connect Wallet</button>
+        <div id="signatureResult"></div>
+    </div>
+
+    <script>
+        let currentAccount = null;
+
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    currentAccount = accounts[0];
+                    document.getElementById('walletAddress').textContent = currentAccount;
+                    document.getElementById('signButton').disabled = false;
+                    document.getElementById('connectButton').textContent = 'Connected';
+                    document.getElementById('connectButton').disabled = true;
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                    alert('Failed to connect wallet. Please try again.');
+                }
+            } else {
+                alert('Please install MetaMask to use this tool.');
+            }
+        }
+
+        async function signMessage() {
+            const agendaId = document.getElementById('agendaId').value;
+            const transactionHash = document.getElementById('transactionHash').value;
+
+            if (!agendaId || !transactionHash) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (!currentAccount) {
+                alert('Please connect your wallet first');
+                return;
+            }
+
+            const message = `I am the one who submitted agenda #${agendaId} via transaction ${transactionHash}. This signature proves that I am the one who submitted this agenda.`;
+
+            try {
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, currentAccount]
+                });
+
+                const signatureResult = document.getElementById('signatureResult');
+                signatureResult.style.display = 'block';
+                signatureResult.innerHTML = `
+                    <h3>Signature Generated:</h3>
+                    <p><strong>Message:</strong><br>${message}</p>
+                    <p><strong>Signature:</strong><br>${signature}</p>
+                    <p><strong>Connected Address:</strong><br>${currentAccount}</p>
+                `;
+            } catch (error) {
+                console.error('Error signing message:', error);
+                alert('Failed to sign message. Please try again.');
+            }
+        }
+
+        // Check if wallet is already connected
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.request({ method: 'eth_accounts' })
+                .then(accounts => {
+                    if (accounts.length > 0) {
+                        currentAccount = accounts[0];
+                        document.getElementById('walletAddress').textContent = currentAccount;
+                        document.getElementById('signButton').disabled = false;
+                        document.getElementById('connectButton').textContent = 'Connected';
+                        document.getElementById('connectButton').disabled = true;
+                    }
+                });
+
+            // Listen for account changes
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length === 0) {
+                    currentAccount = null;
+                    document.getElementById('walletAddress').textContent = 'Not connected';
+                    document.getElementById('signButton').disabled = true;
+                    document.getElementById('connectButton').textContent = 'Connect Wallet';
+                    document.getElementById('connectButton').disabled = false;
+                } else {
+                    currentAccount = accounts[0];
+                    document.getElementById('walletAddress').textContent = currentAccount;
+                    document.getElementById('signButton').disabled = false;
+                    document.getElementById('connectButton').textContent = 'Connected';
+                    document.getElementById('connectButton').disabled = true;
+                }
+            });
+        }
+
+        document.getElementById('connectButton').addEventListener('click', connectWallet);
+        document.getElementById('signButton').addEventListener('click', signMessage);
+    </script>
+</body>
+</html>

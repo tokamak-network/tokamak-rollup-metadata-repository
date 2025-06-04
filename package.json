@@ -1,0 +1,39 @@
+{
+  "name": "tokamak-rollup-metadata-repository",
+  "version": "1.0.0",
+  "description": "Metadata management repository for L2 rollups deployed with Tokamak SDK",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint **/*.ts",
+    "validate": "ts-node scripts/validate-metadata.ts"
+  },
+  "keywords": [
+    "tokamak",
+    "layer2",
+    "rollup",
+    "metadata",
+    "blockchain",
+    "sequencer",
+    "staking"
+  ],
+  "author": "Tokamak Network",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "ethers": "^6.8.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.8.9",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
+    "eslint": "^8.53.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
