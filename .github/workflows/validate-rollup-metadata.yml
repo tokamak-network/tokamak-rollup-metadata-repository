@@ -22,6 +22,11 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read          # Read repository contents
+  pull-requests: write    # Comment on and merge pull requests
+  checks: write           # Update check status
+
 jobs:
   validate:
     runs-on: ubuntu-latest
