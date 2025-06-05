@@ -29,9 +29,27 @@ Before submitting a PR, ensure you have:
 
 ## 🚀 Step-by-Step PR Submission
 
-### Step 1: Prepare Your Branch
+### Step 1: Fork the Repository
 
 ```bash
+# Fork the repository via GitHub UI or CLI
+gh repo fork tokamak-network/tokamak-rollup-metadata-repository
+
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/tokamak-rollup-metadata-repository.git
+cd tokamak-rollup-metadata-repository
+
+# Add upstream remote
+git remote add upstream https://github.com/tokamak-network/tokamak-rollup-metadata-repository.git
+```
+
+### Step 2: Prepare Your Branch
+
+```bash
+# Make sure you're on the latest main
+git checkout main
+git pull upstream main
+
 # Create feature branch with descriptive name
 git checkout -b add-rollup-0x1234567890123456789012345678901234567890
 
@@ -39,33 +57,37 @@ git checkout -b add-rollup-0x1234567890123456789012345678901234567890
 git checkout -b update-rollup-0x1234567890123456789012345678901234567890-withdrawal-config
 ```
 
-### Step 2: Create or Update Metadata File
+### Step 3: Create or Update Metadata File
 
 ```bash
-# Use interactive metadata creator
-npm run create:metadata
+# 1. Check the schema structure
+cat schemas/rollup-metadata.ts
 
-# Or manually create file with correct naming
-# data/{network}/{systemConfig_address}.json
+# 2. Create your JSON file following the L2RollupMetadata interface
 vim data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
 
-### Step 3: Local Validation
+### Step 4: Local Validation
 
 ```bash
 # Run complete validation suite
-npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
+npm install
+npm run validate
 
-# Check for common issues
-npm run validate:schema data/sepolia/*.json
-npm run validate:onchain data/sepolia/*.json
-npm run validate:signature data/sepolia/*.json
+# Check schema compliance
+npm run validate:schema
 
-# Validate PR title format
-npm run validate -- --pr-title "[Rollup] sepolia - 0x1234567890123456789012345678901234567890 - My Awesome L2" data/sepolia/0x1234567890123456789012345678901234567890.json
+# Verify on-chain data
+npm run validate:onchain
+
+# Validate signature for registration
+npm run validate:signature:register -- data/sepolia/0x1234567890123456789012345678901234567890.json
+
+# Validate signature for updates
+npm run validate:signature:update -- data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
 
-### Step 4: Commit Changes
+### Step 5: Commit Changes
 
 ```bash
 # Add your metadata file
@@ -74,39 +96,56 @@ git add data/sepolia/0x1234567890123456789012345678901234567890.json
 # Use descriptive commit message
 git commit -m "Add rollup metadata for 0x1234567890123456789012345678901234567890
 
-- Chain ID: 12345
+- l1ChainId: 11155111 (Sepolia)
+- l2ChainId: 12345
 - Name: My Awesome L2
 - Network: Sepolia testnet
-- Sequencer: 0x5678...
+- SystemConfig: 0x1234567890123456789012345678901234567890
 - All validations passed"
 ```
 
-### Step 5: Push and Create PR
+### Step 6: Push to Your Fork
 
 ```bash
-# Push to your fork
+# Push to your fork (not upstream)
 git push origin add-rollup-0x1234567890123456789012345678901234567890
-
-# Create PR via GitHub UI or CLI
-gh pr create --title "[Rollup] sepolia - 0x1234567890123456789012345678901234567890 - My Awesome L2" --body "PR description"
 ```
+
+### Step 7: Create Pull Request
+
+```bash
+# Create PR via GitHub UI or CLI
+gh pr create --repo tokamak-network/tokamak-rollup-metadata-repository \
+  --title "[Rollup] sepolia 0x1234567890123456789012345678901234567890 - My Awesome L2" \
+  --body "Add new rollup registration for My Awesome L2 on Sepolia testnet"
+
+# Or use the GitHub web interface:
+# 1. Go to your fork on GitHub
+# 2. Click "Contribute" → "Open pull request"
+# 3. Fill in title and description
+# 4. Complete the PR template checklist
+# 5. Submit the PR
+```
+
+> 📋 **Important**: When creating the PR, GitHub will show a template with a checklist. Complete all items to ensure your submission follows the requirements.
 
 ## 📝 PR Title Format
 
 ### Required Format
 
 ```
-[Rollup] {network} - {systemConfig_address} - {rollup_name}
+[Rollup] {network} {systemConfig_address} - {rollup_name}
+[Update] {network} {systemConfig_address} - {rollup_name}
 ```
 
 ### Examples
 
 ```bash
 # New rollup registration
-[Rollup] sepolia - 0x1234567890123456789012345678901234567890 - My Awesome L2
+[Rollup] sepolia 0x1234567890123456789012345678901234567890 - My Awesome L2
 
 # Rollup update
-[Update] mainnet - 0xabcdef1234567890abcdef1234567890abcdef12 - Production L2
+[Update] mainnet 0xabcdef1234567890abcdef1234567890abcdef12 - Production L2
 
 # Multiple files (batch update)
 [Batch] sepolia - Update withdrawal configs for 3 rollups
@@ -115,10 +154,10 @@ gh pr create --title "[Rollup] sepolia - 0x1234567890123456789012345678901234567
 ### Format Rules
 
 - **Prefix**: Use `[Rollup]` for new registrations, `[Update]` for modifications
-- **Network**: Must match directory name exactly
+- **Network**: Must match directory name exactly (mainnet or sepolia)
 - **Address**: SystemConfig address in lowercase
 - **Name**: Human-readable rollup name
-- **Separators**: Use ` - ` (space-dash-space) between elements
+- **Separators**: Use ` ` (space) between network and address, ` - ` (space-dash-space) before name
 
 ## 📄 PR Description Template
 
@@ -129,7 +168,8 @@ gh pr create --title "[Rollup] sepolia - 0x1234567890123456789012345678901234567
 
 ### Basic Information
 - **Name**: My Awesome L2
-- **Chain ID**: 12345
+- **l1ChainId**: 11155111 (Sepolia)
+- **l2ChainId**: 12345
 - **Network**: Sepolia testnet
 - **SystemConfig**: 0x1234567890123456789012345678901234567890
 
@@ -205,17 +245,16 @@ When you submit a PR, the following validations run automatically:
    - Signature format validation
    - Message format compliance
    - Signature recovery and verification
-   - Timestamp validation (within 24 hours)
+   - Sequencer address matches on-chain sequencer
 
 4. **Business Logic Validation**
    - Filename matches SystemConfig address
    - Directory matches network/chain ID
    - PR title format compliance
-   - No duplicate chain IDs
+   - Single file change per PR
 
 5. **Security Checks**
    - URL accessibility verification
-   - Known malicious address detection
    - Content security scanning
 
 ### Validation Results
@@ -226,7 +265,7 @@ Results are automatically posted as PR comments:
 ```markdown
 ## ✅ Validation Successful
 
-All validation checks passed! Your PR is ready for review.
+All validation checks passed! Your PR is ready for maintainer review.
 
 ### Validation Summary
 - ✅ Schema validation passed
@@ -238,6 +277,7 @@ All validation checks passed! Your PR is ready for review.
 ### Next Steps
 - PR is ready for maintainer review
 - No action required from submitter
+- Awaiting manual approval from maintainers
 ```
 
 #### ❌ Failure Example
@@ -264,148 +304,32 @@ Please fix the following issues:
 2. Re-generate and update signature
 3. Test RPC endpoint performance
 4. Verify explorer URL accessibility
-5. Run local validation: `npm run validate data/sepolia/0x1234*.json`
-```
-
-## 👥 Review Process
-
-### Automated Review
-
-- **Immediate**: Validation pipeline runs on PR submission
-- **Results**: Posted as PR comments within 2-3 minutes
-- **Re-validation**: Triggers on every push to PR branch
-
-### Human Review
-
-#### Review Criteria
-
-Maintainers review for:
-
-1. **Technical Correctness**
-   - All validations passing
-   - Metadata completeness and accuracy
-   - Proper integration compatibility
-
-2. **Security Assessment**
-   - Sequencer signature authenticity
-   - Contract deployment verification
-   - No suspicious patterns or malicious content
-
-3. **Operational Readiness**
-   - RPC endpoints stable and accessible
-   - Rollup operational and functional
-   - Documentation quality
-
-4. **Community Standards**
-   - Appropriate naming and descriptions
-   - Professional presentation
-   - Compliance with repository guidelines
-
-#### Review Timeline
-
-- **Automated validation**: 2-3 minutes
-- **Initial review**: 1-2 business days
-- **Follow-up reviews**: 1 business day after changes
-- **Final approval**: Same day if all requirements met
-
-### Review Feedback Categories
-
-#### 🚫 Blocking Issues (Must Fix)
-- Validation failures
-- Security concerns
-- Missing required information
-- Incorrect metadata format
-
-#### ⚠️ Improvement Suggestions (Recommended)
-- Better naming/descriptions
-- Additional configuration options
-- Performance optimizations
-- Documentation enhancements
-
-#### 💡 Enhancement Ideas (Optional)
-- Future improvements
-- Best practice recommendations
-- Community integration suggestions
-
-## 🔄 Handling Review Feedback
-
-### Addressing Feedback
-
-1. **Read all feedback carefully**
-2. **Fix blocking issues first**
-3. **Address suggestions where possible**
-4. **Ask questions if unclear**
-5. **Update and push changes**
-
-### Making Updates
-
-```bash
-# Make requested changes
-vim data/sepolia/0x1234567890123456789012345678901234567890.json
-
-# Validate changes locally
-npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
-
-# Commit updates
-git add data/sepolia/0x1234567890123456789012345678901234567890.json
-git commit -m "Address review feedback
-
-- Fix sequencer address mismatch
-- Update RPC endpoint URL
-- Add missing bridge configuration"
-
-# Push updates
-git push origin add-rollup-0x1234567890123456789012345678901234567890
-```
-
-### Responding to Reviewers
-
-```markdown
-## Response to Review
-
-Thank you for the feedback! I've addressed all the issues:
-
-### Fixed Issues
-- ✅ Updated sequencer address to match on-chain value
-- ✅ Regenerated signature with correct format
-- ✅ Updated RPC endpoint URL
-- ✅ Fixed explorer URL
-
-### Questions
-> Should we include additional bridge configurations?
-
-We currently only support ETH transfers, but plan to add USDC support in the next release. Should I include placeholder configuration now or add it later?
-
-### Validation
-- ✅ All local validations now pass
-- ✅ Re-tested all endpoints
-- ✅ Verified signature integrity
+5. Run local validation: `npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json`
 ```
 
 ## 🎯 Best Practices
 
 ### Before Submitting
 
+- **Run local validation** multiple times to catch issues early
 - **Double-check all addresses** for accuracy and case sensitivity
 - **Test RPC endpoints** thoroughly for responsiveness
 - **Verify signature** manually before including in metadata
-- **Run complete validation** locally multiple times
-- **Check for typos** in descriptions and URLs
+- **Use correct PR title format** to avoid auto-rejection
 
-### During Review Process
+### During Validation Process
 
-- **Respond promptly** to feedback and questions
-- **Be thorough** in addressing all feedback points
-- **Ask for clarification** when feedback is unclear
-- **Test changes** locally before pushing updates
-- **Keep communication professional** and constructive
+- **Monitor PR comments** for validation results
+- **Fix issues promptly** to reduce validation cycles
+- **Test locally** before pushing fixes
+- **Keep changes minimal** to avoid introducing new issues
 
-### After Approval
+### After Validation Success
 
-- **Monitor rollup operation** to ensure everything works correctly
+- **Automatic merge** when all checks pass
+- **Monitor PR status** for merge confirmation
+- **Test integration** with your rollup infrastructure after merge
 - **Update metadata** promptly if configuration changes
-- **Report issues** if automated systems detect problems
-- **Contribute improvements** to documentation and tools
 
 ## 🚨 Common Issues and Solutions
 
@@ -423,9 +347,8 @@ cast call $SYSTEM_CONFIG_ADDRESS "unsafeBlockSigner()" --rpc-url $RPC_URL
 **Signature verification fails**
 ```bash
 # Regenerate signature with exact message format
-node scripts/generate-signature.js --chain-id 12345 --private-key $PRIVATE_KEY
-
-# Ensure timestamp is recent (within 24 hours)
+# Use the signature generation HTML tool provided in the repository
+# No automated signature generation script is available
 ```
 
 ### 2. File Naming Issues
@@ -444,10 +367,10 @@ mv data/sepolia/incorrect-name.json data/sepolia/0x12345678901234567890123456789
 **Incorrect title format**
 ```bash
 # Wrong: "Add my rollup"
-# Correct: "[Rollup] sepolia - 0x1234567890123456789012345678901234567890 - My Rollup"
+# Correct: "[Rollup] sepolia 0x1234567890123456789012345678901234567890 - My Rollup"
 
 # Update via GitHub UI or CLI
-gh pr edit --title "[Rollup] sepolia - 0x1234567890123456789012345678901234567890 - My Rollup"
+gh pr edit --title "[Rollup] sepolia 0x1234567890123456789012345678901234567890 - My Rollup"
 ```
 
 ### 4. Network Path Issues
@@ -456,7 +379,118 @@ gh pr edit --title "[Rollup] sepolia - 0x123456789012345678901234567890123456789
 ```bash
 # Check chain ID and network mapping
 # Move file to correct directory
-mv data/mainnet/0x1234*.json data/sepolia/0x1234*.json
+mv data/mainnet/0x1234567890123456789012345678901234567890.json data/sepolia/0x1234567890123456789012345678901234567890.json
+```
+
+## 🔄 Handling Validation Issues
+
+### Fixing Failed Validations
+
+When automated validation fails, follow these steps:
+
+1. **Review the validation report** posted as PR comment
+2. **Fix identified issues** in your metadata file
+3. **Test locally** before pushing updates
+4. **Push changes** to trigger re-validation
+5. **Wait for auto-merge** when all checks pass
+
+### Making Updates
+
+```bash
+# Make requested changes
+vim data/sepolia/0x1234567890123456789012345678901234567890.json
+
+# Validate changes locally
+npm run validate
+
+# Commit updates
+git add data/sepolia/0x1234567890123456789012345678901234567890.json
+git commit -m "Fix validation issues
+
+- Fix sequencer address mismatch
+- Update RPC endpoint URL
+- Regenerate signature"
+
+# Push updates (triggers re-validation)
+git push origin add-rollup-0x1234567890123456789012345678901234567890
+```
+
+### Re-validation Process
+
+- **Automatic**: Triggers on every push to PR branch
+- **No wait time**: Validation starts immediately
+- **Real-time feedback**: Results posted as PR comments
+
+## 👥 Review Process
+
+### Automated Review
+
+All reviews are handled automatically through GitHub Actions validation pipeline:
+
+- **Immediate**: Validation pipeline runs on PR submission
+- **Results**: Posted as PR comments within 2-3 minutes
+- **Re-validation**: Triggers on every push to PR branch
+- **Auto-merge**: Automatically merges when all validations pass
+
+### Validation Timeline
+
+- **Schema validation**: ~30 seconds
+- **On-chain verification**: ~1-2 minutes
+- **Security checks**: ~30 seconds
+- **Total validation time**: 2-3 minutes
+- **Auto-merge**: Immediate after all checks pass
+
+### Approval Criteria
+
+PRs are automatically approved and merged when:
+
+1. ✅ **All validations pass** - Schema, on-chain, signature verification
+2. ✅ **Security checks pass** - No malicious patterns detected
+3. ✅ **File naming correct** - Matches SystemConfig address
+4. ✅ **PR title format valid** - Follows required format
+5. ✅ **No conflicts** - Clean merge possible
+
+### Review Results
+
+#### ✅ Auto-Approval and Merge
+```markdown
+## ✅ Validation Successful - Auto-Merged
+
+All validation checks passed! Your rollup has been successfully registered.
+
+### Validation Summary
+- ✅ Schema validation passed
+- ✅ On-chain verification passed
+- ✅ Signature verification passed
+- ✅ File naming validation passed
+- ✅ Security checks passed
+
+### Next Steps
+- Your rollup metadata is now live
+- No further action required
+- Thank you for your contribution!
+```
+
+#### ❌ Validation Failed - Manual Fix Required
+```markdown
+## ❌ Validation Failed - Please Fix Issues
+
+Please fix the following issues and push updates to trigger re-validation:
+
+### Critical Issues
+- ❌ **On-chain verification failed**: Sequencer address mismatch
+  - On-chain sequencer: 0x1111111111111111111111111111111111111111
+  - Metadata sequencer: 0x2222222222222222222222222222222222222222
+  - **Fix**: Update sequencer address in metadata to match on-chain value
+
+- ❌ **Signature verification failed**: Invalid signature format
+  - **Fix**: Re-generate signature using correct message format
+
+### How to Fix
+1. Update metadata with correct sequencer address
+2. Re-generate and update signature
+3. Push changes to trigger re-validation
+4. PR will auto-merge when all checks pass
 ```
 
 ## 📊 PR Metrics and Analytics
@@ -466,15 +500,15 @@ mv data/mainnet/0x1234*.json data/sepolia/0x1234*.json
 Track your PR success with these metrics:
 
 - **Validation pass rate**: Aim for 100% on submission
-- **Review cycles**: Target 1-2 cycles for approval
-- **Time to merge**: Typical 2-5 business days
+- **Time to validation**: Typical 2-3 minutes for automated checks
+- **Manual review success**: Best practice achievement
 - **Quality score**: Based on completeness and accuracy
 
 ### Performance Indicators
 
 - **First-time validation success**: Best practice achievement
-- **Zero review cycles**: Exceptional quality submission
-- **Fast approval**: Demonstrates thorough preparation
+- **Zero validation cycles**: Exceptional quality submission
+- **Fast automated approval**: Demonstrates thorough preparation
 - **Community positive feedback**: High-quality contribution
 
 ## 🔗 Related Documentation

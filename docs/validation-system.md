@@ -6,7 +6,7 @@ Comprehensive automated validation system ensuring metadata integrity and securi
 
 The validation system provides multi-layered security through JSON schema validation, on-chain verification, cryptographic signature validation, and automated testing. All validation is performed automatically via GitHub Actions with comprehensive error reporting.
 
-## 🔍 Validation Layers - 6계층 시스템
+## 🔍 Validation Layers
 
 ### Layer 1: Schema Validation
 - **JSON Structure**: Validates against defined schema with required fields and data types
@@ -35,7 +35,7 @@ The validation system provides multi-layered security through JSON schema valida
 - **Cross-Validation**: Ensures signature message operation matches PR title operation
 
 ### Layer 6: Immutable Field Protection
-- **Core Field Protection**: Prevents modification of chainId, SystemConfig, rollupType during updates
+- **Core Field Protection**: Prevents modification of l1ChainId, l2ChainId, SystemConfig, rollupType during updates
 - **Data Integrity**: Maintains consistency across updates with detailed violation reporting
 - **Staking Protection**: Protects registration transaction and candidate address data
 
@@ -83,19 +83,20 @@ graph TD
 
 ### Schema Validation
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L323-L363)
+**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L67-L237)
 
 ```javascript
 const rollupMetadataSchema = {
   type: 'object',
   required: [
-    'chainId', 'name', 'description', 'rollupType', 'stack',
+    'l1ChainId', 'l2ChainId', 'name', 'description', 'rollupType', 'stack',
     'rpcUrl', 'nativeToken', 'status', 'createdAt', 'lastUpdated',
     'l1Contracts', 'l2Contracts', 'bridges', 'explorers',
     'sequencer', 'staking', 'networkConfig', 'metadata'
   ],
   properties: {
-    chainId: { type: 'number', minimum: 1 },
+    l1ChainId: { type: 'number', minimum: 1 },
+    l2ChainId: { type: 'number', minimum: 1 },
     name: { type: 'string', minLength: 1 },
     rollupType: {
       type: 'string',
@@ -108,14 +109,14 @@ const rollupMetadataSchema = {
 ```
 
 **Key Features:**
-- Comprehensive JSON schema with 25+ required fields
+- Comprehensive JSON schema with 18 required fields
 - Address format validation with EIP-55 checksum support
 - URL format validation for HTTP/HTTPS and WebSocket protocols
 - Enum validation for rollup types and network configurations
 
 ### On-Chain Verification
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L484-L541)
+**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L485-L541)
 
 **SystemConfig Validation:**
 - Contract existence verification on L1 network
@@ -123,7 +124,7 @@ const rollupMetadataSchema = {
 - Sequencer address comparison (on-chain vs metadata)
 - RPC connectivity and comprehensive error handling
 
-**Native Token Address Validation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L961-L1000)
+**Native Token Address Validation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L969-L1017)
 - Validates `SystemConfig.nativeTokenAddress()` matches `metadata.nativeToken.l1Address`
 - ERC20 token specific validation (ETH tokens skipped)
 - Ensures on-chain configuration consistency
@@ -135,7 +136,7 @@ const rollupMetadataSchema = {
 **Message Format:**
 ```
 Tokamak Rollup Registry
-Chain ID: {chainId}
+Chain ID: {l2ChainId}
 Operation: {operation}
 SystemConfig: {systemConfigAddress}
 ```
@@ -148,7 +149,7 @@ SystemConfig: {systemConfigAddress}
 
 ### File Structure & Naming
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L371-L386)
+**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L364-L386)
 
 **Validation Rules:**
 - Filename must match SystemConfig address: `{address}.json` (lowercase)
@@ -156,36 +157,39 @@ SystemConfig: {systemConfigAddress}
 - Case-insensitive address matching with proper normalization
 - Directory structure validation for supported networks
 
-**Network-ChainId Consistency**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L388-L430)
+**Network-ChainId Consistency**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L387-L430)
 - Mainnet directory rejects known testnet chainIds
 - Sepolia directory rejects known mainnet chainIds
 - Proper L2 chainId categorization by network type
 
 ### Operation-Based Validation
 
-**PR Title Parsing**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L432-L483)
+**PR Title Parsing**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L434-L483)
 
 **Required Format:**
 - `[Rollup] network 0x1234...abcd - L2 Name` (new rollups)
 - `[Update] network 0x1234...abcd - L2 Name` (existing rollups)
 
-**File Existence Logic**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L727-L750)
+**File Existence Logic**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L729-L750)
 - **Register operations**: File must NOT exist (prevents overwriting)
 - **Update operations**: File must exist (validates existing rollup)
 - Clear error messages with suggested operation type
 
 ### Immutable Field Protection
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L752-L817)
+**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L758-L817)
 
 **Protected Fields:**
-- `chainId` - Chain ID
+- `l1ChainId` - L1 Chain ID
+- `l2ChainId` - L2 Chain ID
 - `l1Contracts.systemConfig` - SystemConfig address
 - `rollupType` - Rollup type (optimistic, zk, etc.)
 - `stack.name` - Stack name
 - `createdAt` - Creation timestamp
-- `staking.registrationTxHash` - Registration transaction hash
-- `staking.candidateAddress` - Candidate address
+
+**Additional Staking Protections:**
+- `staking.registrationTxHash` - Registration transaction hash (when candidate)
+- `staking.candidateAddress` - Candidate address (when candidate)
 
 **Features:**
 - Compares existing file with new metadata using nested object access
@@ -199,7 +203,7 @@ SystemConfig: {systemConfigAddress}
 
 **Main Orchestration**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L593-L730)
 
-**11-Step Validation Sequence:**
+**Multi-Step Validation Sequence:**
 1. Network path extraction and validation
 2. JSON schema validation
 3. PR title parsing and validation
@@ -208,9 +212,10 @@ SystemConfig: {systemConfigAddress}
 6. Signature verification with message validation
 7. Contract address format validation
 8. Sequencer address format validation
-9. Network-chainId consistency validation
-10. Operation-based file existence validation
-11. Immutable fields protection (updates only)
+9. Native token address consistency validation (ERC20 only)
+10. Network-chainId consistency validation
+11. Operation-based file existence validation
+12. Immutable fields protection (updates only)
 
 **Features:**
 - Operation-aware validation (register vs update)
@@ -227,7 +232,7 @@ SystemConfig: {systemConfigAddress}
 - Multi-step validation process with proper error reporting
 - Environment variable support for custom RPC URLs
 - Comprehensive test execution (unit + integration)
-- Parallel validation for improved performance
+- Auto-merge functionality after successful validation
 
 ### CLI Validation Tools
 
@@ -238,7 +243,8 @@ npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
 # Individual validation components
 npm run validate:schema data/sepolia/0x1234567890123456789012345678901234567890.json
 npm run validate:onchain data/sepolia/0x1234567890123456789012345678901234567890.json
-npm run validate:signature data/sepolia/0x1234567890123456789012345678901234567890.json
+npm run validate:signature:register data/sepolia/0x1234567890123456789012345678901234567890.json
+npm run validate:signature:update data/sepolia/0x1234567890123456789012345678901234567890.json
 
 # With PR title validation
 npm run validate --pr-title "[Rollup] sepolia 0x1234567890123456789012345678901234567890 - My L2" data/sepolia/0x1234567890123456789012345678901234567890.json
@@ -252,7 +258,7 @@ npm run validate:all  # Validate all metadata files
 ### Common Validation Errors
 
 **1. Schema Validation Errors**
-- Missing required fields (`chainId`, `name`, `systemConfig`, etc.)
+- Missing required fields (`l1ChainId`, `l2ChainId`, `name`, `systemConfig`, etc.)
 - Invalid data types (string instead of number, etc.)
 - Format violations (invalid URLs, malformed addresses)
 - Enum value violations (unsupported rollup types)
@@ -310,12 +316,12 @@ Example PR Titles:
 ### Protected Fields (Cannot be changed):
 
 Core Identity:
-- chainId, l1Contracts.systemConfig, rollupType, stack.name
+- l1ChainId, l2ChainId, l1Contracts.systemConfig, rollupType, stack.name
 
 Timestamps:
 - createdAt (creation timestamp)
 
-Staking Data:
+Staking Data (when isCandidate is true):
 - staking.registrationTxHash, staking.candidateAddress
 
 ### Allowed Updates:
@@ -330,7 +336,7 @@ Staking Data:
 ### Message Format Requirements:
 
 Tokamak Rollup Registry
-Chain ID: {chainId}
+Chain ID: {l2ChainId}
 Operation: {register|update}
 SystemConfig: {systemConfigAddress}
 
@@ -338,6 +344,7 @@ SystemConfig: {systemConfigAddress}
 - Operation type mismatch between PR title and signature
 - Wrong sequencer signing (must be on-chain sequencer)
 - Message format deviation (extra spaces, different text)
+- Using l1ChainId instead of l2ChainId in message
 ```
 
 ## 🔗 Related Documentation

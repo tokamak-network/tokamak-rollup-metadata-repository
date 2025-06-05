@@ -15,7 +15,8 @@ This document defines the JSON schema for rollup metadata, including all require
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "required": [
-    "chainId",
+    "l1ChainId",
+    "l2ChainId",
     "name",
     "description",
     "rollupType",
@@ -23,28 +24,43 @@ This document defines the JSON schema for rollup metadata, including all require
     "rpcUrl",
     "nativeToken",
     "status",
+    "createdAt",
+    "lastUpdated",
     "l1Contracts",
+    "l2Contracts",
+    "bridges",
+    "explorers",
     "sequencer",
+    "staking",
+    "networkConfig",
     "metadata"
   ],
   "properties": {
-    "chainId": { "type": "integer", "minimum": 1 },
+    "l1ChainId": { "type": "integer", "minimum": 1 },
+    "l2ChainId": { "type": "integer", "minimum": 1 },
     "name": { "type": "string", "minLength": 1, "maxLength": 100 },
     "description": { "type": "string", "minLength": 1, "maxLength": 500 },
-    "rollupType": { "enum": ["optimistic", "zk"] },
+    "logo": { "type": "string" },
+    "website": { "type": "string" },
+    "rollupType": { "enum": ["optimistic", "zk", "sovereign"] },
     "stack": { "$ref": "#/definitions/Stack" },
-    "rpcUrl": { "$ref": "#/definitions/HttpsUrl" },
+    "rpcUrl": { "type": "string" },
+    "wsUrl": { "type": "string" },
     "nativeToken": { "$ref": "#/definitions/NativeToken" },
-    "status": { "enum": ["active", "inactive", "deprecated"] },
+    "status": { "enum": ["active", "inactive", "maintenance", "deprecated", "shutdown"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "lastUpdated": { "type": "string", "format": "date-time" },
+    "shutdown": { "$ref": "#/definitions/Shutdown" },
     "l1Contracts": { "$ref": "#/definitions/L1Contracts" },
+    "l2Contracts": { "$ref": "#/definitions/L2Contracts" },
+    "bridges": { "type": "array", "items": { "$ref": "#/definitions/Bridge" } },
+    "explorers": { "type": "array", "items": { "$ref": "#/definitions/Explorer" } },
+    "supportResources": { "$ref": "#/definitions/SupportResources" },
     "sequencer": { "$ref": "#/definitions/Sequencer" },
-    "metadata": { "$ref": "#/definitions/Metadata" },
-    "websocketUrl": { "$ref": "#/definitions/WssUrl" },
-    "explorer": { "$ref": "#/definitions/Explorer" },
-    "bridges": { "$ref": "#/definitions/Bridges" },
     "staking": { "$ref": "#/definitions/Staking" },
+    "networkConfig": { "$ref": "#/definitions/NetworkConfig" },
     "withdrawalConfig": { "$ref": "#/definitions/WithdrawalConfig" },
-    "networkConfig": { "$ref": "#/definitions/NetworkConfig" }
+    "metadata": { "$ref": "#/definitions/Metadata" }
   }
 }
 ```
@@ -53,15 +69,27 @@ This document defines the JSON schema for rollup metadata, including all require
 
 ### Basic Information
 
-#### chainId
+#### l1ChainId
 - **Type**: `integer`
 - **Required**: Yes
-- **Validation**: Must be positive integer, unique across all rollups
-- **Description**: Unique chain identifier for the L2 network
+- **Validation**: Must be positive integer (1: mainnet, 11155111: sepolia)
+- **Description**: L1 network chain ID where SystemConfig is deployed
 
 ```json
 {
-  "chainId": 12345
+  "l1ChainId": 1
+}
+```
+
+#### l2ChainId
+- **Type**: `integer`
+- **Required**: Yes
+- **Validation**: Must be positive integer, unique across all rollups
+- **Description**: L2 network's own chain identifier
+
+```json
+{
+  "l2ChainId": 12345
 }
 ```
 
@@ -92,12 +120,24 @@ This document defines the JSON schema for rollup metadata, including all require
 #### rollupType
 - **Type**: `enum`
 - **Required**: Yes
-- **Values**: `"optimistic"`, `"zk"`
+- **Values**: `"optimistic"`, `"zk"`, `"sovereign"`
 - **Description**: Type of rollup technology used
 
 ```json
 {
   "rollupType": "optimistic"
+}
+```
+
+#### status
+- **Type**: `enum`
+- **Required**: Yes
+- **Values**: `"active"`, `"inactive"`, `"maintenance"`, `"deprecated"`, `"shutdown"`
+- **Description**: Current operational status
+
+```json
+{
+  "status": "active"
 }
 ```
 
@@ -130,7 +170,6 @@ This document defines the JSON schema for rollup metadata, including all require
 #### rpcUrl
 - **Type**: `string`
 - **Required**: Yes
-- **Format**: HTTPS URL
 - **Description**: Primary RPC endpoint for the L2 network
 
 ```json
@@ -139,15 +178,14 @@ This document defines the JSON schema for rollup metadata, including all require
 }
 ```
 
-#### websocketUrl
+#### wsUrl
 - **Type**: `string`
 - **Required**: No
-- **Format**: WebSocket URL (wss://)
 - **Description**: WebSocket endpoint for real-time data
 
 ```json
 {
-  "websocketUrl": "wss://ws.my-l2.com"
+  "wsUrl": "wss://ws.my-l2.com"
 }
 ```
 
@@ -173,21 +211,6 @@ This document defines the JSON schema for rollup metadata, including all require
 **Supported Types:**
 - `"eth"`: Native ETH
 - `"erc20"`: Custom ERC20 token
-- `"ton"`: Tokamak Network TON token
-
-### Status
-
-#### status
-- **Type**: `enum`
-- **Required**: Yes
-- **Values**: `"active"`, `"inactive"`, `"deprecated"`
-- **Description**: Current operational status
-
-```json
-{
-  "status": "active"
-}
-```
 
 ## 🏗️ Contract Information
 
@@ -213,6 +236,43 @@ This document defines the JSON schema for rollup metadata, including all require
 }
 ```
 
+**Required Properties:**
+- `systemConfig`: Core SystemConfig contract (used as filename identifier)
+
+**Optional Properties:**
+- `l1StandardBridge`, `optimismPortal`, `l2OutputOracle`: Optimistic rollup contracts
+- `disputeGameFactory`, `l1CrossDomainMessenger`, `l1ERC721Bridge`: Bridge contracts
+- `addressManager`: Legacy address manager
+
+### L2 Contracts
+
+#### l2Contracts
+- **Type**: `object`
+- **Required**: Yes
+- **Description**: All deployed L2 contract addresses
+
+```json
+{
+  "l2Contracts": {
+    "nativeToken": "0xdeaddeaddeaddeaddeaddeaddeaddeaddeaddead",
+    "l2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "l2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "l1Block": "0x4200000000000000000000000000000000000015",
+    "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "gasPriceOracle": "0x420000000000000000000000000000000000000f"
+  }
+}
+```
+
+**Required Properties:**
+- `nativeToken`: L2 native token contract address
+
+**Optional Properties:**
+- `l2CrossDomainMessenger`, `l2StandardBridge`: L2 bridge contracts
+- `l1Block`, `l2ToL1MessagePasser`: L2 system contracts
+- `gasPriceOracle`: Gas price management contract
+- `wrappedETH`: ETH wrapped as ERC20 (when native token is ERC20)
+
 ### Sequencer Information
 
 #### sequencer
@@ -237,29 +297,37 @@ This document defines the JSON schema for rollup metadata, including all require
 
 ## 🌉 Bridge and Explorer
 
-### Explorer
+### Explorers
 
-#### explorer
-- **Type**: `object`
-- **Required**: No
-- **Description**: Block explorer information
+#### explorers
+- **Type**: `array`
+- **Required**: Yes
+- **Description**: Block explorer information array
 
 ```json
 {
-  "explorer": {
-    "name": "My L2 Explorer",
-    "url": "https://explorer.my-l2.com",
-    "apiUrl": "https://api.explorer.my-l2.com",
-    "standard": "blockscout"
-  }
+  "explorers": [
+    {
+      "name": "My L2 Explorer",
+      "url": "https://explorer.my-l2.com",
+      "type": "blockscout",
+      "status": "active",
+      "apiUrl": "https://api.explorer.my-l2.com"
+    }
+  ]
 }
 ```
+
+**Explorer Types:**
+- `"blockscout"`: Blockscout explorer
+- `"etherscan"`: Etherscan-compatible
+- `"custom"`: Custom explorer implementation
 
 ### Bridges
 
 #### bridges
 - **Type**: `array`
-- **Required**: No
+- **Required**: Yes
 - **Description**: Supported bridge protocols
 
 ```json
@@ -269,6 +337,7 @@ This document defines the JSON schema for rollup metadata, including all require
       "name": "Native Bridge",
       "type": "native",
       "url": "https://bridge.my-l2.com",
+      "status": "active",
       "supportedTokens": [
         {
           "symbol": "ETH",
@@ -300,21 +369,33 @@ This document defines the JSON schema for rollup metadata, including all require
 
 ### staking
 - **Type**: `object`
-- **Required**: No
-- **Description**: Ton Staking V2 candidate status
+- **Required**: Yes
+- **Description**: Ton Staking V2 candidate status and registration information
 
 ```json
 {
   "staking": {
     "isCandidate": true,
+    "candidateRegisteredAt": "2024-12-01T00:00:00Z",
     "candidateStatus": "active",
-    "candidateAddress": "0x1234567890123456789012345678901234567890",
-    "votingPower": "1000000000000000000000",
-    "commissionRate": "5.0",
-    "registrationDate": "2025-01-01T00:00:00Z"
+    "registrationTxHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+    "candidateAddress": "0x9876543210987654321098765432109876543210",
+    "rollupConfigAddress": "0x1234567890123456789012345678901234567890",
+    "stakingServiceName": "My Awesome L2 Candidate"
   }
 }
 ```
+
+**Required Properties:**
+- `isCandidate`: Whether registered as candidate in Staking V2
+
+**Optional Properties:**
+- `candidateRegisteredAt`: Candidate registration time (ISO 8601 format)
+- `candidateStatus`: Current status (`"not_registered"`, `"pending"`, `"active"`, `"suspended"`, `"terminated"`)
+- `registrationTxHash`: Transaction hash where SystemConfig was registered
+- `candidateAddress`: Generated candidate address after registration
+- `rollupConfigAddress`: Same as systemConfig address (alias for compatibility)
+- `stakingServiceName`: Name displayed in staking UI
 
 **Note**: This metadata is for status tracking only. Actual candidate registration happens through the Ton Staking V2 protocol separately.
 
@@ -333,11 +414,6 @@ This document defines the JSON schema for rollup metadata, including all require
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6"
-    },
-    "supportResources": {
-      "statusPageUrl": "https://status.my-l2.com",
-      "supportContactUrl": "https://support.my-l2.com",
-      "explorerWithdrawalGuideUrl": "https://docs.my-l2.com/withdrawals"
     }
   }
 }
@@ -351,7 +427,7 @@ This document defines the JSON schema for rollup metadata, including all require
 
 #### networkConfig
 - **Type**: `object`
-- **Required**: No
+- **Required**: Yes
 - **Description**: Network operation parameters
 
 ```json
@@ -360,8 +436,7 @@ This document defines the JSON schema for rollup metadata, including all require
     "blockTime": 2,
     "gasLimit": "30000000",
     "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240,
-    "maxTxPerBatch": 1000
+    "outputRootFrequency": 240
   }
 }
 ```
@@ -371,7 +446,6 @@ This document defines the JSON schema for rollup metadata, including all require
 - `gasLimit`: Block gas limit
 - `batchSubmissionFrequency`: Batch submission interval (seconds)
 - `outputRootFrequency`: Output root proposal interval (seconds)
-- `maxTxPerBatch`: Maximum transactions per batch
 
 ## 🔐 Metadata Signature
 
@@ -384,19 +458,18 @@ This document defines the JSON schema for rollup metadata, including all require
 {
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x1234567890abcdef...",
-    "signedBy": "0x1234567890123456789012345678901234567890",
-    "signedAt": "2025-01-01T00:00:00Z",
-    "message": "Tokamak Rollup Registry\nChain ID: 12345\nOperation: register\nTimestamp: 1704067200"
+    "signature": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+    "signedBy": "0x1234567890123456789012345678901234567890"
   }
 }
 ```
 
-**Signature Process:**
-1. Format message exactly as shown
-2. Sign with sequencer private key
-3. Include signature and signer address
-4. Timestamp must be recent (within 24 hours)
+**Required Properties:**
+- `version`: Metadata schema version string
+- `signature`: Ethereum signature (130 characters including 0x prefix)
+- `signedBy`: Address of the sequencer who signed (must match sequencer.address)
+
+> 📖 **For signature details**: See [Registration Guide](registration-guide.md#signature-generation)
 
 ## 📏 Validation Rules
 
@@ -492,9 +565,12 @@ This document defines the JSON schema for rollup metadata, including all require
 
 ```json
 {
-  "chainId": 12345,
+  "l1ChainId": 11155111,
+  "l2ChainId": 12345,
   "name": "My Awesome L2",
   "description": "An innovative L2 solution built with Tokamak SDK",
+  "logo": "https://assets.my-l2.com/logo.png",
+  "website": "https://my-l2.com",
   "rollupType": "optimistic",
   "stack": {
     "name": "thanos",
@@ -503,7 +579,7 @@ This document defines the JSON schema for rollup metadata, including all require
     "documentation": "https://docs.tokamak.network/thanos"
   },
   "rpcUrl": "https://rpc.my-l2.com",
-  "websocketUrl": "wss://ws.my-l2.com",
+  "wsUrl": "wss://ws.my-l2.com",
   "nativeToken": {
     "type": "eth",
     "symbol": "ETH",
@@ -512,6 +588,8 @@ This document defines the JSON schema for rollup metadata, including all require
     "logoUrl": "https://assets.my-l2.com/eth-logo.png"
   },
   "status": "active",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "lastUpdated": "2025-01-01T12:00:00Z",
   "l1Contracts": {
     "systemConfig": "0x1234567890123456789012345678901234567890",
     "l1StandardBridge": "0x2345678901234567890123456789012345678901",
@@ -522,22 +600,20 @@ This document defines the JSON schema for rollup metadata, including all require
     "l1ERC721Bridge": "0x7890123456789012345678901234567890123456",
     "addressManager": "0x8901234567890123456789012345678901234567"
   },
-  "sequencer": {
-    "address": "0x1234567890123456789012345678901234567890",
-    "batcherAddress": "0x2345678901234567890123456789012345678901",
-    "proposerAddress": "0x3456789012345678901234567890123456789012"
-  },
-  "explorer": {
-    "name": "My L2 Explorer",
-    "url": "https://explorer.my-l2.com",
-    "apiUrl": "https://api.explorer.my-l2.com",
-    "standard": "blockscout"
+  "l2Contracts": {
+    "nativeToken": "0xdeaddeaddeaddeaddeaddeaddeaddeaddeaddead",
+    "l2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "l2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "l1Block": "0x4200000000000000000000000000000000000015",
+    "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "gasPriceOracle": "0x420000000000000000000000000000000000000f"
   },
   "bridges": [
     {
       "name": "Native Bridge",
       "type": "native",
       "url": "https://bridge.my-l2.com",
+      "status": "active",
       "supportedTokens": [
         {
           "symbol": "ETH",
@@ -557,13 +633,42 @@ This document defines the JSON schema for rollup metadata, including all require
       ]
     }
   ],
+  "explorers": [
+    {
+      "name": "My L2 Explorer",
+      "url": "https://explorer.my-l2.com",
+      "type": "blockscout",
+      "status": "active",
+      "apiUrl": "https://api.explorer.my-l2.com"
+    }
+  ],
+  "supportResources": {
+    "statusPageUrl": "https://status.my-l2.com",
+    "supportContactUrl": "https://support.my-l2.com",
+    "documentationUrl": "https://docs.my-l2.com",
+    "communityUrl": "https://discord.gg/my-l2",
+    "helpCenterUrl": "https://help.my-l2.com",
+    "announcementUrl": "https://twitter.com/my-l2"
+  },
+  "sequencer": {
+    "address": "0x1234567890123456789012345678901234567890",
+    "batcherAddress": "0x2345678901234567890123456789012345678901",
+    "proposerAddress": "0x3456789012345678901234567890123456789012"
+  },
   "staking": {
     "isCandidate": true,
+    "candidateRegisteredAt": "2024-12-01T00:00:00Z",
     "candidateStatus": "active",
-    "candidateAddress": "0x1234567890123456789012345678901234567890",
-    "votingPower": "1000000000000000000000",
-    "commissionRate": "5.0",
-    "registrationDate": "2025-01-01T00:00:00Z"
+    "registrationTxHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+    "candidateAddress": "0x9876543210987654321098765432109876543210",
+    "rollupConfigAddress": "0x1234567890123456789012345678901234567890",
+    "stakingServiceName": "My Awesome L2 Candidate"
+  },
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "30000000",
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
   },
   "withdrawalConfig": {
     "challengePeriod": 120,
@@ -571,26 +676,12 @@ This document defines the JSON schema for rollup metadata, including all require
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6"
-    },
-    "supportResources": {
-      "statusPageUrl": "https://status.my-l2.com",
-      "supportContactUrl": "https://support.my-l2.com",
-      "explorerWithdrawalGuideUrl": "https://docs.my-l2.com/withdrawals"
     }
-  },
-  "networkConfig": {
-    "blockTime": 2,
-    "gasLimit": "30000000",
-    "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240,
-    "maxTxPerBatch": 1000
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x1234567890abcdef...",
-    "signedBy": "0x1234567890123456789012345678901234567890",
-    "signedAt": "2025-01-01T00:00:00Z",
-    "message": "Tokamak Rollup Registry\nChain ID: 12345\nOperation: register\nTimestamp: 1704067200"
+    "signature": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+    "signedBy": "0x1234567890123456789012345678901234567890"
   }
 }
 ```
@@ -601,3 +692,31 @@ This document defines the JSON schema for rollup metadata, including all require
 - [Validation System](validation-system.md) - Automated validation rules
 - [File Naming](file-naming.md) - Naming conventions and directory structure
 - [Withdrawal Monitoring](withdrawal-monitoring.md) - withdrawalConfig implementation
+
+### Support Resources
+
+#### supportResources
+- **Type**: `object`
+- **Required**: No
+- **Description**: L2 support resources and contact information
+
+```json
+{
+  "supportResources": {
+    "statusPageUrl": "https://status.my-l2.com",
+    "supportContactUrl": "https://support.my-l2.com",
+    "documentationUrl": "https://docs.my-l2.com",
+    "communityUrl": "https://discord.gg/my-l2",
+    "helpCenterUrl": "https://help.my-l2.com",
+    "announcementUrl": "https://twitter.com/my-l2"
+  }
+}
+```
+
+**All Properties Optional:**
+- `statusPageUrl`: Rollup status monitoring page
+- `supportContactUrl`: Support contact (Discord, Telegram, etc.)
+- `documentationUrl`: Official technical documentation
+- `communityUrl`: Community chat or forum
+- `helpCenterUrl`: Help center or FAQ page
+- `announcementUrl`: Official announcements channel

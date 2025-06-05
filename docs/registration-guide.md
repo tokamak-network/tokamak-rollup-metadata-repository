@@ -1,10 +1,10 @@
 # Rollup Registration Guide
 
-A step-by-step guide for registering Tokamak rollup metadata.
+Complete guide for creating and preparing Tokamak rollup metadata files.
 
 ## 🎯 Overview
 
-This guide explains how to register rollup metadata in the Tokamak rollup metadata repository. Registration requires **sequencer signature** and **on-chain verification**.
+This guide covers how to create valid rollup metadata files, including field completion, signature generation, and local validation. For PR submission process, see [PR Process](pr-process.md).
 
 ## 📋 Prerequisites
 
@@ -17,14 +17,13 @@ This guide explains how to register rollup metadata in the Tokamak rollup metada
 ### Environment Setup
 - ✅ Node.js 18+ installed
 - ✅ Git configured
-- ✅ GitHub account with repository access
 
-## 🚀 Step-by-Step Registration
+## 🚀 Metadata Creation Process
 
-### Step 1: Repository Setup
+### Step 1: Environment Setup
 
 ```bash
-# Clone the repository
+# Clone the repository (or work in your fork)
 git clone https://github.com/tokamak-network/tokamak-rollup-metadata-repository.git
 cd tokamak-rollup-metadata-repository
 
@@ -51,46 +50,15 @@ const sequencer = await systemConfig.unsafeBlockSigner();
 
 ### Step 3: Create Metadata File
 
-Create a new metadata file using the SystemConfig address as filename:
-
 ```bash
-# Filename format: {systemConfig_address}.json
-# Example: 0x5678901234567890123456789012345678901234.json
+# 1. Check the schema structure
+cat schemas/rollup-metadata.ts
 
-# Use the interactive generator
-npm run create:metadata
-
-# Or create manually
+# 2. Create your JSON file following the L2RollupMetadata interface
 vim data/sepolia/0x5678901234567890123456789012345678901234.json
 ```
 
-### Step 4: Fill Required Information
-
-Complete all required fields in the metadata:
-
-```json
-{
-  "chainId": 12345,
-  "name": "My Awesome L2",
-  "description": "An innovative L2 solution built with Tokamak SDK",
-  "rollupType": "optimistic",
-  "stack": {
-    "name": "thanos",
-    "version": "1.0.0"
-  },
-  "status": "active",
-  "rpcUrl": "https://rpc.my-l2.com",
-  "nativeToken": {
-    "type": "eth",
-    "symbol": "ETH",
-    "name": "Ethereum",
-    "decimals": 18
-  },
-  // ... other required fields
-}
-```
-
-### Step 5: Generate Sequencer Signature
+### Step 4: Generate Sequencer Signature
 
 Create a signature to prove sequencer ownership:
 
@@ -179,7 +147,7 @@ Add the signature to metadata:
 }
 ```
 
-### Step 6: Local Validation
+### Step 5: Local Validation
 
 Run all validations locally before submitting:
 
@@ -190,32 +158,11 @@ npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
 # Individual validations
 npm run validate:schema data/sepolia/0x5678901234567890123456789012345678901234.json
 npm run validate:onchain data/sepolia/0x5678901234567890123456789012345678901234.json
-npm run validate:signature data/sepolia/0x5678901234567890123456789012345678901234.json
-```
 
-### Step 7: Submit Pull Request
-
-Create a branch and submit PR:
-
-```bash
-# Create branch
-git checkout -b add-rollup-0x5678901234567890123456789012345678901234
-
-# Add and commit
-git add data/sepolia/0x5678901234567890123456789012345678901234.json
-git commit -m "Add rollup metadata for 0x5678901234567890123456789012345678901234"
-
-# Push and create PR
-git push origin add-rollup-0x5678901234567890123456789012345678901234
-```
-
-**PR Title Format:**
-```
-# For new registration
-[Rollup] sepolia - 0x5678901234567890123456789012345678901234 - My Awesome L2
-
-# For metadata updates
-[Update] sepolia - 0x5678901234567890123456789012345678901234 - My Awesome L2
+# Signature validation (choose operation type)
+npm run validate:signature:register data/sepolia/0x5678901234567890123456789012345678901234.json
+# OR for updates:
+# npm run validate:signature:update data/sepolia/0x5678901234567890123456789012345678901234.json
 ```
 
 ## ✅ Validation Checklist
@@ -227,7 +174,7 @@ Before submitting your PR, ensure:
 - [ ] All required fields are populated
 - [ ] JSON is valid and properly formatted
 - [ ] Ethereum addresses are lowercase
-- [ ] URLs are accessible (HTTPS)
+- [ ] URLs are accessible (HTTPS recommended, HTTP allowed)
 
 ### On-Chain Verification
 - [ ] SystemConfig contract exists on specified network
@@ -238,13 +185,11 @@ Before submitting your PR, ensure:
 - [ ] Message follows exact format
 - [ ] Signature is valid and recoverable
 - [ ] Signed by the correct sequencer address
-- [ ] Timestamp is recent (within 24 hours)
 
 ### Metadata Quality
-- [ ] Chain ID is unique and not conflicting
-- [ ] RPC endpoint responds correctly
-- [ ] Bridge and explorer URLs work
-- [ ] Logo image is accessible
+- [ ] RPC endpoint is accessible
+- [ ] Bridge and explorer URLs are valid
+- [ ] Logo image URL is accessible (if provided)
 
 ## 🔧 Advanced Configuration
 
@@ -260,11 +205,6 @@ For withdrawal monitoring, add `withdrawalConfig`:
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x...",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6"
-    },
-    "supportResources": {
-      "statusPageUrl": "https://status.my-l2.com",
-      "supportContactUrl": "https://support.my-l2.com",
-      "explorerWithdrawalGuideUrl": "https://docs.my-l2.com/withdrawals"
     }
   }
 }
@@ -298,17 +238,46 @@ Configure supported tokens for bridge integration:
       "url": "https://bridge.my-l2.com",
       "supportedTokens": [
         {
-          "symbol": "ETH",
-          "l1Address": "0x0000000000000000000000000000000000000000",
-          "l2Address": "0x0000000000000000000000000000000000000000",
+          "symbol": "TON",
+          "l1Address": "0x2be5e8c109e2197D077D13A82dAead6a9b3433C5",
+          "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
           "decimals": 18,
           "isNativeToken": true
+        },
+        {
+          "symbol": "ETH",
+          "l1Address": "0x0000000000000000000000000000000000000000",
+          "l2Address": "0x4200000000000000000000000000000000000006",
+          "decimals": 18,
+          "isWrappedETH": true
         }
       ]
     }
   ]
 }
 ```
+
+## 🔄 Updating Existing Metadata
+
+### When to Update
+Update your rollup metadata when:
+- **Infrastructure changes**: New RPC endpoints, explorers, or bridges
+- **Contract upgrades**: SystemConfig or other contract address changes
+- **Status changes**: Active ↔ Inactive, maintenance mode
+
+> **⚠️ Important**: Only the current on-chain sequencer can submit updates. The sequencer address must match the `unsafeBlockSigner()` result from the SystemConfig contract.
+
+### Update Process
+
+1. **Locate existing file**: Find your current metadata in `data/<network>/<systemConfig>.json`
+2. **Make necessary changes**: Update only the fields that have changed
+3. **Generate new signature**: Use `Operation: update` in the signature message
+4. **Create update PR**: Use `[Update]` prefix in PR title
+5. **Validation**: System validates both new data and signature
+
+### Important Update Rules
+- **SystemConfig address cannot change**: If your SystemConfig changes, it's a new rollup
+- **Chain ID cannot change**: Chain ID is immutable for a rollup
 
 ## 🚨 Common Issues and Solutions
 
@@ -343,27 +312,3 @@ If you encounter issues during registration:
 - [Validation System](validation-system.md) - Understanding validation process
 - [PR Process](pr-process.md) - Pull request submission guidelines
 - [FAQ](faq.md) - Frequently asked questions
-
-## 🔄 Updating Existing Metadata
-
-### When to Update
-Update your rollup metadata when:
-- **Infrastructure changes**: New RPC endpoints, explorers, or bridges
-- **Contract upgrades**: SystemConfig or other contract address changes
-- **Status changes**: Active ↔ Inactive, maintenance mode
-- **Staking changes**: Candidate status, voting power updates
-- **Network configuration**: Block time, gas limits, batch frequencies
-
-### Update Process
-
-1. **Locate existing file**: Find your current metadata in `data/<network>/<systemConfig>.json`
-2. **Make necessary changes**: Update only the fields that have changed
-3. **Generate new signature**: Use `Operation: update` in the signature message
-4. **Create update PR**: Use `[Update]` prefix in PR title
-5. **Validation**: System validates both new data and signature
-
-### Important Update Rules
-- **SystemConfig address cannot change**: If your SystemConfig changes, it's a new rollup
-- **Chain ID cannot change**: Chain ID is immutable for a rollup
-- **Always use new signature**: Each update requires a fresh signature with current timestamp
-- **Maintain sequencer authority**: Only the current on-chain sequencer can submit updates

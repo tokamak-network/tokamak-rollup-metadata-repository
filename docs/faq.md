@@ -55,24 +55,21 @@ If your sequencer address changes:
 3. **Submit update PR**: Include the new signature and sequencer address
 4. **Automatic verification**: The system will verify the new sequencer matches on-chain data
 
-### What networks are supported?
+### What L1 networks are supported?
 
-Currently supported networks:
-- **Mainnet** (Chain ID: 1)
-- **Sepolia** (Chain ID: 11155111)
-- **Holesky** (Chain ID: 17000)
-- **Optimism** (Chain ID: 10)
-- **Base** (Chain ID: 8453)
-- **Arbitrum One** (Chain ID: 42161)
+Currently supported L1 networks for deploying SystemConfig contracts:
+- **Mainnet** (Chain ID: 1) - Ethereum mainnet
+- **Sepolia** (Chain ID: 11155111) - Ethereum testnet
 
-For rollups with Chain ID >= 1000, you can create custom network directories.
+These are the L1 networks where your SystemConfig contract should be deployed. Your L2 rollup can have any Chain ID >= 1000.
 
 ## 📝 Metadata Questions
 
 ### What information is required?
 
 **Required fields:**
-- `chainId`: Unique chain identifier
+- `l1ChainId`: L1 chain identifier (where SystemConfig is deployed)
+- `l2ChainId`: L2 chain identifier (rollup's own chain ID)
 - `name`: Human-readable rollup name
 - `description`: Brief description
 - `rollupType`: "optimistic" or "zk"
@@ -90,14 +87,17 @@ For rollups with Chain ID >= 1000, you can create custom network directories.
 - `withdrawalConfig`: Withdrawal monitoring setup
 - `networkConfig`: Network operation parameters
 
+> 📖 **For detailed field specifications**, see [Metadata Schema](metadata-schema.md)
+
 ### How do I generate the required signature?
 
 ```javascript
 // 1. Format the exact message
 const message = `Tokamak Rollup Registry
-Chain ID: ${chainId}
+L1 Chain ID: ${l1ChainId}
+L2 Chain ID: ${l2ChainId}
 Operation: register
-Timestamp: ${Math.floor(Date.now() / 1000)}`;
+SystemConfig: ${systemConfigAddress.toLowerCase()}`;
 
 // 2. Sign with sequencer private key
 const signature = await wallet.signMessage(message);
@@ -107,20 +107,22 @@ const signature = await wallet.signMessage(message);
   "metadata": {
     "version": "1.0.0",
     "signature": signature,
-    "signedBy": wallet.address,
-    "signedAt": new Date().toISOString(),
-    "message": message
+    "signedBy": wallet.address
   }
 }
 ```
+
+> 📖 **For complete signature guide**, see [Registration Guide - Step 5](registration-guide.md#step-5-generate-sequencer-signature)
 
 ### Can I update my metadata after registration?
 
 Yes, metadata can be updated at any time by:
 1. **Making changes** to your metadata file
-2. **Generating new signature** with updated timestamp
+2. **Generating new signature** with `Operation: update`
 3. **Submitting update PR** with `[Update]` prefix in title
 4. **Passing validation** including sequencer verification
+
+> 📖 **For detailed update process**, see [Registration Guide - Updating Existing Metadata](registration-guide.md#updating-existing-metadata)
 
 ### What is the withdrawal configuration for?
 
@@ -133,16 +135,14 @@ The `withdrawalConfig` enables automatic withdrawal monitoring:
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x...",
       "outputProposedEventTopic": "0x..."
-    },
-    "supportResources": {
-      "statusPageUrl": "https://status.my-l2.com",
-      "supportContactUrl": "https://support.my-l2.com"
     }
   }
 }
 ```
 
 This allows wallets and dApps to provide real-time withdrawal status updates to users.
+
+> 📖 **For withdrawal monitoring details**, see [Withdrawal Monitoring](withdrawal-monitoring.md)
 
 ## 🔄 Process Questions
 
@@ -153,10 +153,8 @@ This allows wallets and dApps to provide real-time withdrawal status updates to 
 - **Merge**: Immediately after validation passes
 - **No manual review required**
 
-**For faster processing:**
-- Ensure all validations pass locally before submitting
-- Include complete and accurate information
-- Follow all guidelines precisely
+
+> 📖 **For complete registration process**, see [Registration Guide](registration-guide.md)
 
 ### What if validation fails?
 
@@ -166,6 +164,8 @@ If validation fails:
 3. **Test locally** using `npm run validate`
 4. **Push updates** to trigger re-validation
 5. **Repeat** until all validations pass
+
+> 📖 **For validation details**, see [Validation System](validation-system.md)
 
 ### Can I submit multiple rollups in one PR?
 
@@ -177,6 +177,8 @@ No, **one PR per rollup** is required. This ensures:
 
 For multiple rollups, submit separate PRs.
 
+> 📖 **For PR guidelines**, see [PR Process](pr-process.md)
+
 ### What if I make a mistake after merging?
 
 If you need to correct information after merging:
@@ -185,18 +187,18 @@ If you need to correct information after merging:
 3. **Include explanation** of what changed and why
 4. **Generate new signature** for the update
 
+> 📖 **For PR title format and process**, see [PR Process](pr-process.md)
+
 ## 🏗️ Integration Questions
 
 ### How does this integrate with Ton Staking V2?
 
 The metadata repository integrates with Ton Staking V2 by:
 - **Using SystemConfig address** as the rollup identifier (called "RollupConfig" in staking)
-- **Providing metadata lookup** for staking interfaces
-- **Displaying rollup information** in staking UI (name, description, status, etc.)
-- **Showing bridge information** for users to access L2 deposits and withdrawals
-- **Providing explorer links** for transaction monitoring and rollup exploration
-- **Tracking staking status** in the `staking` field
-- **Enabling delegation UI** integration
+- **Using candidateAddress** as the actual candidate identifier in staking service
+- **Providing metadata information** in L2 tab where selected rollup details can be displayed
+
+The `candidateAddress` field contains the generated candidate address that is used as the primary identifier for the rollup candidate in the staking system. This address is created during the staking candidate registration process and differs from the SystemConfig address.
 
 **Note**: Metadata registration is separate from staking candidate registration. L2 operators must register as staking candidates through the L1 verification contract separately.
 
@@ -247,6 +249,8 @@ npm install
 npm run validate -- --help
 ```
 
+> 📖 **For complete development setup**, see [Development Setup](development-setup.md)
+
 ### What tools are available for development?
 
 **Validation tools:**
@@ -260,6 +264,8 @@ npm run validate -- --help
 - `npm test` - Run test suite
 - `npm run lint` - Run linting
 - `npm run build` - Build TypeScript
+
+> 📖 **For validation system details**, see [Validation System](validation-system.md)
 
 ### How do I run local validation?
 
@@ -275,6 +281,17 @@ npm run validate:schema data/sepolia/0x1234567890123456789012345678901234567890.
 npm run validate:onchain data/sepolia/0x1234567890123456789012345678901234567890.json
 npm run validate:signature:register data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
+
+> 📖 **For local validation guide**, see [Registration Guide - Step 6](registration-guide.md#step-6-local-validation)
+
+### Why is my file in the wrong directory?
+
+File must be placed based on network:
+- **Check chain ID**: Verify your rollup's chain ID
+- **Use correct network**: Map chain ID to correct network directory
+- **Create custom directory**: For chain ID >= 1000, create descriptive directory name
+
+> 📖 **For file naming rules**, see [File Naming](file-naming.md)
 
 ### How do I contribute to the tooling?
 
@@ -294,13 +311,17 @@ Common causes:
 - **RPC issues**: Check RPC URL and network connectivity
 - **Wrong network**: Verify you're calling the contract on the correct network
 
+> 📖 **For validation details**, see [Validation System](validation-system.md)
+
 ### Why is signature verification failing?
 
 Common causes:
 - **Wrong message format**: Use exact format specified in docs
 - **Incorrect signer**: Must sign with sequencer private key
-- **Expired timestamp**: Signature must be within 24 hours
 - **Invalid signature format**: Ensure signature is valid hex string
+- **Sequencer mismatch**: Signer must match on-chain sequencer address
+
+> 📖 **For signature generation guide**, see [Registration Guide - Step 5](registration-guide.md#step-5-generate-sequencer-signature)
 
 ### Why is my file in the wrong directory?
 
@@ -308,6 +329,8 @@ File must be placed based on network:
 - **Check chain ID**: Verify your rollup's chain ID
 - **Use correct network**: Map chain ID to correct network directory
 - **Create custom directory**: For chain ID >= 1000, create descriptive directory name
+
+> 📖 **For file naming rules**, see [File Naming](file-naming.md)
 
 ### How do I fix filename errors?
 
@@ -321,13 +344,7 @@ rollup-12345.json
 0x1234567890123456789012345678901234567890.json
 ```
 
-### What if my RPC endpoint is slow?
-
-If RPC validation times out:
-- **Optimize RPC performance**: Use faster RPC provider
-- **Check network issues**: Verify connectivity to your RPC
-- **Increase timeout**: Set longer timeout in validation
-- **Use backup RPC**: Configure alternative RPC endpoints
+> 📖 **For complete naming conventions**, see [File Naming](file-naming.md)
 
 ## 📋 Best Practices
 
