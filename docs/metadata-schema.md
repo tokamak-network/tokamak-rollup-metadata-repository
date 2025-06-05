@@ -154,7 +154,8 @@ This document defines the JSON schema for rollup metadata, including all require
     "name": "thanos",
     "version": "1.0.0",
     "commit": "abc123def456",
-    "documentation": "https://docs.tokamak.network/thanos"
+    "documentation": "https://docs.tokamak.network/thanos",
+    "zkProofSystem": "plonk"
   }
 }
 ```
@@ -164,6 +165,7 @@ This document defines the JSON schema for rollup metadata, including all require
 - `version`: Semantic version string
 - `commit`: Git commit hash (optional)
 - `documentation`: Link to stack documentation (optional)
+- `zkProofSystem`: ZK proof system type (`"plonk"`, `"stark"`, `"groth16"`, `"fflonk"`) - for future ZK rollups
 
 ### Network Configuration
 
@@ -203,14 +205,21 @@ This document defines the JSON schema for rollup metadata, including all require
     "symbol": "ETH",
     "name": "Ethereum",
     "decimals": 18,
-    "logoUrl": "https://assets.my-l2.com/eth-logo.png"
+    "l1Address": "0x0000000000000000000000000000000000000000",
+    "logoUrl": "https://assets.my-l2.com/eth-logo.png",
+    "coingeckoId": "ethereum"
   }
 }
 ```
 
-**Supported Types:**
-- `"eth"`: Native ETH
-- `"erc20"`: Custom ERC20 token
+**Native Token Properties:**
+- `type`: Token type (`"eth"` or `"erc20"`)
+- `symbol`: Token symbol (ETH, TON, USDC)
+- `name`: Full token name
+- `decimals`: Decimal places (usually 18 for ETH, 6 for USDC)
+- `l1Address`: L1 contract address (required for ERC20 type)
+- `logoUrl`: Token logo URL (optional)
+- `coingeckoId`: CoinGecko ID for price data (optional)
 
 ## 🏗️ Contract Information
 
@@ -231,7 +240,12 @@ This document defines the JSON schema for rollup metadata, including all require
     "disputeGameFactory": "0x5678901234567890123456789012345678901234",
     "l1CrossDomainMessenger": "0x6789012345678901234567890123456789012345",
     "l1ERC721Bridge": "0x7890123456789012345678901234567890123456",
-    "addressManager": "0x8901234567890123456789012345678901234567"
+    "addressManager": "0x8901234567890123456789012345678901234567",
+    "optimismMintableERC20Factory": "0x9012345678901234567890123456789012345678",
+    "optimismMintableERC721Factory": "0xa123456789012345678901234567890123456789",
+    "superchainConfig": "0xb234567890123456789012345678901234567890",
+    "l1UsdcBridge": "0xc345678901234567890123456789012345678901",
+    "l1Usdc": "0xd456789012345678901234567890123456789012"
   }
 }
 ```
@@ -243,6 +257,12 @@ This document defines the JSON schema for rollup metadata, including all require
 - `l1StandardBridge`, `optimismPortal`, `l2OutputOracle`: Optimistic rollup contracts
 - `disputeGameFactory`, `l1CrossDomainMessenger`, `l1ERC721Bridge`: Bridge contracts
 - `addressManager`: Legacy address manager
+- `optimismMintableERC20Factory`, `optimismMintableERC721Factory`: Token factory contracts
+- `superchainConfig`: Superchain configuration contract
+- `l1UsdcBridge`, `l1Usdc`: USDC bridge contracts
+- `zkVerifier`, `rollupProcessor`, `exitRoot`: ZK rollup contracts (future use)
+- `globalExitRootManager`, `polygonDataCommittee`: Polygon-style contracts (future use)
+- `rollupManager`, `proxyAdmin`: Common rollup contracts
 
 ### L2 Contracts
 
@@ -259,7 +279,18 @@ This document defines the JSON schema for rollup metadata, including all require
     "l2StandardBridge": "0x4200000000000000000000000000000000000010",
     "l1Block": "0x4200000000000000000000000000000000000015",
     "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
-    "gasPriceOracle": "0x420000000000000000000000000000000000000f"
+    "gasPriceOracle": "0x420000000000000000000000000000000000000f",
+    "l2ERC721Bridge": "0x4200000000000000000000000000000000000014",
+    "l1FeeVault": "0x4200000000000000000000000000000000000011",
+    "sequencerFeeVault": "0x4200000000000000000000000000000000000012",
+    "baseFeeVault": "0x4200000000000000000000000000000000000019",
+    "l2UsdcBridge": "0x4200000000000000000000000000000000000018",
+    "l2Usdc": "0x4200000000000000000000000000000000000017",
+    "wrappedETH": "0x4200000000000000000000000000000000000006",
+    "polygonZkEVMBridge": "0x4200000000000000000000000000000000000005",
+    "polygonZkEVMGlobalExitRoot": "0x4200000000000000000000000000000000000004",
+    "multicall": "0x4200000000000000000000000000000000000003",
+    "create2Deployer": "0x4200000000000000000000000000000000000002"
   }
 }
 ```
@@ -271,7 +302,12 @@ This document defines the JSON schema for rollup metadata, including all require
 - `l2CrossDomainMessenger`, `l2StandardBridge`: L2 bridge contracts
 - `l1Block`, `l2ToL1MessagePasser`: L2 system contracts
 - `gasPriceOracle`: Gas price management contract
-- `wrappedETH`: ETH wrapped as ERC20 (when native token is ERC20)
+- `l2ERC721Bridge`: NFT bridge contract
+- `l1FeeVault`, `sequencerFeeVault`, `baseFeeVault`: Fee collection contracts
+- `l2UsdcBridge`, `l2Usdc`: USDC bridge contracts
+- `wrappedETH`: ETH wrapped as ERC20 address (when native token is ERC20)
+- `polygonZkEVMBridge`, `polygonZkEVMGlobalExitRoot`: ZK rollup contracts (future use)
+- `multicall`, `create2Deployer`: Common utility contracts
 
 ### Sequencer Information
 
@@ -285,15 +321,19 @@ This document defines the JSON schema for rollup metadata, including all require
   "sequencer": {
     "address": "0x1234567890123456789012345678901234567890",
     "batcherAddress": "0x2345678901234567890123456789012345678901",
-    "proposerAddress": "0x3456789012345678901234567890123456789012"
+    "proposerAddress": "0x3456789012345678901234567890123456789012",
+    "aggregatorAddress": "0x4567890123456789012345678901234567890123",
+    "trustedSequencer": "0x5678901234567890123456789012345678901234"
   }
 }
 ```
 
-**Properties:**
+**Sequencer Properties:**
 - `address`: Current sequencer address (must match SystemConfig.unsafeBlockSigner())
-- `batcherAddress`: Address that submits batches to L1 (optional)
-- `proposerAddress`: Address that proposes L2 output roots (optional)
+- `batcherAddress`: Address that submits batches to L1 (optional, for optimistic rollups)
+- `proposerAddress`: Address that proposes L2 output roots (optional, for optimistic rollups)
+- `aggregatorAddress`: Aggregator address (optional, for future ZK rollups)
+- `trustedSequencer`: Trusted sequencer address (optional, for future ZK rollups)
 
 ## 🌉 Bridge and Explorer
 
@@ -323,6 +363,13 @@ This document defines the JSON schema for rollup metadata, including all require
 - `"etherscan"`: Etherscan-compatible
 - `"custom"`: Custom explorer implementation
 
+**Explorer Properties:**
+- `name`: Explorer display name
+- `url`: Explorer website URL
+- `type`: Explorer type
+- `status`: Operational status (`"active"`, `"inactive"`, `"maintenance"`, `"none"`)
+- `apiUrl`: API endpoint URL (optional)
+
 ### Bridges
 
 #### bridges
@@ -344,7 +391,8 @@ This document defines the JSON schema for rollup metadata, including all require
           "l1Address": "0x0000000000000000000000000000000000000000",
           "l2Address": "0x0000000000000000000000000000000000000000",
           "decimals": 18,
-          "isNativeToken": true
+          "isNativeToken": true,
+          "isWrappedETH": false
         },
         {
           "symbol": "USDC",
@@ -352,6 +400,7 @@ This document defines the JSON schema for rollup metadata, including all require
           "l2Address": "0xb1c75e89fc0c2e4b8e6d9f3b4a5c7b8f12e4d6c3",
           "decimals": 6,
           "isNativeToken": false,
+          "isWrappedETH": false,
           "logoUrl": "https://assets.my-l2.com/usdc-logo.png"
         }
       ]
@@ -362,8 +411,23 @@ This document defines the JSON schema for rollup metadata, including all require
 
 **Bridge Types:**
 - `"native"`: Standard Optimism bridge
+- `"canonical"`: Canonical bridge protocol
 - `"third-party"`: External bridge protocol
-- `"nft"`: NFT-specific bridge
+
+**Bridge Properties:**
+- `name`: Bridge display name
+- `type`: Bridge protocol type (`"native"`, `"canonical"`, `"third-party"`)
+- `url`: Bridge interface URL
+- `status`: Operational status (`"active"`, `"inactive"`, `"maintenance"`, `"none"`)
+
+**Supported Token Properties:**
+- `symbol`: Token symbol (ETH, USDC, etc.)
+- `l1Address`: L1 token address (0x0000... for ETH)
+- `l2Address`: L2 token address
+- `decimals`: Token decimal places
+- `isNativeToken`: Whether it's the L2's native token
+- `isWrappedETH`: Whether ETH is wrapped as ERC20 token
+- `logoUrl`: Token logo URL (optional)
 
 ## 💰 Staking Information
 
@@ -435,17 +499,27 @@ This document defines the JSON schema for rollup metadata, including all require
   "networkConfig": {
     "blockTime": 2,
     "gasLimit": "30000000",
+    "baseFeePerGas": "1000000000",
+    "priorityFeePerGas": "1000000000",
     "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240
+    "outputRootFrequency": 240,
+    "batchTimeout": 3600,
+    "trustedAggregatorTimeout": 7200,
+    "forceBatchTimeout": 86400
   }
 }
 ```
 
-**Parameters:**
+**Network Configuration Properties:**
 - `blockTime`: L2 block time in seconds
 - `gasLimit`: Block gas limit
-- `batchSubmissionFrequency`: Batch submission interval (seconds)
-- `outputRootFrequency`: Output root proposal interval (seconds)
+- `baseFeePerGas`: Base fee per gas (optional)
+- `priorityFeePerGas`: Priority fee per gas (optional)
+- `batchSubmissionFrequency`: Batch submission interval in seconds (optional, default: 1440s)
+- `outputRootFrequency`: Output root proposal interval in seconds (optional, default: 240s)
+- `batchTimeout`: ZK batch timeout in seconds (optional, for future ZK rollups)
+- `trustedAggregatorTimeout`: Trusted aggregator timeout in seconds (optional, for future ZK rollups)
+- `forceBatchTimeout`: Force batch timeout in seconds (optional, for future ZK rollups)
 
 ## 🔐 Metadata Signature
 
@@ -576,7 +650,8 @@ This document defines the JSON schema for rollup metadata, including all require
     "name": "thanos",
     "version": "1.0.0",
     "commit": "abc123def456",
-    "documentation": "https://docs.tokamak.network/thanos"
+    "documentation": "https://docs.tokamak.network/thanos",
+    "zkProofSystem": "plonk"
   },
   "rpcUrl": "https://rpc.my-l2.com",
   "wsUrl": "wss://ws.my-l2.com",
@@ -585,7 +660,9 @@ This document defines the JSON schema for rollup metadata, including all require
     "symbol": "ETH",
     "name": "Ethereum",
     "decimals": 18,
-    "logoUrl": "https://assets.my-l2.com/eth-logo.png"
+    "l1Address": "0x0000000000000000000000000000000000000000",
+    "logoUrl": "https://assets.my-l2.com/eth-logo.png",
+    "coingeckoId": "ethereum"
   },
   "status": "active",
   "createdAt": "2025-01-01T00:00:00Z",
@@ -598,7 +675,12 @@ This document defines the JSON schema for rollup metadata, including all require
     "disputeGameFactory": "0x5678901234567890123456789012345678901234",
     "l1CrossDomainMessenger": "0x6789012345678901234567890123456789012345",
     "l1ERC721Bridge": "0x7890123456789012345678901234567890123456",
-    "addressManager": "0x8901234567890123456789012345678901234567"
+    "addressManager": "0x8901234567890123456789012345678901234567",
+    "optimismMintableERC20Factory": "0x9012345678901234567890123456789012345678",
+    "optimismMintableERC721Factory": "0xa123456789012345678901234567890123456789",
+    "superchainConfig": "0xb234567890123456789012345678901234567890",
+    "l1UsdcBridge": "0xc345678901234567890123456789012345678901",
+    "l1Usdc": "0xd456789012345678901234567890123456789012"
   },
   "l2Contracts": {
     "nativeToken": "0xdeaddeaddeaddeaddeaddeaddeaddeaddeaddead",
@@ -606,7 +688,18 @@ This document defines the JSON schema for rollup metadata, including all require
     "l2StandardBridge": "0x4200000000000000000000000000000000000010",
     "l1Block": "0x4200000000000000000000000000000000000015",
     "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
-    "gasPriceOracle": "0x420000000000000000000000000000000000000f"
+    "gasPriceOracle": "0x420000000000000000000000000000000000000f",
+    "l2ERC721Bridge": "0x4200000000000000000000000000000000000014",
+    "l1FeeVault": "0x4200000000000000000000000000000000000011",
+    "sequencerFeeVault": "0x4200000000000000000000000000000000000012",
+    "baseFeeVault": "0x4200000000000000000000000000000000000019",
+    "l2UsdcBridge": "0x4200000000000000000000000000000000000018",
+    "l2Usdc": "0x4200000000000000000000000000000000000017",
+    "wrappedETH": "0x4200000000000000000000000000000000000006",
+    "polygonZkEVMBridge": "0x4200000000000000000000000000000000000005",
+    "polygonZkEVMGlobalExitRoot": "0x4200000000000000000000000000000000000004",
+    "multicall": "0x4200000000000000000000000000000000000003",
+    "create2Deployer": "0x4200000000000000000000000000000000000002"
   },
   "bridges": [
     {
@@ -620,7 +713,8 @@ This document defines the JSON schema for rollup metadata, including all require
           "l1Address": "0x0000000000000000000000000000000000000000",
           "l2Address": "0x0000000000000000000000000000000000000000",
           "decimals": 18,
-          "isNativeToken": true
+          "isNativeToken": true,
+          "isWrappedETH": false
         },
         {
           "symbol": "USDC",
@@ -628,6 +722,7 @@ This document defines the JSON schema for rollup metadata, including all require
           "l2Address": "0xb1c75e89fc0c2e4b8e6d9f3b4a5c7b8f12e4d6c3",
           "decimals": 6,
           "isNativeToken": false,
+          "isWrappedETH": false,
           "logoUrl": "https://assets.my-l2.com/usdc-logo.png"
         }
       ]
@@ -653,7 +748,9 @@ This document defines the JSON schema for rollup metadata, including all require
   "sequencer": {
     "address": "0x1234567890123456789012345678901234567890",
     "batcherAddress": "0x2345678901234567890123456789012345678901",
-    "proposerAddress": "0x3456789012345678901234567890123456789012"
+    "proposerAddress": "0x3456789012345678901234567890123456789012",
+    "aggregatorAddress": "0x4567890123456789012345678901234567890123",
+    "trustedSequencer": "0x5678901234567890123456789012345678901234"
   },
   "staking": {
     "isCandidate": true,
@@ -667,8 +764,13 @@ This document defines the JSON schema for rollup metadata, including all require
   "networkConfig": {
     "blockTime": 2,
     "gasLimit": "30000000",
+    "baseFeePerGas": "1000000000",
+    "priorityFeePerGas": "1000000000",
     "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240
+    "outputRootFrequency": 240,
+    "batchTimeout": 3600,
+    "trustedAggregatorTimeout": 7200,
+    "forceBatchTimeout": 86400
   },
   "withdrawalConfig": {
     "challengePeriod": 120,
@@ -692,31 +794,3 @@ This document defines the JSON schema for rollup metadata, including all require
 - [Validation System](validation-system.md) - Automated validation rules
 - [File Naming](file-naming.md) - Naming conventions and directory structure
 - [Withdrawal Monitoring](withdrawal-monitoring.md) - withdrawalConfig implementation
-
-### Support Resources
-
-#### supportResources
-- **Type**: `object`
-- **Required**: No
-- **Description**: L2 support resources and contact information
-
-```json
-{
-  "supportResources": {
-    "statusPageUrl": "https://status.my-l2.com",
-    "supportContactUrl": "https://support.my-l2.com",
-    "documentationUrl": "https://docs.my-l2.com",
-    "communityUrl": "https://discord.gg/my-l2",
-    "helpCenterUrl": "https://help.my-l2.com",
-    "announcementUrl": "https://twitter.com/my-l2"
-  }
-}
-```
-
-**All Properties Optional:**
-- `statusPageUrl`: Rollup status monitoring page
-- `supportContactUrl`: Support contact (Discord, Telegram, etc.)
-- `documentationUrl`: Official technical documentation
-- `communityUrl`: Community chat or forum
-- `helpCenterUrl`: Help center or FAQ page
-- `announcementUrl`: Official announcements channel
