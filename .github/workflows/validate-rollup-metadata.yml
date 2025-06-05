@@ -5,6 +5,22 @@ on:
     branches: [ main ]
     paths:
       - 'data/**/*.json'
+  # 수동 실행을 위한 이벤트 추가
+  workflow_dispatch:
+    inputs:
+      file_path:
+        description: 'Path to the rollup metadata file to validate (e.g., data/sepolia/0x1234567890123456789012345678901234567890.json)'
+        required: true
+        type: string
+      pr_title:
+        description: 'PR title to simulate for validation (e.g., [Rollup] sepolia 0x1234567890123456789012345678901234567890 - My L2)'
+        required: true
+        type: string
+      skip_auto_merge:
+        description: 'Skip auto-merge step (useful for testing)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   validate:
@@ -27,26 +43,50 @@ jobs:
 
     - name: Get changed files
       id: changed-files
+      if: github.event_name == 'pull_request'
       uses: tj-actions/changed-files@v40
       with:
         files: |
           data/**/*.json
 
-    - name: Check if only one rollup file was changed
-      if: steps.changed-files.outputs.any_changed == 'true'
+    - name: Set files for manual execution
+      if: github.event_name == 'workflow_dispatch'
       run: |
-        file_count=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | wc -w)
-        if [ $file_count -ne 1 ]; then
-          echo "❌ Error: Only one rollup metadata file should be changed per PR. Found $file_count files."
-          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-          exit 1
+        echo "Setting file for manual execution: ${{ github.event.inputs.file_path }}"
+        echo "any_changed=true" >> $GITHUB_OUTPUT
+        echo "all_changed_files=${{ github.event.inputs.file_path }}" >> $GITHUB_OUTPUT
+      id: manual-files
+
+    - name: Check if only one rollup file was changed
+      if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          # 수동 실행의 경우 파일 존재 여부만 확인
+          if [ ! -f "${{ github.event.inputs.file_path }}" ]; then
+            echo "❌ Error: File does not exist: ${{ github.event.inputs.file_path }}"
+            exit 1
+          fi
+          echo "✅ Manual execution - validating single file: ${{ github.event.inputs.file_path }}"
+        else
+          # PR의 경우 기존 로직 유지
+          file_count=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | wc -w)
+          if [ $file_count -ne 1 ]; then
+            echo "❌ Error: Only one rollup metadata file should be changed per PR. Found $file_count files."
+            echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+            exit 1
+          fi
+          echo "✅ Only one rollup metadata file was changed."
         fi
-        echo "✅ Only one rollup metadata file was changed."
 
     - name: Validate PR title format
       run: |
-        PR_TITLE="${{ github.event.pull_request.title }}"
-        echo "PR Title: $PR_TITLE"
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          PR_TITLE="${{ github.event.inputs.pr_title }}"
+          echo "Manual execution - using provided PR title: $PR_TITLE"
+        else
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+        fi
 
         # PR 제목 형식: [Rollup] <network> <systemConfig_address> - <rollup_name> 또는 [Update] <network> <systemConfig_address> - <rollup_name>
         if [[ ! "$PR_TITLE" =~ ^\[(Rollup|Update)\]\ (mainnet|sepolia)\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
@@ -69,13 +109,23 @@ jobs:
         echo "✅ PR title format is correct."
 
     - name: Validate rollup metadata with onchain verification
-      if: steps.changed-files.outputs.any_changed == 'true'
+      if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
       run: |
         echo "🔍 Starting comprehensive rollup metadata validation..."
-        echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
 
-        PR_TITLE="${{ github.event.pull_request.title }}"
-        echo "PR Title: $PR_TITLE"
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          FILES="${{ github.event.inputs.file_path }}"
+          PR_TITLE="${{ github.event.inputs.pr_title }}"
+          echo "Manual execution mode"
+          echo "File to validate: $FILES"
+          echo "PR Title: $PR_TITLE"
+        else
+          FILES="${{ steps.changed-files.outputs.all_changed_files }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR mode"
+          echo "Changed files: $FILES"
+          echo "PR Title: $PR_TITLE"
+        fi
 
         # Extract operation type from PR title for display
         if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
@@ -89,8 +139,8 @@ jobs:
 
         echo "Operation type: $OPERATION"
 
-        # 변경된 파일들에 대해 통합 검증 실행
-        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+        # 파일들에 대해 통합 검증 실행
+        for file in $FILES; do
           echo ""
           echo "📋 Validating $file..."
           echo "  ├── JSON schema validation"
@@ -116,8 +166,37 @@ jobs:
         echo ""
         echo "🎉 All rollup metadata validations completed successfully!"
 
+    - name: Auto-merge PR
+      if: success() && github.event_name == 'pull_request' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_auto_merge != 'true')
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          console.log("🚀 All validations passed! Auto-merging PR...");
+
+          try {
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              commit_title: "Auto-merge: " + context.payload.pull_request.title,
+              commit_message: "✅ All validations passed\n\n" +
+                             "- Schema validation: ✅\n" +
+                             "- On-chain verification: ✅\n" +
+                             "- Signature verification: ✅\n" +
+                             "- All security checks: ✅\n\n" +
+                             "Automatically merged by GitHub Actions after successful validation.",
+              merge_method: "squash"
+            });
+
+            console.log("✅ PR successfully merged!");
+          } catch (error) {
+            console.error("❌ Auto-merge failed:", error.message);
+            throw error;
+          }
+
     - name: Comment on PR
-      if: always()
+      if: always() && github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
         script: |
@@ -184,3 +263,23 @@ jobs:
             issue_number: context.issue.number,
             body: message
           });
+
+    - name: Manual execution summary
+      if: always() && github.event_name == 'workflow_dispatch'
+      run: |
+        echo "## 🎯 Manual Validation Summary"
+        echo ""
+        echo "**File validated:** ${{ github.event.inputs.file_path }}"
+        echo "**PR Title used:** ${{ github.event.inputs.pr_title }}"
+        echo "**Validation result:** ${{ job.status }}"
+        echo "**Auto-merge skipped:** ${{ github.event.inputs.skip_auto_merge }}"
+        echo ""
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "✅ **All validations passed!**"
+          echo ""
+          echo "The rollup metadata file has been successfully validated and is ready for submission via PR."
+        else
+          echo "❌ **Validation failed.**"
+          echo ""
+          echo "Please check the errors above and fix them before submitting a PR."
+        fi
