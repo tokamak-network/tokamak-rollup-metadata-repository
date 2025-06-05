@@ -457,9 +457,9 @@ describe('RollupMetadataValidator', () => {
     });
   });
 
-  describe('File Existence Validation for Operations', () => {
+  describe('File Existence Validation', () => {
     const fs = require('fs');
-    const testFilePath = './test-temp-rollup.json';
+    const testFilePath = './test-rollup-file-existence.json';
 
     afterEach(() => {
       // Clean up test files
@@ -468,44 +468,31 @@ describe('RollupMetadataValidator', () => {
       }
     });
 
-    test('should pass register operation when file does not exist', () => {
-      // Ensure file doesn't exist
+    test('should always pass - file existence validation is handled by GitHub Actions', () => {
+      // File existence validation is now handled by GitHub Actions
+      // which properly compares with the main branch to determine operation type.
+      // This validation method is kept for API compatibility but always returns true.
+
+      // Test with non-existent file and register operation
       if (fs.existsSync(testFilePath)) {
         fs.unlinkSync(testFilePath);
       }
+      const result1 = validator.validateFileExistenceForOperation(testFilePath, 'register');
+      expect(result1.valid).toBe(true);
 
-      const result = validator.validateFileExistenceForOperation(testFilePath, 'register');
-      expect(result.valid).toBe(true);
-    });
-
-    test('should fail register operation when file already exists', () => {
-      // Create test file
+      // Test with existing file and register operation
       fs.writeFileSync(testFilePath, JSON.stringify({ test: 'data' }));
+      const result2 = validator.validateFileExistenceForOperation(testFilePath, 'register');
+      expect(result2.valid).toBe(true);
 
-      const result = validator.validateFileExistenceForOperation(testFilePath, 'register');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('File already exists');
-      expect(result.error).toContain('Use [Update] operation');
-    });
+      // Test with existing file and update operation
+      const result3 = validator.validateFileExistenceForOperation(testFilePath, 'update');
+      expect(result3.valid).toBe(true);
 
-    test('should pass update operation when file exists', () => {
-      // Create test file
-      fs.writeFileSync(testFilePath, JSON.stringify({ test: 'data' }));
-
-      const result = validator.validateFileExistenceForOperation(testFilePath, 'update');
-      expect(result.valid).toBe(true);
-    });
-
-    test('should fail update operation when file does not exist', () => {
-      // Ensure file doesn't exist
-      if (fs.existsSync(testFilePath)) {
-        fs.unlinkSync(testFilePath);
-      }
-
-      const result = validator.validateFileExistenceForOperation(testFilePath, 'update');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('File does not exist');
-      expect(result.error).toContain('Use [Rollup] operation');
+      // Test with non-existent file and update operation
+      fs.unlinkSync(testFilePath);
+      const result4 = validator.validateFileExistenceForOperation(testFilePath, 'update');
+      expect(result4.valid).toBe(true);
     });
   });
 

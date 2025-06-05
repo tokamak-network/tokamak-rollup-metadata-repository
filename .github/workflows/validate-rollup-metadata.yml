@@ -55,30 +55,64 @@ jobs:
         echo "Setting file for manual execution: ${{ github.event.inputs.file_path }}"
         echo "any_changed=true" >> $GITHUB_OUTPUT
         echo "all_changed_files=${{ github.event.inputs.file_path }}" >> $GITHUB_OUTPUT
+        # For manual execution, check if file exists in main branch
+        if git show main:"${{ github.event.inputs.file_path }}" >/dev/null 2>&1; then
+          echo "all_modified_files=${{ github.event.inputs.file_path }}" >> $GITHUB_OUTPUT
+          echo "added_files=" >> $GITHUB_OUTPUT
+          echo "File exists in main branch - treating as modification"
+        else
+          echo "added_files=${{ github.event.inputs.file_path }}" >> $GITHUB_OUTPUT
+          echo "all_modified_files=" >> $GITHUB_OUTPUT
+          echo "File doesn't exist in main branch - treating as addition"
+        fi
       id: manual-files
 
-    - name: Check if only one rollup file was changed
+    - name: Check file changes and validate operation type
       if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
       run: |
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          # 수동 실행의 경우 파일 존재 여부만 확인
-          if [ ! -f "${{ github.event.inputs.file_path }}" ]; then
-            echo "❌ Error: File does not exist: ${{ github.event.inputs.file_path }}"
-            exit 1
-          fi
-          echo "✅ Manual execution - validating single file: ${{ github.event.inputs.file_path }}"
+          # Manual execution - use manually determined values
+          ADDED_FILES="${{ steps.manual-files.outputs.added_files }}"
+          MODIFIED_FILES="${{ steps.manual-files.outputs.all_modified_files }}"
+          ALL_FILES="${{ github.event.inputs.file_path }}"
         else
-          # PR의 경우 기존 로직 유지
-          file_count=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | wc -w)
-          if [ $file_count -ne 1 ]; then
-            echo "❌ Error: Only one rollup metadata file should be changed per PR. Found $file_count files."
-            echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-            exit 1
-          fi
-          echo "✅ Only one rollup metadata file was changed."
+          # PR execution - use changed-files action outputs (compares with main branch)
+          ADDED_FILES="${{ steps.changed-files.outputs.added_files }}"
+          MODIFIED_FILES="${{ steps.changed-files.outputs.modified_files }}"
+          ALL_FILES="${{ steps.changed-files.outputs.all_changed_files }}"
         fi
 
-    - name: Validate PR title format
+        echo "Added files (new in this PR): $ADDED_FILES"
+        echo "Modified files (exist in main): $MODIFIED_FILES"
+        echo "All changed files: $ALL_FILES"
+
+        # Count total changed files
+        file_count=$(echo "$ALL_FILES" | wc -w)
+        if [ $file_count -ne 1 ]; then
+          echo "❌ Error: Only one rollup metadata file should be changed per PR. Found $file_count files."
+          echo "Changed files: $ALL_FILES"
+          exit 1
+        fi
+
+        # Determine expected operation based on file change type (compared to main branch)
+        if [ -n "$ADDED_FILES" ] && [ -z "$MODIFIED_FILES" ]; then
+          echo "EXPECTED_OPERATION=register" >> $GITHUB_OUTPUT
+          echo "FILE_CHANGE_TYPE=added" >> $GITHUB_OUTPUT
+          echo "✅ New file detected (not in main branch) - expecting [Rollup] operation"
+        elif [ -z "$ADDED_FILES" ] && [ -n "$MODIFIED_FILES" ]; then
+          echo "EXPECTED_OPERATION=update" >> $GITHUB_OUTPUT
+          echo "FILE_CHANGE_TYPE=modified" >> $GITHUB_OUTPUT
+          echo "✅ Modified file detected (exists in main branch) - expecting [Update] operation"
+        else
+          echo "❌ Error: Cannot determine file change type"
+          echo "Added files: $ADDED_FILES"
+          echo "Modified files: $MODIFIED_FILES"
+          echo "This shouldn't happen - please check the file changes"
+          exit 1
+        fi
+      id: file-analysis
+
+    - name: Validate PR title format and operation consistency
       run: |
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           PR_TITLE="${{ github.event.inputs.pr_title }}"
@@ -99,14 +133,34 @@ jobs:
           exit 1
         fi
 
-        # Extract operation type for later use
+        # Extract operation type from PR title
         if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
-          echo "operation=register" >> $GITHUB_OUTPUT
+          PR_OPERATION="register"
         elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
-          echo "operation=update" >> $GITHUB_OUTPUT
+          PR_OPERATION="update"
         fi
 
-        echo "✅ PR title format is correct."
+        # Validate operation consistency with file changes
+        EXPECTED_OPERATION="${{ steps.file-analysis.outputs.EXPECTED_OPERATION }}"
+        FILE_CHANGE_TYPE="${{ steps.file-analysis.outputs.FILE_CHANGE_TYPE }}"
+
+        if [ "$PR_OPERATION" != "$EXPECTED_OPERATION" ]; then
+          echo "❌ Error: PR title operation doesn't match file change type"
+          echo "File change type: $FILE_CHANGE_TYPE"
+          echo "Expected operation: [$EXPECTED_OPERATION] (use [Rollup] for new files, [Update] for modified files)"
+          echo "PR title operation: [$PR_OPERATION]"
+          echo ""
+          echo "Fix by using the correct operation in your PR title:"
+          if [ "$EXPECTED_OPERATION" = "register" ]; then
+            echo "Use: [Rollup] <network> <address> - <name> (for new rollup registration)"
+          else
+            echo "Use: [Update] <network> <address> - <name> (for updating existing rollup)"
+          fi
+          exit 1
+        fi
+
+        echo "operation=$PR_OPERATION" >> $GITHUB_OUTPUT
+        echo "✅ PR title format and operation consistency validated"
 
     - name: Validate rollup metadata with onchain verification
       if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'

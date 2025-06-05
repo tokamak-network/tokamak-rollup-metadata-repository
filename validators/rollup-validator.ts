@@ -730,24 +730,17 @@ export class RollupMetadataValidator {
     filepath: string,
     operation: 'register' | 'update',
   ): { valid: boolean; error?: string } {
-    const fs = require('fs');
-    const fileExists = fs.existsSync(filepath);
+    // Note: File existence validation is now handled by GitHub Actions
+    // which properly compares with the main branch to determine if a file
+    // is newly added (register) or modified (update).
+    //
+    // This validation is kept for compatibility but should not fail
+    // based on local filesystem state since that creates a catch-22
+    // where new rollups cannot be registered.
 
-    if (operation === 'register') {
-      if (fileExists) {
-        return {
-          valid: false,
-          error: `Register operation failed: File already exists at ${filepath}. Use [Update] operation for existing rollups.`,
-        };
-      }
-    } else if (operation === 'update') {
-      if (!fileExists) {
-        return {
-          valid: false,
-          error: `Update operation failed: File does not exist at ${filepath}. Use [Rollup] operation for new rollups.`,
-        };
-      }
-    }
+    // Keep parameters for API compatibility
+    void filepath;
+    void operation;
 
     return { valid: true };
   }

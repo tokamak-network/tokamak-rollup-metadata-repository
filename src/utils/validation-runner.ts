@@ -33,14 +33,14 @@ export interface ValidationResult {
  */
 export async function validateRollupFile(
   filepath: string,
-  options: ValidationOptions = {}
+  options: ValidationOptions = {},
 ): Promise<ValidationResult> {
   const result: ValidationResult = {
     valid: false,
     errors: [],
     warnings: [],
     fileInfo: { filepath: '', filename: '', network: '' },
-    rpcInfo: { url: '', isCustom: false }
+    rpcInfo: { url: '', isCustom: false },
   };
 
   try {
@@ -49,7 +49,7 @@ export async function validateRollupFile(
     result.fileInfo = {
       filepath: fileInfo.filepath,
       filename: fileInfo.filename,
-      network: fileInfo.network
+      network: fileInfo.network,
     };
 
     if (!fileInfo.exists) {
@@ -61,7 +61,7 @@ export async function validateRollupFile(
     const rpcConfig = getRpcConfig(fileInfo.network);
     result.rpcInfo = {
       url: rpcConfig.url,
-      isCustom: rpcConfig.isCustom
+      isCustom: rpcConfig.isCustom,
     };
 
     // 3. Read and parse metadata
@@ -76,7 +76,7 @@ export async function validateRollupFile(
     const validationResult = await validator.validateRollupMetadata(
       metadata,
       fileInfo.filepath,
-      options.prTitle
+      options.prTitle,
     );
 
     result.valid = validationResult.valid;
@@ -88,7 +88,7 @@ export async function validateRollupFile(
       if (layer2ManagerProxy) {
         const stakingResult = await validator.validateStakingRegistration(
           metadata,
-          layer2ManagerProxy
+          layer2ManagerProxy,
         );
         if (!stakingResult.valid) {
           result.errors.push(`Staking validation failed: ${stakingResult.error}`);
@@ -96,7 +96,7 @@ export async function validateRollupFile(
         }
       } else {
         result.warnings.push(
-          `No Layer2ManagerProxy address configured for network ${fileInfo.network}. Skipping staking validation.`
+          `No Layer2ManagerProxy address configured for network ${fileInfo.network}. Skipping staking validation.`,
         );
       }
     }
@@ -104,7 +104,7 @@ export async function validateRollupFile(
     // 7. Add helpful warnings
     if (!rpcConfig.isCustom) {
       result.warnings.push(
-        `Using public RPC for ${fileInfo.network}. Set ${fileInfo.network.toUpperCase()}_RPC_URL for higher rate limits.`
+        `Using public RPC for ${fileInfo.network}. Set ${fileInfo.network.toUpperCase()}_RPC_URL for higher rate limits.`,
       );
     }
 
@@ -154,7 +154,8 @@ export function displayValidationResults(result: ValidationResult, verbose: bool
     // Display metadata info if available
     if (result.metadata && verbose) {
       console.log('\n📋 Rollup Information:');
-      console.log(`   Chain ID: ${result.metadata.chainId}`);
+      console.log(`   L1 Chain ID: ${result.metadata.l1ChainId}`);
+      console.log(`   L2 Chain ID: ${result.metadata.l2ChainId}`);
       console.log(`   Name: ${result.metadata.name}`);
       console.log(`   Type: ${result.metadata.rollupType}`);
       console.log(`   Stack: ${result.metadata.stack.name} v${result.metadata.stack.version}`);
