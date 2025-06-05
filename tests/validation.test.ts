@@ -13,46 +13,46 @@ describe('RollupMetadataValidator', () => {
       const validMetadata: Partial<L2RollupMetadata> = {
         l1ChainId: 11155111, // Sepolia
         l2ChainId: 17001, // L2 chain ID
-        name: "Test L2",
-        description: "Test description",
-        rollupType: "optimistic",
+        name: 'Test L2',
+        description: 'Test description',
+        rollupType: 'optimistic',
         stack: {
-          name: "thanos",
-          version: "1.0.0"
+          name: 'thanos',
+          version: '1.0.0',
         },
-        rpcUrl: "https://rpc.test-l2.com",
+        rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
-          type: "eth",
-          symbol: "ETH",
-          name: "Ethereum",
-          decimals: 18
+          type: 'eth',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          decimals: 18,
         },
-        status: "active",
-        createdAt: "2025-01-01T00:00:00Z",
-        lastUpdated: "2025-01-01T00:00:00Z",
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
         l1Contracts: {
-          systemConfig: "0x1234567890123456789012345678901234567890"
+          systemConfig: '0x1234567890123456789012345678901234567890',
         },
         l2Contracts: {
-          nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000"
+          nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
         },
         bridges: [],
         explorers: [],
         sequencer: {
-          address: "0x1234567890123456789012345678901234567890"
+          address: '0x1234567890123456789012345678901234567890',
         },
         staking: {
-          isCandidate: false
+          isCandidate: false,
         },
         networkConfig: {
           blockTime: 2,
-          gasLimit: "30000000"
+          gasLimit: '30000000',
         },
         metadata: {
-          version: "1.0.0",
-          signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-          signedBy: "0x1234567890123456789012345678901234567890"
-        }
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
       };
 
       const result = validator.validateSchema(validMetadata);
@@ -63,35 +63,35 @@ describe('RollupMetadataValidator', () => {
       const metadataWithSupport: Partial<L2RollupMetadata> = {
         l1ChainId: 11155111, // Sepolia
         l2ChainId: 17001, // L2 chain ID
-        name: "Test L2",
-        description: "Test description",
-        rollupType: "optimistic",
-        stack: { name: "thanos", version: "1.0.0" },
-        rpcUrl: "https://rpc.test-l2.com",
-        nativeToken: { type: "eth", symbol: "ETH", name: "Ethereum", decimals: 18 },
-        status: "active",
-        createdAt: "2025-01-01T00:00:00Z",
-        lastUpdated: "2025-01-01T00:00:00Z",
-        l1Contracts: { systemConfig: "0x1234567890123456789012345678901234567890" },
-        l2Contracts: { nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000" },
+        name: 'Test L2',
+        description: 'Test description',
+        rollupType: 'optimistic',
+        stack: { name: 'thanos', version: '1.0.0' },
+        rpcUrl: 'https://rpc.test-l2.com',
+        nativeToken: { type: 'eth', symbol: 'ETH', name: 'Ethereum', decimals: 18 },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: { systemConfig: '0x1234567890123456789012345678901234567890' },
+        l2Contracts: { nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000' },
         bridges: [],
         explorers: [],
-        sequencer: { address: "0x1234567890123456789012345678901234567890" },
+        sequencer: { address: '0x1234567890123456789012345678901234567890' },
         staking: { isCandidate: false },
-        networkConfig: { blockTime: 2, gasLimit: "30000000" },
+        networkConfig: { blockTime: 2, gasLimit: '30000000' },
         supportResources: {
-          statusPageUrl: "https://status.test-l2.com",
-          supportContactUrl: "https://discord.gg/test-l2",
-          documentationUrl: "https://docs.test-l2.com",
-          communityUrl: "https://t.me/test_l2",
-          helpCenterUrl: "https://help.test-l2.com",
-          announcementUrl: "https://twitter.com/test_l2"
+          statusPageUrl: 'https://status.test-l2.com',
+          supportContactUrl: 'https://discord.gg/test-l2',
+          documentationUrl: 'https://docs.test-l2.com',
+          communityUrl: 'https://t.me/test_l2',
+          helpCenterUrl: 'https://help.test-l2.com',
+          announcementUrl: 'https://twitter.com/test_l2',
         },
         metadata: {
-          version: "1.0.0",
-          signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-          signedBy: "0x1234567890123456789012345678901234567890"
-        }
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
       };
 
       const result = validator.validateSchema(metadataWithSupport);
@@ -101,12 +101,12 @@ describe('RollupMetadataValidator', () => {
 
   describe('signature validation', () => {
     test('valid signature format', () => {
-      const validSignature = '0x' + 'a'.repeat(128);
+      // Test signature validation logic if needed
       expect(validator.isValidAddress('0x1234567890123456789012345678901234567890')).toBe(true);
     });
 
     test('invalid signature length', () => {
-      const invalidSignature = '0x' + 'a'.repeat(64); // Too short
+      // Test signature validation logic if needed
       expect(validator.isValidAddress('0x123456789012345678901234567890')).toBe(false);
     });
   });
@@ -120,7 +120,7 @@ describe('RollupMetadataValidator', () => {
         operation: 'register',
         network: 'sepolia',
         systemConfigAddress: '0x1234567890123456789012345678901234567890',
-        rollupName: 'My Awesome L2'
+        rollupName: 'My Awesome L2',
       });
     });
 
@@ -132,7 +132,7 @@ describe('RollupMetadataValidator', () => {
         operation: 'update',
         network: 'mainnet',
         systemConfigAddress: '0x1234567890123456789012345678901234567890',
-        rollupName: 'Updated L2 Name'
+        rollupName: 'Updated L2 Name',
       });
     });
 
@@ -144,7 +144,7 @@ describe('RollupMetadataValidator', () => {
         operation: 'register',
         network: 'sepolia',
         systemConfigAddress: '0X1234567890ABCDEF1234567890ABCDEF12345678',
-        rollupName: 'Test L2'
+        rollupName: 'Test L2',
       });
     });
 
@@ -156,7 +156,7 @@ describe('RollupMetadataValidator', () => {
         operation: 'update',
         network: 'mainnet',
         systemConfigAddress: '0x1234abcd5678ef901234ABCD5678EF9012345678',
-        rollupName: 'Custom L2'
+        rollupName: 'Custom L2',
       });
     });
 
@@ -207,12 +207,12 @@ describe('RollupMetadataValidator', () => {
     test('should detect non-existent contract (mock)', async () => {
       // Mock provider that returns no code
       const mockProvider = {
-        getCode: jest.fn().mockResolvedValue('0x')
+        getCode: jest.fn().mockResolvedValue('0x'),
       };
 
       // Set up validator with mock provider
       validator.setProvider = jest.fn();
-      (validator as any).provider = mockProvider;
+      (validator as unknown as { provider: unknown }).provider = mockProvider;
 
       const result = await validator.validateContractExistence('0x1234567890123456789012345678901234567890');
       expect(result.valid).toBe(false);
@@ -222,12 +222,12 @@ describe('RollupMetadataValidator', () => {
     test('should detect existing contract (mock)', async () => {
       // Mock provider that returns contract code
       const mockProvider = {
-        getCode: jest.fn().mockResolvedValue('0x608060405234801561001057600080fd5b...')
+        getCode: jest.fn().mockResolvedValue('0x608060405234801561001057600080fd5b...'),
       };
 
       // Set up validator with mock provider
       validator.setProvider = jest.fn();
-      (validator as any).provider = mockProvider;
+      (validator as unknown as { provider: unknown }).provider = mockProvider;
 
       const result = await validator.validateContractExistence('0x1234567890123456789012345678901234567890');
       expect(result.valid).toBe(true);
@@ -236,12 +236,12 @@ describe('RollupMetadataValidator', () => {
     test('should handle RPC errors gracefully', async () => {
       // Mock provider that throws error
       const mockProvider = {
-        getCode: jest.fn().mockRejectedValue(new Error('Network error'))
+        getCode: jest.fn().mockRejectedValue(new Error('Network error')),
       };
 
       // Set up validator with mock provider
       validator.setProvider = jest.fn();
-      (validator as any).provider = mockProvider;
+      (validator as unknown as { provider: unknown }).provider = mockProvider;
 
       const result = await validator.validateContractExistence('0x1234567890123456789012345678901234567890');
       expect(result.valid).toBe(false);
@@ -260,32 +260,32 @@ describe('RollupMetadataValidator', () => {
       const metadata: L2RollupMetadata = {
         l1ChainId: 11155111, // Sepolia
         l2ChainId: 17001, // L2 chain ID
-        name: "Test L2",
-        description: "Test description",
-        rollupType: "optimistic",
-        stack: { name: "thanos", version: "1.0.0" },
-        rpcUrl: "https://rpc.test-l2.com",
+        name: 'Test L2',
+        description: 'Test description',
+        rollupType: 'optimistic',
+        stack: { name: 'thanos', version: '1.0.0' },
+        rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'eth',
           symbol: 'ETH',
           name: 'Ether',
-          decimals: 18
+          decimals: 18,
         },
-        status: "active",
-        createdAt: "2025-01-01T00:00:00Z",
-        lastUpdated: "2025-01-01T00:00:00Z",
-        l1Contracts: { systemConfig: "0x1234567890123456789012345678901234567890" },
-        l2Contracts: { nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000" },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: { systemConfig: '0x1234567890123456789012345678901234567890' },
+        l2Contracts: { nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000' },
         bridges: [],
         explorers: [],
-        sequencer: { address: "0x1234567890123456789012345678901234567890" },
+        sequencer: { address: '0x1234567890123456789012345678901234567890' },
         staking: { isCandidate: false },
-        networkConfig: { blockTime: 2, gasLimit: "30000000" },
+        networkConfig: { blockTime: 2, gasLimit: '30000000' },
         metadata: {
-          version: "1.0.0",
-          signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-          signedBy: "0x1234567890123456789012345678901234567890"
-        }
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
       };
 
       const result = await validator.validateNativeTokenAddress(metadata);
@@ -296,38 +296,41 @@ describe('RollupMetadataValidator', () => {
       const metadata: L2RollupMetadata = {
         l1ChainId: 11155111, // Sepolia
         l2ChainId: 17001, // L2 chain ID
-        name: "Test L2",
-        description: "Test description",
-        rollupType: "optimistic",
-        stack: { name: "thanos", version: "1.0.0" },
-        rpcUrl: "https://rpc.test-l2.com",
+        name: 'Test L2',
+        description: 'Test description',
+        rollupType: 'optimistic',
+        stack: { name: 'thanos', version: '1.0.0' },
+        rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'erc20',
           symbol: 'USDC',
           name: 'USD Coin',
           decimals: 6,
-          l1Address: '0xa0b86a33e6128cdbd33f91135e4f6e8e7fb1f88d'
-        },
-        status: "active",
-        createdAt: "2025-01-01T00:00:00Z",
-        lastUpdated: "2025-01-01T00:00:00Z",
-        l1Contracts: { systemConfig: "0x1234567890123456789012345678901234567890" },
-        l2Contracts: { nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000" },
+          // l1Address is missing
+        } as unknown as typeof metadata.nativeToken,
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: { systemConfig: '0x1234567890123456789012345678901234567890' },
+        l2Contracts: { nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000' },
         bridges: [],
         explorers: [],
-        sequencer: { address: "0x1234567890123456789012345678901234567890" },
+        sequencer: { address: '0x1234567890123456789012345678901234567890' },
         staking: { isCandidate: false },
-        networkConfig: { blockTime: 2, gasLimit: "30000000" },
+        networkConfig: { blockTime: 2, gasLimit: '30000000' },
         metadata: {
-          version: "1.0.0",
-          signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-          signedBy: "0x1234567890123456789012345678901234567890"
-        }
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
       };
 
       // Since we can't easily mock the contract call in this test setup,
       // we'll test that the method exists and handles the logic correctly
       expect(typeof validator.validateNativeTokenAddress).toBe('function');
+      // Also verify that the metadata object is properly structured
+      expect(metadata.nativeToken.type).toBe('erc20');
+      expect(metadata.nativeToken.l1Address).toBeUndefined();
     });
 
     test('should return error when RPC provider not set', async () => {
@@ -335,33 +338,33 @@ describe('RollupMetadataValidator', () => {
       const metadata: L2RollupMetadata = {
         l1ChainId: 11155111, // Sepolia
         l2ChainId: 17001, // L2 chain ID
-        name: "Test L2",
-        description: "Test description",
-        rollupType: "optimistic",
-        stack: { name: "thanos", version: "1.0.0" },
-        rpcUrl: "https://rpc.test-l2.com",
+        name: 'Test L2',
+        description: 'Test description',
+        rollupType: 'optimistic',
+        stack: { name: 'thanos', version: '1.0.0' },
+        rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'erc20',
           symbol: 'USDC',
           name: 'USD Coin',
           decimals: 6,
-          l1Address: '0xa0b86a33e6128cdbd33f91135e4f6e8e7fb1f88d'
-        },
-        status: "active",
-        createdAt: "2025-01-01T00:00:00Z",
-        lastUpdated: "2025-01-01T00:00:00Z",
-        l1Contracts: { systemConfig: "0x1234567890123456789012345678901234567890" },
-        l2Contracts: { nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000" },
+          // l1Address is missing
+        } as unknown as typeof metadata.nativeToken,
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: { systemConfig: '0x1234567890123456789012345678901234567890' },
+        l2Contracts: { nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000' },
         bridges: [],
         explorers: [],
-        sequencer: { address: "0x1234567890123456789012345678901234567890" },
+        sequencer: { address: '0x1234567890123456789012345678901234567890' },
         staking: { isCandidate: false },
-        networkConfig: { blockTime: 2, gasLimit: "30000000" },
+        networkConfig: { blockTime: 2, gasLimit: '30000000' },
         metadata: {
-          version: "1.0.0",
-          signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-          signedBy: "0x1234567890123456789012345678901234567890"
-        }
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
       };
 
       const result = await testValidator.validateNativeTokenAddress(metadata);
@@ -373,33 +376,33 @@ describe('RollupMetadataValidator', () => {
       const metadata: L2RollupMetadata = {
         l1ChainId: 11155111, // Sepolia
         l2ChainId: 17001, // L2 chain ID
-        name: "Test L2",
-        description: "Test description",
-        rollupType: "optimistic",
-        stack: { name: "thanos", version: "1.0.0" },
-        rpcUrl: "https://rpc.test-l2.com",
+        name: 'Test L2',
+        description: 'Test description',
+        rollupType: 'optimistic',
+        stack: { name: 'thanos', version: '1.0.0' },
+        rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'erc20',
           symbol: 'USDC',
           name: 'USD Coin',
-          decimals: 6
+          decimals: 6,
           // l1Address is missing
-        } as any,
-        status: "active",
-        createdAt: "2025-01-01T00:00:00Z",
-        lastUpdated: "2025-01-01T00:00:00Z",
-        l1Contracts: { systemConfig: "0x1234567890123456789012345678901234567890" },
-        l2Contracts: { nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000" },
+        } as unknown as typeof metadata.nativeToken,
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: { systemConfig: '0x1234567890123456789012345678901234567890' },
+        l2Contracts: { nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000' },
         bridges: [],
         explorers: [],
-        sequencer: { address: "0x1234567890123456789012345678901234567890" },
+        sequencer: { address: '0x1234567890123456789012345678901234567890' },
         staking: { isCandidate: false },
-        networkConfig: { blockTime: 2, gasLimit: "30000000" },
+        networkConfig: { blockTime: 2, gasLimit: '30000000' },
         metadata: {
-          version: "1.0.0",
-          signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-          signedBy: "0x1234567890123456789012345678901234567890"
-        }
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
       };
 
       const result = await validator.validateNativeTokenAddress(metadata);
@@ -513,48 +516,48 @@ describe('RollupMetadataValidator', () => {
     const existingMetadata: L2RollupMetadata = {
       l1ChainId: 11155111, // Sepolia
       l2ChainId: 17001, // L2 chain ID
-      name: "Original L2",
-      description: "Original description",
-      rollupType: "optimistic",
+      name: 'Original L2',
+      description: 'Original description',
+      rollupType: 'optimistic',
       stack: {
-        name: "thanos",
-        version: "1.0.0"
+        name: 'thanos',
+        version: '1.0.0',
       },
-      rpcUrl: "https://rpc.original-l2.com",
+      rpcUrl: 'https://rpc.original-l2.com',
       nativeToken: {
-        type: "eth",
-        symbol: "ETH",
-        name: "Ethereum",
-        decimals: 18
+        type: 'eth',
+        symbol: 'ETH',
+        name: 'Ethereum',
+        decimals: 18,
       },
-      status: "active",
-      createdAt: "2025-01-01T00:00:00Z",
-      lastUpdated: "2025-01-01T00:00:00Z",
+      status: 'active',
+      createdAt: '2025-01-01T00:00:00Z',
+      lastUpdated: '2025-01-01T00:00:00Z',
       l1Contracts: {
-        systemConfig: "0x1234567890123456789012345678901234567890"
+        systemConfig: '0x1234567890123456789012345678901234567890',
       },
       l2Contracts: {
-        nativeToken: "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000"
+        nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
       },
       bridges: [],
       explorers: [],
       sequencer: {
-        address: "0x1234567890123456789012345678901234567890"
+        address: '0x1234567890123456789012345678901234567890',
       },
       staking: {
         isCandidate: true,
-        registrationTxHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
-        candidateAddress: "0x9876543210987654321098765432109876543210"
+        registrationTxHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab',
+        candidateAddress: '0x9876543210987654321098765432109876543210',
       },
       networkConfig: {
         blockTime: 2,
-        gasLimit: "30000000"
+        gasLimit: '30000000',
       },
       metadata: {
-        version: "1.0.0",
-        signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-        signedBy: "0x1234567890123456789012345678901234567890"
-      }
+        version: '1.0.0',
+        signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+        signedBy: '0x1234567890123456789012345678901234567890',
+      },
     };
 
     beforeEach(() => {
@@ -572,9 +575,9 @@ describe('RollupMetadataValidator', () => {
     test('should pass when no immutable fields are changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
-        description: "Updated description",
-        lastUpdated: "2025-01-02T00:00:00Z",
-        status: "maintenance" as const
+        description: 'Updated description',
+        lastUpdated: '2025-01-02T00:00:00Z',
+        status: 'maintenance' as const,
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
@@ -586,62 +589,62 @@ describe('RollupMetadataValidator', () => {
       const updatedMetadata = {
         ...existingMetadata,
         l1ChainId: 11155112,
-        l2ChainId: 17002
+        l2ChainId: 17002,
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Immutable field 'L1 Chain ID' cannot be changed"))).toBe(true);
-      expect(result.errors.some(error => error.includes("Immutable field 'L2 Chain ID' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Immutable field \'L1 Chain ID\' cannot be changed'))).toBe(true);
+      expect(result.errors.some(error => error.includes('Immutable field \'L2 Chain ID\' cannot be changed'))).toBe(true);
     });
 
     test('should fail when systemConfig address is changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
         l1Contracts: {
-          systemConfig: "0x9876543210987654321098765432109876543210"
-        }
+          systemConfig: '0x9876543210987654321098765432109876543210',
+        },
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Immutable field 'SystemConfig address' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Immutable field \'SystemConfig address\' cannot be changed'))).toBe(true);
     });
 
     test('should fail when rollupType is changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
-        rollupType: "zk" as const
+        rollupType: 'zk' as const,
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Immutable field 'Rollup type' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Immutable field \'Rollup type\' cannot be changed'))).toBe(true);
     });
 
     test('should fail when stack name is changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
         stack: {
-          name: "optimism",
-          version: "2.0.0"
-        }
+          name: 'optimism',
+          version: '2.0.0',
+        },
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Immutable field 'Stack name' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Immutable field \'Stack name\' cannot be changed'))).toBe(true);
     });
 
     test('should fail when createdAt timestamp is changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
-        createdAt: "2025-01-02T00:00:00Z"
+        createdAt: '2025-01-02T00:00:00Z',
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Immutable field 'Creation timestamp' cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Immutable field \'Creation timestamp\' cannot be changed'))).toBe(true);
     });
 
     test('should fail when staking registration tx hash is changed', () => {
@@ -649,13 +652,13 @@ describe('RollupMetadataValidator', () => {
         ...existingMetadata,
         staking: {
           ...existingMetadata.staking,
-          registrationTxHash: "0xdifferent1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
-        }
+          registrationTxHash: '0xdifferent1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+        },
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Staking registration transaction hash cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Staking registration transaction hash cannot be changed'))).toBe(true);
     });
 
     test('should fail when staking candidate address is changed', () => {
@@ -663,13 +666,13 @@ describe('RollupMetadataValidator', () => {
         ...existingMetadata,
         staking: {
           ...existingMetadata.staking,
-          candidateAddress: "0x5555555555555555555555555555555555555555"
-        }
+          candidateAddress: '0x5555555555555555555555555555555555555555',
+        },
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Staking candidate address cannot be changed"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Staking candidate address cannot be changed'))).toBe(true);
     });
 
     test('should handle multiple immutable field violations', () => {
@@ -677,17 +680,17 @@ describe('RollupMetadataValidator', () => {
         ...existingMetadata,
         l1ChainId: 11155112,
         l2ChainId: 17002,
-        rollupType: "zk" as const,
-        createdAt: "2025-01-02T00:00:00Z"
+        rollupType: 'zk' as const,
+        createdAt: '2025-01-02T00:00:00Z',
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
       expect(result.errors).toHaveLength(4); // Now 4 errors: L1 chain ID, L2 chain ID, rollupType, createdAt
-      expect(result.errors.some(error => error.includes("L1 Chain ID"))).toBe(true);
-      expect(result.errors.some(error => error.includes("L2 Chain ID"))).toBe(true);
-      expect(result.errors.some(error => error.includes("Rollup type"))).toBe(true);
-      expect(result.errors.some(error => error.includes("Creation timestamp"))).toBe(true);
+      expect(result.errors.some(error => error.includes('L1 Chain ID'))).toBe(true);
+      expect(result.errors.some(error => error.includes('L2 Chain ID'))).toBe(true);
+      expect(result.errors.some(error => error.includes('Rollup type'))).toBe(true);
+      expect(result.errors.some(error => error.includes('Creation timestamp'))).toBe(true);
     });
 
     test('should pass when file does not exist (for register operation)', () => {
@@ -704,7 +707,7 @@ describe('RollupMetadataValidator', () => {
 
       const result = validator.validateImmutableFields(existingMetadata, malformedFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(error => error.includes("Failed to validate immutable fields"))).toBe(true);
+      expect(result.errors.some(error => error.includes('Failed to validate immutable fields'))).toBe(true);
 
       // Clean up
       fs.unlinkSync(malformedFilePath);
@@ -716,15 +719,15 @@ describe('RollupMetadataValidator', () => {
       const testObj = {
         level1: {
           level2: {
-            level3: 'test_value'
+            level3: 'test_value',
           },
-          simpleValue: 42
+          simpleValue: 42,
         },
-        topLevel: 'top'
+        topLevel: 'top',
       };
 
       // Access private method using bracket notation
-      const getNestedValue = (validator as any).getNestedValue.bind(validator);
+      const getNestedValue = (validator as unknown as { getNestedValue: (obj: unknown, path: string) => unknown }).getNestedValue.bind(validator);
 
       expect(getNestedValue(testObj, 'topLevel')).toBe('top');
       expect(getNestedValue(testObj, 'level1.simpleValue')).toBe(42);

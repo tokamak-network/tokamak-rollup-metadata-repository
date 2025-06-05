@@ -9,59 +9,59 @@ addFormats(ajv);
 // SystemConfig contract ABI (unsafeBlockSigner function only)
 const SYSTEM_CONFIG_ABI = [
   {
-    "inputs": [],
-    "name": "unsafeBlockSigner",
-    "outputs": [
+    'inputs': [],
+    'name': 'unsafeBlockSigner',
+    'outputs': [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        'internalType': 'address',
+        'name': '',
+        'type': 'address',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    'stateMutability': 'view',
+    'type': 'function',
   },
   {
-    "inputs": [],
-    "name": "nativeTokenAddress",
-    "outputs": [
+    'inputs': [],
+    'name': 'nativeTokenAddress',
+    'outputs': [
       {
-        "internalType": "address",
-        "name": "addr_",
-        "type": "address"
-      }
+        'internalType': 'address',
+        'name': 'addr_',
+        'type': 'address',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
-  }
+    'stateMutability': 'view',
+    'type': 'function',
+  },
 ];
 
 // Layer2ManagerProxy ABI for registerCandidateAddOn function and event
 const LAYER2_MANAGER_ABI = [
   {
-    "inputs": [
-      { "internalType": "address", "name": "rollupConfig", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
-      { "internalType": "bool", "name": "flagTon", "type": "bool" },
-      { "internalType": "string", "name": "memo", "type": "string" }
+    'inputs': [
+      { 'internalType': 'address', 'name': 'rollupConfig', 'type': 'address' },
+      { 'internalType': 'uint256', 'name': 'amount', 'type': 'uint256' },
+      { 'internalType': 'bool', 'name': 'flagTon', 'type': 'bool' },
+      { 'internalType': 'string', 'name': 'memo', 'type': 'string' },
     ],
-    "name": "registerCandidateAddOn",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'name': 'registerCandidateAddOn',
+    'outputs': [],
+    'stateMutability': 'nonpayable',
+    'type': 'function',
   },
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "address", "name": "rollupConfig", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "wtonAmount", "type": "uint256" },
-      { "indexed": false, "internalType": "string", "name": "memo", "type": "string" },
-      { "indexed": false, "internalType": "address", "name": "operator", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "candidateAddOn", "type": "address" }
+    'anonymous': false,
+    'inputs': [
+      { 'indexed': false, 'internalType': 'address', 'name': 'rollupConfig', 'type': 'address' },
+      { 'indexed': false, 'internalType': 'uint256', 'name': 'wtonAmount', 'type': 'uint256' },
+      { 'indexed': false, 'internalType': 'string', 'name': 'memo', 'type': 'string' },
+      { 'indexed': false, 'internalType': 'address', 'name': 'operator', 'type': 'address' },
+      { 'indexed': false, 'internalType': 'address', 'name': 'candidateAddOn', 'type': 'address' },
     ],
-    "name": "RegisteredCandidateAddOn",
-    "type": "event"
-  }
+    'name': 'RegisteredCandidateAddOn',
+    'type': 'event',
+  },
 ];
 
 // JSON schema definition
@@ -70,7 +70,7 @@ const rollupMetadataSchema = {
   required: [
     'l1ChainId', 'l2ChainId', 'name', 'description', 'rollupType', 'stack',
     'rpcUrl', 'nativeToken', 'status', 'createdAt', 'lastUpdated', 'l1Contracts', 'l2Contracts',
-    'bridges', 'explorers', 'sequencer', 'staking', 'networkConfig', 'metadata'
+    'bridges', 'explorers', 'sequencer', 'staking', 'networkConfig', 'metadata',
   ],
   properties: {
     l1ChainId: { type: 'number', minimum: 1 }, // L1 chain ID
@@ -81,7 +81,7 @@ const rollupMetadataSchema = {
     website: { type: 'string', format: 'uri' },
     rollupType: {
       type: 'string',
-      enum: ['optimistic', 'zk', 'sovereign', 'validium']
+      enum: ['optimistic', 'zk', 'sovereign', 'validium'],
     },
     stack: {
       type: 'object',
@@ -91,9 +91,9 @@ const rollupMetadataSchema = {
         version: { type: 'string' },
         zkProofSystem: {
           type: 'string',
-          enum: ['plonk', 'stark', 'groth16', 'fflonk']
-        }
-      }
+          enum: ['plonk', 'stark', 'groth16', 'fflonk'],
+        },
+      },
     },
     rpcUrl: { type: 'string', format: 'uri' },
     wsUrl: { type: 'string', format: 'uri' },
@@ -107,12 +107,12 @@ const rollupMetadataSchema = {
         decimals: { type: 'number', minimum: 0, maximum: 18 },
         l1Address: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
         logoUrl: { type: 'string', format: 'uri' },
-        coingeckoId: { type: 'string' }
-      }
+        coingeckoId: { type: 'string' },
+      },
     },
     status: {
       type: 'string',
-      enum: ['active', 'inactive', 'maintenance', 'deprecated', 'shutdown']
+      enum: ['active', 'inactive', 'maintenance', 'deprecated', 'shutdown'],
     },
     createdAt: { type: 'string', format: 'date-time' },
     lastUpdated: { type: 'string', format: 'date-time' },
@@ -121,9 +121,9 @@ const rollupMetadataSchema = {
       type: 'object',
       required: ['systemConfig'],
       properties: {
-        systemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' }
+        systemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
       },
-      additionalProperties: true
+      additionalProperties: true,
     },
     l2Contracts: { type: 'object' },
     bridges: {
@@ -147,12 +147,12 @@ const rollupMetadataSchema = {
                 l2Address: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
                 decimals: { type: 'number', minimum: 0 },
                 isNativeToken: { type: 'boolean' },
-                isWrappedETH: { type: 'boolean' }
-              }
-            }
-          }
-        }
-      }
+                isWrappedETH: { type: 'boolean' },
+              },
+            },
+          },
+        },
+      },
     },
     explorers: {
       type: 'array',
@@ -164,9 +164,9 @@ const rollupMetadataSchema = {
           url: { type: 'string', format: 'uri' },
           type: { enum: ['blockscout', 'etherscan', 'custom'] },
           status: { enum: ['active', 'inactive', 'maintenance', 'none'] },
-          apiUrl: { type: 'string', format: 'uri' }
-        }
-      }
+          apiUrl: { type: 'string', format: 'uri' },
+        },
+      },
     },
     supportResources: {
       type: 'object',
@@ -176,8 +176,8 @@ const rollupMetadataSchema = {
         documentationUrl: { type: 'string', format: 'uri' },
         communityUrl: { type: 'string', format: 'uri' },
         helpCenterUrl: { type: 'string', format: 'uri' },
-        announcementUrl: { type: 'string', format: 'uri' }
-      }
+        announcementUrl: { type: 'string', format: 'uri' },
+      },
     },
     sequencer: {
       type: 'object',
@@ -187,8 +187,8 @@ const rollupMetadataSchema = {
         batcherAddress: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
         proposerAddress: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
         aggregatorAddress: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
-        trustedSequencer: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' }
-      }
+        trustedSequencer: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+      },
     },
     staking: {
       type: 'object',
@@ -200,22 +200,22 @@ const rollupMetadataSchema = {
         registrationTxHash: { type: 'string', pattern: '^0x[a-fA-F0-9]{64}$' },
         candidateAddress: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
         rollupConfigAddress: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
-        stakingServiceName: { type: 'string' }
+        stakingServiceName: { type: 'string' },
       },
       if: {
-        properties: { isCandidate: { const: true } }
+        properties: { isCandidate: { const: true } },
       },
       then: {
-        required: ['isCandidate', 'registrationTxHash', 'candidateAddress']
-      }
+        required: ['isCandidate', 'registrationTxHash', 'candidateAddress'],
+      },
     },
     networkConfig: {
       type: 'object',
       required: ['blockTime', 'gasLimit'],
       properties: {
         blockTime: { type: 'number', minimum: 1 },
-        gasLimit: { type: 'string' }
-      }
+        gasLimit: { type: 'string' },
+      },
     },
     shutdown: {
       type: 'object',
@@ -224,8 +224,8 @@ const rollupMetadataSchema = {
         isPlanned: { type: 'boolean' },
         plannedShutdownDate: { type: 'string', format: 'date-time' },
         actualShutdownDate: { type: 'string', format: 'date-time' },
-        reason: { type: 'string' }
-      }
+        reason: { type: 'string' },
+      },
     },
     metadata: {
       type: 'object',
@@ -233,10 +233,10 @@ const rollupMetadataSchema = {
       properties: {
         version: { type: 'string' },
         signature: { type: 'string', pattern: '^0x[a-fA-F0-9]{130}$' },
-        signedBy: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' }
-      }
-    }
-  }
+        signedBy: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+      },
+    },
+  },
 };
 
 const validateSchema = ajv.compile(rollupMetadataSchema);
@@ -261,7 +261,7 @@ export class RollupMetadataValidator {
     if (!this.provider) {
       return {
         valid: false,
-        error: 'RPC provider not set. Call setProvider() first.'
+        error: 'RPC provider not set. Call setProvider() first.',
       };
     }
 
@@ -271,7 +271,7 @@ export class RollupMetadataValidator {
       if (code === '0x' || code === '0x0') {
         return {
           valid: false,
-          error: `No contract deployed at address: ${contractAddress}`
+          error: `No contract deployed at address: ${contractAddress}`,
         };
       }
 
@@ -279,7 +279,7 @@ export class RollupMetadataValidator {
     } catch (error) {
       return {
         valid: false,
-        error: `Failed to check contract existence: ${(error as Error).message}`
+        error: `Failed to check contract existence: ${(error as Error).message}`,
       };
     }
   }
@@ -296,7 +296,7 @@ export class RollupMetadataValidator {
       const systemConfigContract = new Contract(
         systemConfigAddress,
         SYSTEM_CONFIG_ABI,
-        this.provider
+        this.provider,
       );
 
       const sequencerAddress = await systemConfigContract.unsafeBlockSigner();
@@ -310,11 +310,11 @@ export class RollupMetadataValidator {
   /**
    * JSON schema validation
    */
-  public validateSchema(metadata: any): { valid: boolean; errors?: any[] } {
+  public validateSchema(metadata: unknown): { valid: boolean; errors?: unknown[] } {
     const valid = validateSchema(metadata);
     return {
       valid,
-      errors: valid ? undefined : (validateSchema.errors || [])
+      errors: valid ? undefined : (validateSchema.errors || []),
     };
   }
 
@@ -391,13 +391,13 @@ export class RollupMetadataValidator {
     // Add known L2 mainnet chainIds
     const knownMainnetL2ChainIds = [
       10, 42161, 137, 8453, // Optimism, Arbitrum, Polygon, Base
-      324, 1101, 59144 // zkSync Era, Polygon zkEVM, Linea
+      324, 1101, 59144, // zkSync Era, Polygon zkEVM, Linea
     ];
 
     // Add known L2 testnet chainIds
     const knownTestnetL2ChainIds = [
       420, 421613, 80001, 84531, // Optimism Goerli, Arbitrum Goerli, Polygon Mumbai, Base Goerli
-      280, 1442, 59140 // zkSync Era Testnet, Polygon zkEVM Testnet, Linea Testnet
+      280, 1442, 59140, // zkSync Era Testnet, Polygon zkEVM Testnet, Linea Testnet
     ];
 
     const isKnownMainnet = mainnetChainIds.includes(chainId) || knownMainnetL2ChainIds.includes(chainId);
@@ -408,7 +408,7 @@ export class RollupMetadataValidator {
       if (isKnownTestnet) {
         return {
           valid: false,
-          error: `ChainId ${chainId} is a testnet chainId but file is in mainnet directory`
+          error: `ChainId ${chainId} is a testnet chainId but file is in mainnet directory`,
         };
       }
       // Allow known mainnet or unknown/custom chainIds for mainnet
@@ -417,7 +417,7 @@ export class RollupMetadataValidator {
       if (isKnownMainnet) {
         return {
           valid: false,
-          error: `ChainId ${chainId} is a mainnet chainId but file is in sepolia directory`
+          error: `ChainId ${chainId} is a mainnet chainId but file is in sepolia directory`,
         };
       }
       // Allow known testnet or unknown/custom chainIds for sepolia
@@ -445,7 +445,7 @@ export class RollupMetadataValidator {
     if (!formatMatch) {
       return {
         valid: false,
-        error: 'PR title must follow format: [Rollup] network 0x1234...abcd - L2 Name or [Update] network 0x1234...abcd - L2 Name'
+        error: 'PR title must follow format: [Rollup] network 0x1234...abcd - L2 Name or [Update] network 0x1234...abcd - L2 Name',
       };
     }
 
@@ -457,7 +457,7 @@ export class RollupMetadataValidator {
     if (!validNetworks.includes(network)) {
       return {
         valid: false,
-        error: `Invalid network: ${network}. Must be one of: ${validNetworks.join(', ')}`
+        error: `Invalid network: ${network}. Must be one of: ${validNetworks.join(', ')}`,
       };
     }
 
@@ -466,7 +466,7 @@ export class RollupMetadataValidator {
     if (!trimmedName) {
       return {
         valid: false,
-        error: 'Rollup name cannot be empty'
+        error: 'Rollup name cannot be empty',
       };
     }
 
@@ -475,7 +475,7 @@ export class RollupMetadataValidator {
       operation,
       network,
       systemConfigAddress,
-      rollupName: trimmedName
+      rollupName: trimmedName,
     };
   }
 
@@ -483,35 +483,35 @@ export class RollupMetadataValidator {
    * Validate onchain sequencer address matches metadata sequencer address
    */
   public async validateOnChainSequencer(
-    metadata: L2RollupMetadata
+    metadata: L2RollupMetadata,
   ): Promise<{ valid: boolean; error?: string; onChainAddress?: string }> {
     if (!metadata.l1Contracts.systemConfig) {
       return {
         valid: false,
-        error: 'SystemConfig address is required for sequencer validation'
+        error: 'SystemConfig address is required for sequencer validation',
       };
     }
 
     // First, check if contract exists
     const contractExistenceResult = await this.validateContractExistence(
-      metadata.l1Contracts.systemConfig
+      metadata.l1Contracts.systemConfig,
     );
     if (!contractExistenceResult.valid) {
       return {
         valid: false,
-        error: contractExistenceResult.error
+        error: contractExistenceResult.error,
       };
     }
 
     try {
       const onChainSequencerAddress = await this.getOnChainSequencerAddress(
-        metadata.l1Contracts.systemConfig
+        metadata.l1Contracts.systemConfig,
       );
 
       if (!onChainSequencerAddress) {
         return {
           valid: false,
-          error: 'Failed to fetch sequencer address from SystemConfig contract'
+          error: 'Failed to fetch sequencer address from SystemConfig contract',
         };
       }
 
@@ -521,18 +521,18 @@ export class RollupMetadataValidator {
         return {
           valid: false,
           error: `Sequencer address mismatch. OnChain: ${onChainSequencerAddress}, Metadata: ${metadataSequencerAddress}`,
-          onChainAddress: onChainSequencerAddress
+          onChainAddress: onChainSequencerAddress,
         };
       }
 
       return {
         valid: true,
-        onChainAddress: onChainSequencerAddress
+        onChainAddress: onChainSequencerAddress,
       };
     } catch (error) {
       return {
         valid: false,
-        error: `OnChain sequencer validation failed: ${(error as Error).message}`
+        error: `OnChain sequencer validation failed: ${(error as Error).message}`,
       };
     }
   }
@@ -542,7 +542,7 @@ export class RollupMetadataValidator {
    */
   public async validateSequencerSignature(
     metadata: L2RollupMetadata,
-    operation: 'register' | 'update' = 'register'
+    operation: 'register' | 'update' = 'register',
   ): Promise<{ valid: boolean; error?: string }> {
     try {
       // Verify onchain sequencer address
@@ -550,7 +550,7 @@ export class RollupMetadataValidator {
       if (!onChainValidation.valid) {
         return {
           valid: false,
-          error: `OnChain validation failed: ${onChainValidation.error}`
+          error: `OnChain validation failed: ${onChainValidation.error}`,
         };
       }
 
@@ -559,14 +559,14 @@ export class RollupMetadataValidator {
 
       const recoveredAddress = ethers.verifyMessage(
         message,
-        metadata.metadata.signature
+        metadata.metadata.signature,
       );
 
       // Check if recovered address matches metadata signer
       if (recoveredAddress.toLowerCase() !== metadata.metadata.signedBy.toLowerCase()) {
         return {
           valid: false,
-          error: 'Signature verification failed: recovered address does not match signedBy'
+          error: 'Signature verification failed: recovered address does not match signedBy',
         };
       }
 
@@ -574,7 +574,7 @@ export class RollupMetadataValidator {
       if (recoveredAddress.toLowerCase() !== onChainValidation.onChainAddress) {
         return {
           valid: false,
-          error: `Signature verification failed: signer (${recoveredAddress.toLowerCase()}) is not the onchain sequencer (${onChainValidation.onChainAddress})`
+          error: `Signature verification failed: signer (${recoveredAddress.toLowerCase()}) is not the onchain sequencer (${onChainValidation.onChainAddress})`,
         };
       }
 
@@ -582,7 +582,7 @@ export class RollupMetadataValidator {
     } catch (error) {
       return {
         valid: false,
-        error: `Signature verification failed: ${(error as Error).message}`
+        error: `Signature verification failed: ${(error as Error).message}`,
       };
     }
   }
@@ -593,7 +593,7 @@ export class RollupMetadataValidator {
   public async validateRollupMetadata(
     metadata: L2RollupMetadata,
     filepath: string,
-    prTitle?: string
+    prTitle?: string,
   ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
     let operation: 'register' | 'update' = 'register'; // default to register
@@ -719,7 +719,7 @@ export class RollupMetadataValidator {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -728,7 +728,7 @@ export class RollupMetadataValidator {
    */
   public validateFileExistenceForOperation(
     filepath: string,
-    operation: 'register' | 'update'
+    operation: 'register' | 'update',
   ): { valid: boolean; error?: string } {
     const fs = require('fs');
     const fileExists = fs.existsSync(filepath);
@@ -737,14 +737,14 @@ export class RollupMetadataValidator {
       if (fileExists) {
         return {
           valid: false,
-          error: `Register operation failed: File already exists at ${filepath}. Use [Update] operation for existing rollups.`
+          error: `Register operation failed: File already exists at ${filepath}. Use [Update] operation for existing rollups.`,
         };
       }
     } else if (operation === 'update') {
       if (!fileExists) {
         return {
           valid: false,
-          error: `Update operation failed: File does not exist at ${filepath}. Use [Rollup] operation for new rollups.`
+          error: `Update operation failed: File does not exist at ${filepath}. Use [Rollup] operation for new rollups.`,
         };
       }
     }
@@ -757,7 +757,7 @@ export class RollupMetadataValidator {
    */
   public validateImmutableFields(
     newMetadata: L2RollupMetadata,
-    existingFilepath: string
+    existingFilepath: string,
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
     const fs = require('fs');
@@ -778,7 +778,7 @@ export class RollupMetadataValidator {
         { path: 'l1Contracts.systemConfig', name: 'SystemConfig address' },
         { path: 'rollupType', name: 'Rollup type' },
         { path: 'stack.name', name: 'Stack name' },
-        { path: 'createdAt', name: 'Creation timestamp' }
+        { path: 'createdAt', name: 'Creation timestamp' },
       ];
 
       // Check each immutable field
@@ -789,7 +789,7 @@ export class RollupMetadataValidator {
         if (existingValue !== undefined && newValue !== existingValue) {
           errors.push(
             `Immutable field '${field.name}' cannot be changed during update. ` +
-            `Existing: ${existingValue}, New: ${newValue}`
+            `Existing: ${existingValue}, New: ${newValue}`,
           );
         }
       }
@@ -798,14 +798,14 @@ export class RollupMetadataValidator {
       if (existingMetadata.staking.isCandidate && existingMetadata.staking.registrationTxHash) {
         if (newMetadata.staking.registrationTxHash !== existingMetadata.staking.registrationTxHash) {
           errors.push(
-            `Staking registration transaction hash cannot be changed during update. ` +
-            `Existing: ${existingMetadata.staking.registrationTxHash}, New: ${newMetadata.staking.registrationTxHash}`
+            'Staking registration transaction hash cannot be changed during update. ' +
+            `Existing: ${existingMetadata.staking.registrationTxHash}, New: ${newMetadata.staking.registrationTxHash}`,
           );
         }
         if (newMetadata.staking.candidateAddress !== existingMetadata.staking.candidateAddress) {
           errors.push(
-            `Staking candidate address cannot be changed during update. ` +
-            `Existing: ${existingMetadata.staking.candidateAddress}, New: ${newMetadata.staking.candidateAddress}`
+            'Staking candidate address cannot be changed during update. ' +
+            `Existing: ${existingMetadata.staking.candidateAddress}, New: ${newMetadata.staking.candidateAddress}`,
           );
         }
       }
@@ -816,16 +816,16 @@ export class RollupMetadataValidator {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
   /**
    * Helper function to get nested object values using dot notation
    */
-  private getNestedValue(obj: any, path: string): any {
+  private getNestedValue(obj: unknown, path: string): unknown {
     return path.split('.').reduce((current, key) => {
-      return current && current[key] !== undefined ? current[key] : undefined;
+      return current && typeof current === 'object' && current !== null && key in current ? (current as Record<string, unknown>)[key] : undefined;
     }, obj);
   }
 
@@ -834,7 +834,7 @@ export class RollupMetadataValidator {
    */
   public async validateStakingRegistration(
     metadata: L2RollupMetadata,
-    layer2ManagerAddress: string
+    layer2ManagerAddress: string,
   ): Promise<{ valid: boolean; error?: string }> {
     if (!metadata.staking.isCandidate) {
       return { valid: true }; // No validation needed if not a candidate
@@ -843,14 +843,14 @@ export class RollupMetadataValidator {
     if (!metadata.staking.registrationTxHash || !metadata.staking.candidateAddress) {
       return {
         valid: false,
-        error: 'Registration transaction hash and candidate address are required when isCandidate is true'
+        error: 'Registration transaction hash and candidate address are required when isCandidate is true',
       };
     }
 
     if (!this.provider) {
       return {
         valid: false,
-        error: 'RPC provider not set. Call setProvider() first.'
+        error: 'RPC provider not set. Call setProvider() first.',
       };
     }
 
@@ -860,7 +860,7 @@ export class RollupMetadataValidator {
       if (!receipt) {
         return {
           valid: false,
-          error: `Transaction not found: ${metadata.staking.registrationTxHash}`
+          error: `Transaction not found: ${metadata.staking.registrationTxHash}`,
         };
       }
 
@@ -868,7 +868,7 @@ export class RollupMetadataValidator {
       if (receipt.to?.toLowerCase() !== layer2ManagerAddress.toLowerCase()) {
         return {
           valid: false,
-          error: `Transaction was not sent to Layer2ManagerProxy (${layer2ManagerAddress}), got: ${receipt.to}`
+          error: `Transaction was not sent to Layer2ManagerProxy (${layer2ManagerAddress}), got: ${receipt.to}`,
         };
       }
 
@@ -877,7 +877,7 @@ export class RollupMetadataValidator {
       if (!tx) {
         return {
           valid: false,
-          error: `Transaction details not found: ${metadata.staking.registrationTxHash}`
+          error: `Transaction details not found: ${metadata.staking.registrationTxHash}`,
         };
       }
 
@@ -889,14 +889,14 @@ export class RollupMetadataValidator {
       } catch (error) {
         return {
           valid: false,
-          error: `Failed to decode transaction data. Expected registerCandidateAddOn function call.`
+          error: 'Failed to decode transaction data. Expected registerCandidateAddOn function call.',
         };
       }
 
       if (!decodedData || decodedData.name !== 'registerCandidateAddOn') {
         return {
           valid: false,
-          error: `Expected registerCandidateAddOn function call, got: ${decodedData?.name || 'unknown'}`
+          error: `Expected registerCandidateAddOn function call, got: ${decodedData?.name || 'unknown'}`,
         };
       }
 
@@ -905,7 +905,7 @@ export class RollupMetadataValidator {
       if (rollupConfigParam.toLowerCase() !== metadata.l1Contracts.systemConfig.toLowerCase()) {
         return {
           valid: false,
-          error: `rollupConfig parameter (${rollupConfigParam}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`
+          error: `rollupConfig parameter (${rollupConfigParam}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`,
         };
       }
 
@@ -922,7 +922,7 @@ export class RollupMetadataValidator {
       if (!registeredEvent) {
         return {
           valid: false,
-          error: 'RegisteredCandidateAddOn event not found in transaction logs'
+          error: 'RegisteredCandidateAddOn event not found in transaction logs',
         };
       }
 
@@ -931,7 +931,7 @@ export class RollupMetadataValidator {
       if (!parsedEvent) {
         return {
           valid: false,
-          error: 'Failed to parse RegisteredCandidateAddOn event'
+          error: 'Failed to parse RegisteredCandidateAddOn event',
         };
       }
 
@@ -941,7 +941,7 @@ export class RollupMetadataValidator {
       if (eventCandidateAddress.toLowerCase() !== metadata.staking.candidateAddress.toLowerCase()) {
         return {
           valid: false,
-          error: `candidateAddress (${metadata.staking.candidateAddress}) does not match event candidateAddOn (${eventCandidateAddress})`
+          error: `candidateAddress (${metadata.staking.candidateAddress}) does not match event candidateAddOn (${eventCandidateAddress})`,
         };
       }
 
@@ -950,7 +950,7 @@ export class RollupMetadataValidator {
       if (eventRollupConfig.toLowerCase() !== metadata.l1Contracts.systemConfig.toLowerCase()) {
         return {
           valid: false,
-          error: `Event rollupConfig (${eventRollupConfig}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`
+          error: `Event rollupConfig (${eventRollupConfig}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`,
         };
       }
 
@@ -958,7 +958,7 @@ export class RollupMetadataValidator {
     } catch (error) {
       return {
         valid: false,
-        error: `Staking registration validation failed: ${(error as Error).message}`
+        error: `Staking registration validation failed: ${(error as Error).message}`,
       };
     }
   }
@@ -967,7 +967,7 @@ export class RollupMetadataValidator {
    * Validate native token address consistency for ERC20 tokens
    */
   public async validateNativeTokenAddress(
-    metadata: L2RollupMetadata
+    metadata: L2RollupMetadata,
   ): Promise<{ valid: boolean; error?: string }> {
     // Skip validation for ETH native tokens
     if (metadata.nativeToken.type === 'eth') {
@@ -982,7 +982,7 @@ export class RollupMetadataValidator {
     if (!this.provider) {
       return {
         valid: false,
-        error: 'RPC provider not set. Call setProvider() first.'
+        error: 'RPC provider not set. Call setProvider() first.',
       };
     }
 
@@ -990,7 +990,7 @@ export class RollupMetadataValidator {
       const systemConfigContract = new Contract(
         metadata.l1Contracts.systemConfig,
         SYSTEM_CONFIG_ABI,
-        this.provider
+        this.provider,
       );
 
       const onChainNativeTokenAddress = await systemConfigContract.nativeTokenAddress();
@@ -1000,7 +1000,7 @@ export class RollupMetadataValidator {
       if (normalizedOnChain !== normalizedMetadata) {
         return {
           valid: false,
-          error: `Native token address mismatch. SystemConfig.nativeTokenAddress(): ${normalizedOnChain}, Metadata nativeToken.l1Address: ${normalizedMetadata}`
+          error: `Native token address mismatch. SystemConfig.nativeTokenAddress(): ${normalizedOnChain}, Metadata nativeToken.l1Address: ${normalizedMetadata}`,
         };
       }
 
@@ -1008,7 +1008,7 @@ export class RollupMetadataValidator {
     } catch (error) {
       return {
         valid: false,
-        error: `Native token address validation failed: ${(error as Error).message}`
+        error: `Native token address validation failed: ${(error as Error).message}`,
       };
     }
   }

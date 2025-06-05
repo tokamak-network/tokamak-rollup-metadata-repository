@@ -148,11 +148,10 @@ This allows wallets and dApps to provide real-time withdrawal status updates to 
 
 ### How long does the registration process take?
 
-**Typical timeline:**
-- **Automated validation**: 2-3 minutes
-- **Initial review**: 1-2 business days
-- **Follow-up reviews**: 1 business day after changes
-- **Total time**: Usually 2-5 business days
+**Automated process:**
+- **Validation**: 2-3 minutes (GitHub Actions)
+- **Merge**: Immediately after validation passes
+- **No manual review required**
 
 **For faster processing:**
 - Ensure all validations pass locally before submitting
@@ -193,18 +192,13 @@ If you need to correct information after merging:
 The metadata repository integrates with Ton Staking V2 by:
 - **Using SystemConfig address** as the rollup identifier (called "RollupConfig" in staking)
 - **Providing metadata lookup** for staking interfaces
+- **Displaying rollup information** in staking UI (name, description, status, etc.)
+- **Showing bridge information** for users to access L2 deposits and withdrawals
+- **Providing explorer links** for transaction monitoring and rollup exploration
 - **Tracking staking status** in the `staking` field
 - **Enabling delegation UI** integration
 
-**Note**: Metadata registration is separate from staking candidate registration. You must register as a staking candidate through the Ton Staking V2 protocol separately.
-
-### Can wallets and dApps use this data?
-
-Yes, the metadata is designed for ecosystem integration:
-- **Wallet integration**: Display rollup information and monitor withdrawals
-- **dApp integration**: Automatic network detection and configuration
-- **Explorer integration**: Enhanced rollup information display
-- **Analytics tools**: Comprehensive rollup data for analysis
+**Note**: Metadata registration is separate from staking candidate registration. L2 operators must register as staking candidates through the L1 verification contract separately.
 
 ### Is there an API for accessing metadata?
 
@@ -216,8 +210,6 @@ https://raw.githubusercontent.com/tokamak-network/tokamak-rollup-metadata-reposi
 # Programmatic access
 curl -s https://raw.githubusercontent.com/tokamak-network/tokamak-rollup-metadata-repository/main/data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
-
-A dedicated API service may be provided in the future.
 
 ### How do I integrate withdrawal monitoring?
 
@@ -251,47 +243,37 @@ cd tokamak-rollup-metadata-repository
 # 2. Install dependencies
 npm install
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your RPC URLs
-
-# 4. Test validation
-npm run validate --help
+# 3. Test validation (works immediately with public RPCs!)
+npm run validate -- --help
 ```
 
 ### What tools are available for development?
 
 **Validation tools:**
-- `npm run validate` - Complete validation
-- `npm run validate:schema` - Schema validation only
-- `npm run validate:onchain` - On-chain verification
-- `npm run validate:signature` - Signature verification
-
-**Utility tools:**
-- `npm run create:metadata` - Interactive metadata creator
-- `npm run generate:example` - Generate example metadata
-- `npm run check:duplicates` - Check for duplicate chain IDs
+- `npm run validate -- <file>` - Complete validation
+- `npm run validate:schema <file>` - Schema validation only
+- `npm run validate:onchain <file>` - On-chain verification
+- `npm run validate:signature:register <file>` - Register signature verification
+- `npm run validate:signature:update <file>` - Update signature verification
 
 **Testing tools:**
 - `npm test` - Run test suite
-- `npm run test:integration` - Integration tests
-- `npm run test:coverage` - Coverage reports
+- `npm run lint` - Run linting
+- `npm run build` - Build TypeScript
 
 ### How do I run local validation?
 
 ```bash
 # Validate specific file
-npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
+npm run validate -- data/sepolia/0x1234567890123456789012345678901234567890.json
 
 # Validate with PR title check
-npm run validate -- --pr-title "[Rollup] sepolia - 0x1234... - My L2" data/sepolia/0x1234*.json
-
-# Validate all files in directory
-npm run validate data/sepolia/*.json
+npm run validate -- --pr-title "[Rollup] sepolia - 0x1234... - My L2" data/sepolia/0x1234567890123456789012345678901234567890.json
 
 # Run specific validation types
-npm run validate:schema data/sepolia/*.json
-npm run validate:onchain data/sepolia/*.json
+npm run validate:schema data/sepolia/0x1234567890123456789012345678901234567890.json
+npm run validate:onchain data/sepolia/0x1234567890123456789012345678901234567890.json
+npm run validate:signature:register data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
 
 ### How do I contribute to the tooling?
