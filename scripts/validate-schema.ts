@@ -55,7 +55,13 @@ async function main() {
       console.error('❌ Schema validation failed:');
       if (result.errors) {
         result.errors.forEach((error, index) => {
-          console.error(`  ${index + 1}. ${error.instancePath || 'root'}: ${error.message}`);
+          // Type guard for error object
+          if (error && typeof error === 'object' && 'instancePath' in error && 'message' in error) {
+            const validationError = error as { instancePath?: string; message: string };
+            console.error(`  ${index + 1}. ${validationError.instancePath || 'root'}: ${validationError.message}`);
+          } else {
+            console.error(`  ${index + 1}. ${JSON.stringify(error)}`);
+          }
         });
       }
       process.exit(1);

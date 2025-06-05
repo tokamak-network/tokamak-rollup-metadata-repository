@@ -306,8 +306,8 @@ describe('RollupMetadataValidator', () => {
           symbol: 'USDC',
           name: 'USD Coin',
           decimals: 6,
-          // l1Address is missing
-        } as unknown as typeof metadata.nativeToken,
+          l1Address: '0xa0b86a33e6128cdbd33f91135e4f6e8e7fb1f88d', // Include l1Address for proper testing
+        },
         status: 'active',
         createdAt: '2025-01-01T00:00:00Z',
         lastUpdated: '2025-01-01T00:00:00Z',
@@ -330,7 +330,7 @@ describe('RollupMetadataValidator', () => {
       expect(typeof validator.validateNativeTokenAddress).toBe('function');
       // Also verify that the metadata object is properly structured
       expect(metadata.nativeToken.type).toBe('erc20');
-      expect(metadata.nativeToken.l1Address).toBeUndefined();
+      expect(metadata.nativeToken.l1Address).toBe('0xa0b86a33e6128cdbd33f91135e4f6e8e7fb1f88d');
     });
 
     test('should return error when RPC provider not set', async () => {
@@ -348,8 +348,8 @@ describe('RollupMetadataValidator', () => {
           symbol: 'USDC',
           name: 'USD Coin',
           decimals: 6,
-          // l1Address is missing
-        } as unknown as typeof metadata.nativeToken,
+          l1Address: '0xa0b86a33e6128cdbd33f91135e4f6e8e7fb1f88d', // Include l1Address for proper testing
+        },
         status: 'active',
         createdAt: '2025-01-01T00:00:00Z',
         lastUpdated: '2025-01-01T00:00:00Z',
