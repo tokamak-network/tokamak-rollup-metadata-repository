@@ -1,0 +1,144 @@
+{
+  "l1ChainId": 11155111,
+  "l2ChainId": 111551153248,
+  "name": "Poseidon",
+  "description": "Thanos L2 rollup deployed with Tokamak SDK (Sepolia testnet)",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example-l2.com",
+
+  "rollupType": "optimistic",
+  "stack": {
+    "name": "thanos",
+    "version": "1.0.0"
+  },
+
+  "rpcUrl": "https://rpc.example-l2.com",
+  "wsUrl": "wss://ws.example-l2.com",
+
+  "nativeToken": {
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "Tokamak Network Token",
+    "decimals": 18,
+    "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
+  },
+
+  "status": "shutdown",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "lastUpdated": "2025-01-06T10:00:00Z",
+
+  "shutdown": {
+    "isPlanned": false,
+    "actualShutdownDate": "2025-01-06T10:00:00Z",
+    "reason": "Explorer and bridge services are no longer operational. RPC endpoint may be unstable.",
+    "migrationInfo": {
+      "migrationDeadline": "2025-02-06T10:00:00Z",
+      "migrationGuide": "Users should withdraw funds before the migration deadline. Contact support for assistance."
+    },
+    "stakingImpact": {
+      "candidateRemovalDate": "2025-01-06T10:00:00Z",
+      "finalRewardDate": "2025-01-06T10:00:00Z",
+      "penaltyApplied": false
+    }
+  },
+
+  "l1Contracts": {
+    "l1CrossDomainMessenger": "0x2D7465e9a9f8b05dfF6622828aC572eB76D473DF",
+    "l1StandardBridge": "0xd5A145ad7c07192DF22f8096460AA8bB00e7479b",
+    "optimismPortal": "0xDe4F232a1867cF6e9394227ff41a0446442Ac6b0",
+    "systemConfig": "0xbCa49844a2982C5E87CB3F813A4F4E94e46D44F9"
+  },
+
+  "l2Contracts": {
+    "nativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+    "l2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "l2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "gasPriceOracle": "0x420000000000000000000000000000000000000F",
+    "l1Block": "0x4200000000000000000000000000000000000015",
+    "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "wrappedETH": "0x4200000000000000000000000000000000000486"
+  },
+
+  "bridges": [
+    {
+      "name": "Poseidon Bridge",
+      "type": "native",
+      "url": "http://k8s-bridge-1abbe77a89-100985143.ap-northeast-2.elb.amazonaws.com",
+      "status": "inactive",
+      "supportedTokens": [
+        {
+          "symbol": "TON",
+          "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044",
+          "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+          "decimals": 18,
+          "isNativeToken": true
+        },
+        {
+          "symbol": "ETH",
+          "l1Address": "0x0000000000000000000000000000000000000000",
+          "l2Address": "0x4200000000000000000000000000000000000486",
+          "decimals": 18,
+          "isWrappedETH": true
+        }
+      ]
+    }
+  ],
+
+  "explorers": [
+    {
+      "name": "Poseidon Explorer",
+      "url": "http://k8s-blockscout-17523318b3-800786680.ap-northeast-2.elb.amazonaws.com",
+      "type": "blockscout",
+      "status": "inactive"
+    }
+  ],
+
+  "sequencer": {
+    "address": "0xa65E838e5665f03aa082bed8fA0C0221c35BB61b",
+    "batcherAddress": "0x78321C7F77ab8420FC770764b55742F9bf6A7FCf",
+    "proposerAddress": "0x4C0A69794e99814c10fc951637Bc1b2d6b8Dd581"
+  },
+
+  "staking": {
+    "isCandidate": true,
+    "candidateRegisteredAt": "2025-04-25T04:19:12Z",
+    "candidateStatus": "active",
+    "registrationTxHash": "0xad0db516f7c8a9b312438fe3fcf3e730115a5f3d56128cfdbaac8d5046f81bc1",
+    "candidateAddress": "0xF078AE62eA4740E19ddf6c0c5e17Ecdb820BbEe1"
+  },
+
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "30000000",
+    "baseFeePerGas": "1000000000",
+    "priorityFeePerGas": "1000000000",
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
+  },
+
+  "withdrawalConfig": {
+    "challengePeriod": 12,
+    "expectedWithdrawalDelay": 732,
+    "monitoringInfo": {
+      "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
+      "outputProposedEventTopic": "0x4ee37ac2c786ec85e87e0fe95c7b7bde0e7e2e1a6a20f3e9eba10b7f97c12345"
+    }
+  },
+
+  "supportResources": {
+    "statusPageUrl": "https://status.poseidon-l2.com",
+    "supportContactUrl": "https://discord.gg/poseidon-support",
+    "documentationUrl": "https://docs.poseidon-l2.com",
+    "communityUrl": "https://t.me/poseidon_community",
+    "helpCenterUrl": "https://help.poseidon-l2.com",
+    "announcementUrl": "https://twitter.com/poseidon_l2"
+  },
+
+  "metadata": {
+    "version": "1.0.0",
+    "createdAt": "2025-01-01T00:00:00Z",
+    "updatedAt": "2025-01-06T10:00:00Z",
+    "signature": "0x8f7d0a2d8a5c36a38f7af6eb3f07e7eebd775ffeb1948c2f9cdbff60fe035bf5763cce24b7d981f3c2f438dc44beaf0bcd8c3fa8936a540813e314b617a2c7cb1c",
+    "signedBy": "0xa65E838e5665f03aa082bed8fA0C0221c35BB61b"
+  }
+}
