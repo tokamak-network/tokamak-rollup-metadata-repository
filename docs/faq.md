@@ -92,17 +92,19 @@ These are the L1 networks where your SystemConfig contract should be deployed. Y
 ### How do I generate the required signature?
 
 ```javascript
-// 1. Format the exact message
+// 1. Format the exact message with timestamp
+const timestamp = Math.floor(Date.now() / 1000);
 const message = `Tokamak Rollup Registry
 L1 Chain ID: ${l1ChainId}
 L2 Chain ID: ${l2ChainId}
 Operation: register
-SystemConfig: ${systemConfigAddress.toLowerCase()}`;
+SystemConfig: ${systemConfigAddress.toLowerCase()}
+Timestamp: ${timestamp}`;
 
 // 2. Sign with sequencer private key
 const signature = await wallet.signMessage(message);
 
-// 3. Include in metadata
+// 3. Include in metadata and submit within 24 hours
 {
   "metadata": {
     "version": "1.0.0",
@@ -143,6 +145,35 @@ The `withdrawalConfig` enables automatic withdrawal monitoring:
 This allows wallets and dApps to provide real-time withdrawal status updates to users.
 
 > 📖 **For withdrawal monitoring details**, see [Withdrawal Monitoring](withdrawal-monitoring.md)
+
+### Why do signatures expire after 24 hours?
+
+**Security Enhancement**: Signature expiration prevents replay attacks and ensures metadata submissions are timely and intentional.
+
+**How it works**:
+- Each signature includes a timestamp when created
+- Signatures are valid for exactly 24 hours from creation
+- After 24 hours, you must generate a new signature
+
+**Best practices**:
+```bash
+# Generate signature and submit PR promptly
+1. Create signature using HTML tool or manual generation
+2. Copy signature to your metadata file
+3. Submit PR within 24 hours
+4. If signature expires, generate a new one
+
+# Check signature validity
+npm run validate:signature:register data/sepolia/0x1234...json
+npm run validate:signature:update data/sepolia/0x1234...json
+```
+
+**What happens if my signature expires?**
+- Validation will fail with clear error message
+- Generate a new signature with current timestamp
+- Update your metadata file and re-submit PR
+
+> 📖 **For signature generation guide**, see [Registration Guide - Step 5](registration-guide.md#step-5-generate-sequencer-signature)
 
 ## 🔄 Process Questions
 

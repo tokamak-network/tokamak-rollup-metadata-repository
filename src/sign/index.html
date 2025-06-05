@@ -196,6 +196,26 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <label for="timestamp">Timestamp (Unix seconds):</label>
+            <input type="number" id="timestamp" placeholder="Unix timestamp in seconds">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                <span>Current time: <span id="currentUnixTime"></span></span>
+                <button type="button" onclick="setCurrentTime()" style="margin-left: 10px; padding: 2px 8px; font-size: 11px;">Use Current Time</button>
+            </div>
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                <span>ISO format: <span id="timestampISO">-</span></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="isoInput">📅 Or paste ISO timestamp from metadata:</label>
+            <input type="text" id="isoInput" placeholder="2025-01-15T10:00:00Z or 2025-01-15T10:00:00.000Z">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                💡 Paste your "createdAt" or "lastUpdated" value here - it will auto-convert to Unix timestamp above
+            </div>
+        </div>
+
         <div class="message-preview">
             <strong>Message to Sign:</strong><br>
             <span id="messagePreview">Fill in the fields above to see the message</span>
@@ -211,14 +231,95 @@
         let currentAccount = null;
         let isConnecting = false;
 
+        function setCurrentTime() {
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            document.getElementById('timestamp').value = currentTimestamp;
+            updateTimestampDisplay();
+            updateMessagePreview();
+        }
+
+        function updateCurrentTimeDisplay() {
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            document.getElementById('currentUnixTime').textContent = currentTimestamp;
+        }
+
+        function updateTimestampDisplay() {
+            const timestampInput = document.getElementById('timestamp');
+            const timestampISO = document.getElementById('timestampISO');
+
+            if (timestampInput.value) {
+                const timestamp = parseInt(timestampInput.value);
+                if (!isNaN(timestamp)) {
+                    const isoTime = new Date(timestamp * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+                    timestampISO.textContent = isoTime;
+                } else {
+                    timestampISO.textContent = 'Invalid timestamp';
+                }
+            } else {
+                timestampISO.textContent = '-';
+            }
+        }
+
+        function convertISOToUnix() {
+            const isoInput = document.getElementById('isoInput');
+            const timestampInput = document.getElementById('timestamp');
+
+            if (isoInput.value.trim()) {
+                try {
+                    // Try to parse the ISO string
+                    const date = new Date(isoInput.value.trim());
+
+                    // Check if the date is valid
+                    if (isNaN(date.getTime())) {
+                        console.log('Invalid ISO date format');
+                        return;
+                    }
+
+                    // Convert to Unix timestamp
+                    const unixTimestamp = Math.floor(date.getTime() / 1000);
+
+                    // Update the Unix timestamp field
+                    timestampInput.value = unixTimestamp;
+
+                    // Update displays
+                    updateTimestampDisplay();
+                    updateMessagePreview();
+
+                    console.log(`Converted ISO "${isoInput.value}" to Unix ${unixTimestamp}`);
+                } catch (error) {
+                    console.log('Error converting ISO to Unix:', error);
+                }
+            }
+        }
+
+        function validateISOInput() {
+            const isoInput = document.getElementById('isoInput');
+            const value = isoInput.value.trim();
+
+            if (value) {
+                const date = new Date(value);
+                if (isNaN(date.getTime())) {
+                    isoInput.style.borderColor = '#ff6b6b';
+                    isoInput.style.backgroundColor = '#ffe0e0';
+                } else {
+                    isoInput.style.borderColor = '#51cf66';
+                    isoInput.style.backgroundColor = '#e0ffe0';
+                }
+            } else {
+                isoInput.style.borderColor = '#ddd';
+                isoInput.style.backgroundColor = '';
+            }
+        }
+
         function updateMessagePreview() {
             const l1ChainId = document.getElementById('l1ChainId').value;
             const l2ChainId = document.getElementById('l2ChainId').value;
             const systemConfig = document.getElementById('systemConfig').value;
             const operation = document.getElementById('operation').value;
+            const timestamp = document.getElementById('timestamp').value;
 
-            if (l1ChainId && l2ChainId && systemConfig && operation) {
-                const message = `Tokamak Rollup Registry\nL1 Chain ID: ${l1ChainId}\nL2 Chain ID: ${l2ChainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}`;
+            if (l1ChainId && l2ChainId && systemConfig && operation && timestamp) {
+                const message = `Tokamak Rollup Registry\nL1 Chain ID: ${l1ChainId}\nL2 Chain ID: ${l2ChainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}\nTimestamp: ${timestamp}`;
                 document.getElementById('messagePreview').textContent = message;
             } else {
                 document.getElementById('messagePreview').textContent = 'Fill in the fields above to see the message';
@@ -360,9 +461,16 @@
             const l2ChainId = document.getElementById('l2ChainId').value;
             const systemConfig = document.getElementById('systemConfig').value;
             const operation = document.getElementById('operation').value;
+            const timestampInput = document.getElementById('timestamp').value;
 
-            if (!l1ChainId || !l2ChainId || !systemConfig || !operation) {
-                alert('Please fill in all fields');
+            if (!l1ChainId || !l2ChainId || !systemConfig || !operation || !timestampInput) {
+                alert('Please fill in all fields including timestamp');
+                return;
+            }
+
+            const timestamp = parseInt(timestampInput);
+            if (isNaN(timestamp)) {
+                alert('Please enter a valid Unix timestamp (numbers only)');
                 return;
             }
 
@@ -371,7 +479,7 @@
                 return;
             }
 
-            const message = `Tokamak Rollup Registry\nL1 Chain ID: ${l1ChainId}\nL2 Chain ID: ${l2ChainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}`;
+            const message = `Tokamak Rollup Registry\nL1 Chain ID: ${l1ChainId}\nL2 Chain ID: ${l2ChainId}\nOperation: ${operation}\nSystemConfig: ${systemConfig.toLowerCase()}\nTimestamp: ${timestamp}`;
 
             try {
                 const signature = await window.ethereum.request({
@@ -379,10 +487,25 @@
                     params: [message, currentAccount]
                 });
 
+                const expiryDate = new Date((timestamp + 86400) * 1000); // 24 hours from signature timestamp
+                const isoTimestamp = new Date(timestamp * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z'); // Convert to ISO format without milliseconds
                 const signatureResult = document.getElementById('signatureResult');
                 signatureResult.style.display = 'block';
                 signatureResult.innerHTML = `
                     <h3>Signature Generated Successfully!</h3>
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 10px; margin: 10px 0;">
+                        <strong>⚠️ Important:</strong> This signature is valid for <strong>24 hours</strong> from timestamp (expires: ${expiryDate.toLocaleString()})
+                        <br><strong>📝 Use this exact timestamp in your metadata:</strong> Copy the ISO timestamp below to your createdAt/lastUpdated field.
+                        <br>Submit your PR within the validity period to avoid signature expiration.
+                    </div>
+                    <p><strong>📅 Timestamp for Metadata (copy this exactly):</strong></p>
+                    <div class="signature-text" style="background-color: #e8f5e8; border: 2px solid #28a745;">${isoTimestamp}</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                        For <strong>register</strong>: use as both "createdAt" and "lastUpdated"<br>
+                        For <strong>update</strong>: use as "lastUpdated" only
+                    </div>
+                    <p><strong>Unix Timestamp Used:</strong></p>
+                    <div class="signature-text">${timestamp}</div>
                     <p><strong>Message:</strong></p>
                     <div class="signature-text">${message}</div>
                     <p><strong>Signature:</strong></p>
@@ -402,7 +525,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded, initializing...');
             checkWalletConnection();
+            setCurrentTime(); // Set current time as default
+            updateCurrentTimeDisplay();
             updateMessagePreview();
+
+            // Update current time display every second
+            setInterval(updateCurrentTimeDisplay, 1000);
         });
 
         // Check if wallet is already connected
@@ -444,6 +572,21 @@
         document.getElementById('l2ChainId').addEventListener('input', updateMessagePreview);
         document.getElementById('systemConfig').addEventListener('input', updateMessagePreview);
         document.getElementById('operation').addEventListener('change', updateMessagePreview);
+        document.getElementById('timestamp').addEventListener('input', function() {
+            updateTimestampDisplay();
+            updateMessagePreview();
+        });
+        document.getElementById('isoInput').addEventListener('input', function() {
+            validateISOInput();
+            convertISOToUnix();
+        });
+        document.getElementById('isoInput').addEventListener('paste', function() {
+            // Small delay to allow paste content to be processed
+            setTimeout(function() {
+                validateISOInput();
+                convertISOToUnix();
+            }, 10);
+        });
     </script>
 </body>
 </html>

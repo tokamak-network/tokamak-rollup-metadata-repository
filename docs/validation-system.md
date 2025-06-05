@@ -39,6 +39,11 @@ The validation system provides multi-layered security through JSON schema valida
 - **Data Integrity**: Maintains consistency across updates with detailed violation reporting
 - **Staking Protection**: Protects registration transaction and candidate address data
 
+### Layer 7: Timestamp-Based Update Validation
+- **Update Recency**: Validates lastUpdated is within 1 hour of current time for updates
+- **Sequential Timestamps**: Ensures new lastUpdated is after previous lastUpdated
+- **Replay Prevention**: Prevents reuse of old metadata through timestamp ordering
+
 ## 🏗️ System Architecture
 
 ### Validation Pipeline
@@ -136,16 +141,27 @@ const rollupMetadataSchema = {
 **Message Format:**
 ```
 Tokamak Rollup Registry
-Chain ID: {l2ChainId}
+L1 Chain ID: {l1ChainId}
+L2 Chain ID: {l2ChainId}
 Operation: {operation}
 SystemConfig: {systemConfigAddress}
+Timestamp: {unixTimestamp}
 ```
 
 **Validation Process:**
 1. Verify on-chain sequencer address
-2. Reconstruct message with correct operation type
+2. Reconstruct message with correct operation type and timestamp
 3. Verify signature using `ethers.verifyMessage()`
 4. Validate signer matches on-chain sequencer
+5. **Check timestamp validity** (24-hour expiry from creation)
+6. **Check timestamp consistency** with metadata time fields
+
+**Security Features:**
+- **Replay Attack Prevention**: Timestamps prevent signature reuse
+- **Temporal Validity**: Signatures expire after 24 hours
+- **Clock Skew Tolerance**: Allows 5 minutes future timestamp variance
+- **Update Timestamp Validation**: For updates, lastUpdated must be within 1 hour and sequential
+- **Timestamp Consistency**: Signature timestamp must exactly match metadata time fields
 
 ### File Structure & Naming
 
@@ -274,6 +290,8 @@ npm run validate:all  # Validate all metadata files
 - Signature verification failure with ethers.js
 - Wrong signer address (not matching on-chain sequencer)
 - Message format mismatch (incorrect operation type)
+- **Signature expiration** (older than 24 hours)
+- **Future timestamp** (more than 5 minutes in future)
 
 **4. File Structure Errors**
 - Filename doesn't match SystemConfig address
@@ -336,15 +354,19 @@ Staking Data (when isCandidate is true):
 ### Message Format Requirements:
 
 Tokamak Rollup Registry
-Chain ID: {l2ChainId}
+L1 Chain ID: {l1ChainId}
+L2 Chain ID: {l2ChainId}
 Operation: {register|update}
 SystemConfig: {systemConfigAddress}
+Timestamp: {unixTimestamp}
 
 ### Common Issues:
 - Operation type mismatch between PR title and signature
 - Wrong sequencer signing (must be on-chain sequencer)
 - Message format deviation (extra spaces, different text)
-- Using l1ChainId instead of l2ChainId in message
+- **Signature expiration** (older than 24 hours)
+- **Missing or invalid timestamp** format
+- **Future timestamp** beyond 5-minute tolerance
 ```
 
 ## 🔗 Related Documentation

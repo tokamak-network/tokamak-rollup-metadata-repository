@@ -146,8 +146,10 @@ export function displayValidationResults(result: ValidationResult, verbose: bool
     console.log('  ✅ Contract address format validation');
     console.log('  ✅ OnChain sequencer verification');
     console.log('  ✅ Sequencer signature verification');
+    console.log('  ✅ Timestamp-based replay protection');
     console.log('  ✅ File existence validation for operation type');
     console.log('  ✅ Immutable fields protection (for updates)');
+    console.log('  ✅ Update timestamp validation (for updates)');
     console.log('  ✅ Network consistency validation');
     console.log('  ✅ PR title format validation');
 

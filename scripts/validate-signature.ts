@@ -120,7 +120,9 @@ async function main() {
       console.log('  2. Check that the message format matches the expected pattern');
       console.log('  3. Verify L1 and L2 chain IDs are correct');
       console.log(`  4. Ensure signature was created for ${operation} operation`);
-      console.log('  5. Use the HTML signature tool to generate a valid signature');
+      console.log('  5. Check signature timestamp is within 24 hours');
+      console.log('  6. For updates: ensure lastUpdated is within 1 hour and after previous');
+      console.log('  7. Use the HTML signature tool to generate a valid signature');
 
       process.exit(1);
     }

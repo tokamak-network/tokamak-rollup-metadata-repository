@@ -526,7 +526,7 @@ This document defines the JSON schema for rollup metadata, including all require
 ### metadata
 - **Type**: `object`
 - **Required**: Yes
-- **Description**: Cryptographic proof of sequencer authority
+- **Description**: Cryptographic proof of sequencer authority with temporal validity
 
 ```json
 {
@@ -540,10 +540,32 @@ This document defines the JSON schema for rollup metadata, including all require
 
 **Required Properties:**
 - `version`: Metadata schema version string
-- `signature`: Ethereum signature (130 characters including 0x prefix)
+- `signature`: Ethereum signature (130 characters including 0x prefix) with 24-hour validity
 - `signedBy`: Address of the sequencer who signed (must match sequencer.address)
 
-> 📖 **For signature details**: See [Registration Guide](registration-guide.md#signature-generation)
+**Security Features:**
+- **Temporal validity**: Signatures expire 24 hours after creation
+- **Replay protection**: Timestamps prevent signature reuse
+- **On-chain verification**: Signer must match SystemConfig.unsafeBlockSigner()
+
+**Message Format:**
+```
+Tokamak Rollup Registry
+L1 Chain ID: {l1ChainId}
+L2 Chain ID: {l2ChainId}
+Operation: {register|update}
+SystemConfig: {systemConfigAddress}
+Timestamp: {unixTimestamp}
+```
+
+**Validation Rules:**
+- **24-hour expiry**: Signatures expire 24 hours after timestamp
+- **Clock skew tolerance**: Maximum 5 minutes future timestamp allowed
+- **Update constraints**: For updates, lastUpdated must be within 1 hour and sequential
+- **Signer verification**: Must match on-chain SystemConfig.unsafeBlockSigner()
+- **Timestamp consistency**: Signature timestamp must exactly match metadata time fields
+  - Register: signature timestamp = createdAt (use same timestamp value)
+  - Update: signature timestamp = lastUpdated (use same timestamp value)
 
 ## 📏 Validation Rules
 

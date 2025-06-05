@@ -291,6 +291,8 @@ jobs:
             message += '- ✅ JSON schema validation\n';
             message += '- ✅ **OnChain SystemConfig.unsafeBlockSigner() verification**\n';
             message += '- ✅ Sequencer signature verification with onchain sequencer address\n';
+            message += '- ✅ **Timestamp-based replay protection (24-hour validity)**\n';
+            message += '- ✅ **Update timestamp validation (1-hour window, sequential)**\n';
             message += '- ✅ Contract address format validation\n';
             message += '- ✅ PR title format and consistency validation\n';
             message += '- ✅ Filename validation (SystemConfig address match)\n';
@@ -306,6 +308,8 @@ jobs:
             message += '### Common issues:\n';
             message += '- **Invalid sequencer address**: The sequencer address in metadata doesn\'t match `SystemConfig.unsafeBlockSigner()`\n';
             message += '- **Invalid signature**: The signature was not created by the actual onchain sequencer\n';
+            message += '- **Signature expiration**: The signature is older than 24 hours\n';
+            message += '- **Update timestamp issues**: For updates, lastUpdated not within 1-hour window or not sequential\n';
             message += '- Invalid JSON format or missing required fields\n';
             message += '- SystemConfig address mismatch between PR title and metadata\n';
             message += '- Incorrect PR title format\n';

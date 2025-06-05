@@ -7,6 +7,30 @@
 export type RollupType = 'optimistic' | 'zk' | 'sovereign';
 export type RollupStatus = 'active' | 'inactive' | 'maintenance' | 'deprecated' | 'shutdown';
 
+/**
+ * Validation constraints for rollup metadata
+ */
+export interface ValidationRules {
+  // Signature validation
+  signatureValidityPeriod: 86400; // 24 hours in seconds
+
+  // Update-specific validation
+  updateTimestampWindow: 3600; // 1 hour in seconds - lastUpdated must be within this window
+
+  // Timestamp ordering
+  updateTimestampMustBeAfterPrevious: true; // For updates, new lastUpdated > existing lastUpdated
+
+  // Immutable fields (cannot be changed during updates)
+  immutableFields: [
+    'l1ChainId',
+    'l2ChainId',
+    'l1Contracts.systemConfig',
+    'rollupType',
+    'stack.name',
+    'createdAt'
+  ];
+}
+
 export interface L2RollupMetadata {
   // Basic information
   l1ChainId: number; // L1 chain ID (1: mainnet, 11155111: sepolia, etc.)
@@ -46,8 +70,9 @@ export interface L2RollupMetadata {
 
   // Operational status
   status: RollupStatus;
-  createdAt: string; // ISO 8601 format - initial registration time
+  createdAt: string; // ISO 8601 format - initial registration time (immutable after creation)
   lastUpdated: string; // ISO 8601 format - last update time
+                      // For updates: must be within 1 hour of current time and after previous lastUpdated
 
   // L2 shutdown related information
   shutdown?: {
@@ -235,7 +260,10 @@ export interface L2RollupMetadata {
   // Metadata information
   metadata: {
     version: string; // Metadata schema version
-    signature: string; // Sequencer's signature
-    signedBy: string; // Sequencer address that signed
+    signature: string; // Sequencer's signature with timestamp-based validation
+                      // Message format: "Tokamak Rollup Registry\nL1 Chain ID: {l1ChainId}\nL2 Chain ID: {l2ChainId}\nOperation: {register|update}\nSystemConfig: {address}\nTimestamp: {unixTimestamp}"
+                      // Validation: 24-hour expiry from timestamp, must be signed by on-chain sequencer
+                      // Replay protection: enforced through lastUpdated timestamp validation for updates
+    signedBy: string; // Sequencer address that signed (must match SystemConfig.unsafeBlockSigner())
   };
 }

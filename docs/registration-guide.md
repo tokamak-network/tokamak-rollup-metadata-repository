@@ -114,27 +114,34 @@ The easiest way to generate signatures is using the provided HTML tool:
 If you prefer programmatic generation:
 
 ```javascript
-// Message format for NEW REGISTRATION
+// Message format for BOTH REGISTRATION AND UPDATES (with 24-hour validity)
+const timestamp = Math.floor(Date.now() / 1000); // Current Unix timestamp
+
 const registerMessage = `Tokamak Rollup Registry
 L1 Chain ID: ${l1ChainId}
 L2 Chain ID: ${l2ChainId}
 Operation: register
-SystemConfig: ${systemConfig.toLowerCase()}`;
+SystemConfig: ${systemConfig.toLowerCase()}
+Timestamp: ${timestamp}`;
 
-// Message format for UPDATES
 const updateMessage = `Tokamak Rollup Registry
 L1 Chain ID: ${l1ChainId}
 L2 Chain ID: ${l2ChainId}
 Operation: update
-SystemConfig: ${systemConfig.toLowerCase()}`;
+SystemConfig: ${systemConfig.toLowerCase()}
+Timestamp: ${timestamp}`;
 
 // Generate signature using MetaMask or ethers.js
 const signature = await signer.signMessage(message);
 ```
 
-**Important**: Use the correct operation type:
-- **`register`**: For new rollup registration
-- **`update`**: For metadata updates
+**Important**:
+- **Use the correct operation type**: `register` for new rollups, `update` for metadata updates
+- **24-hour validity**: Signatures expire 24 hours after timestamp generation
+- **Submit promptly**: Create your PR within 24 hours to avoid signature expiration
+- **Timestamp consistency**: Ensure signature timestamp matches metadata time fields
+  - Register: signature timestamp should match `createdAt` time
+  - Update: signature timestamp should match `lastUpdated` time
 
 Add the signature to metadata:
 ```json
@@ -185,6 +192,12 @@ Before submitting your PR, ensure:
 - [ ] Message follows exact format
 - [ ] Signature is valid and recoverable
 - [ ] Signed by the correct sequencer address
+- [ ] Signature timestamp is within 24 hours
+
+### Update-Specific Validation (if updating)
+- [ ] lastUpdated is within 1 hour of current time
+- [ ] lastUpdated is after previous lastUpdated timestamp
+- [ ] Only mutable fields are changed
 
 ### Metadata Quality
 - [ ] RPC endpoint is accessible
@@ -271,9 +284,10 @@ Update your rollup metadata when:
 
 1. **Locate existing file**: Find your current metadata in `data/<network>/<systemConfig>.json`
 2. **Make necessary changes**: Update only the fields that have changed
-3. **Generate new signature**: Use `Operation: update` in the signature message
+3. **Generate new signature**: Use `Operation: update` in the signature message with current timestamp
 4. **Create update PR**: Use `[Update]` prefix in PR title
-5. **Validation**: System validates both new data and signature
+5. **Submit within 24 hours**: Signature expires 24 hours after generation
+6. **Validation**: System validates both new data and signature freshness
 
 ### Important Update Rules
 - **SystemConfig address cannot change**: If your SystemConfig changes, it's a new rollup
