@@ -51,8 +51,8 @@ const sequencer = await systemConfig.unsafeBlockSigner();
 ### Step 3: Create Metadata File
 
 ```bash
-# 1. Check the schema structure
-cat schemas/rollup-metadata.ts
+# 1. Check the example JSON structure
+cat schemas/example-rollup-metadata.json
 
 # 2. Create your JSON file following the L2RollupMetadata interface
 vim data/sepolia/0x5678901234567890123456789012345678901234.json

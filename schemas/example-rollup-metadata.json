@@ -1,0 +1,123 @@
+{
+  "l1ChainId": 11155111,
+  "l2ChainId": 123456789,
+  "name": "Example L2",
+  "description": "Example rollup deployed with Tokamak SDK",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example-l2.com",
+
+  "rollupType": "optimistic",
+  "stack": {
+    "name": "thanos",
+    "version": "1.0.0"
+  },
+
+  "rpcUrl": "https://rpc.example-l2.com",
+  "wsUrl": "wss://ws.example-l2.com",
+
+  "nativeToken": {
+    "type": "erc20",
+    "symbol": "TKN",
+    "name": "Example Token",
+    "decimals": 18,
+    "l1Address": "0x1234567890123456789012345678901234567890"
+  },
+
+  "status": "active",
+  "createdAt": "2025-01-15T10:00:00Z",
+  "lastUpdated": "2025-01-15T10:00:00Z",
+
+  "l1Contracts": {
+    "l1CrossDomainMessenger": "0x1111111111111111111111111111111111111111",
+    "l1StandardBridge": "0x2222222222222222222222222222222222222222",
+    "optimismPortal": "0x3333333333333333333333333333333333333333",
+    "systemConfig": "0x1234567890123456789012345678901234567890"
+  },
+
+  "l2Contracts": {
+    "nativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+    "l2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "l2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "gasPriceOracle": "0x420000000000000000000000000000000000000F",
+    "l1Block": "0x4200000000000000000000000000000000000015",
+    "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "wrappedETH": "0x4200000000000000000000000000000000000486"
+  },
+
+  "bridges": [
+    {
+      "name": "Example Bridge",
+      "type": "native",
+      "url": "https://bridge.example-l2.com",
+      "status": "active",
+      "supportedTokens": [
+        {
+          "symbol": "TKN",
+          "l1Address": "0x1234567890123456789012345678901234567890",
+          "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+          "decimals": 18,
+          "isNativeToken": true
+        },
+        {
+          "symbol": "ETH",
+          "l1Address": "0x0000000000000000000000000000000000000000",
+          "l2Address": "0x4200000000000000000000000000000000000486",
+          "decimals": 18,
+          "isWrappedETH": true
+        }
+      ]
+    }
+  ],
+
+  "explorers": [
+    {
+      "name": "Example Explorer",
+      "url": "https://explorer.example-l2.com",
+      "type": "blockscout",
+      "status": "active"
+    }
+  ],
+
+  "sequencer": {
+    "address": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+    "batcherAddress": "0xbcdefabcdefabcdefabcdefabcdefabcdefabcdef",
+    "proposerAddress": "0xcdefabcdefabcdefabcdefabcdefabcdefabcdefab"
+  },
+
+  "staking": {
+    "isCandidate": false
+  },
+
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "30000000",
+    "baseFeePerGas": "1000000000",
+    "priorityFeePerGas": "1000000000",
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
+  },
+
+  "withdrawalConfig": {
+    "challengePeriod": 120,
+    "expectedWithdrawalDelay": 1560,
+    "monitoringInfo": {
+      "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
+      "outputProposedEventTopic": "0x4ee37ac2c786ec85e87e0fe95c7b7bde0e7e2e1a6a20f3e9eba10b7f97c12345"
+    }
+  },
+
+  "supportResources": {
+    "statusPageUrl": "https://status.example-l2.com",
+    "supportContactUrl": "https://discord.gg/example-support",
+    "documentationUrl": "https://docs.example-l2.com",
+    "communityUrl": "https://t.me/example_community",
+    "helpCenterUrl": "https://help.example-l2.com",
+    "announcementUrl": "https://twitter.com/example_l2"
+  },
+
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x[GENERATED_BY_SEQUENCER_SIGNATURE]",
+    "signedBy": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+  }
+}
