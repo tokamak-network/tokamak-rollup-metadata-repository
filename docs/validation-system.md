@@ -39,10 +39,11 @@ The validation system provides multi-layered security through JSON schema valida
 - **Data Integrity**: Maintains consistency across updates with detailed violation reporting
 - **Staking Protection**: Protects registration transaction and candidate address data
 
-### Layer 7: Timestamp-Based Update Validation
+### Layer 7: Timestamp-Based Validation
 - **Update Recency**: Validates lastUpdated is within 1 hour of current time for updates
 - **Sequential Timestamps**: Ensures new lastUpdated is after previous lastUpdated
-- **Replay Prevention**: Prevents reuse of old metadata through timestamp ordering
+- **Signature Expiry**: Enforces 24-hour validity period for all signatures (register/update)
+- **Replay Prevention**: Prevents reuse of old metadata through timestamp ordering and signature expiration
 
 ## 🏗️ System Architecture
 
@@ -88,7 +89,7 @@ graph TD
 
 ### Schema Validation
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L67-L237)
+**Implementation**: [`validators/schema-validator.ts`](../validators/schema-validator.ts#L7-L205)
 
 ```javascript
 const rollupMetadataSchema = {
@@ -121,7 +122,7 @@ const rollupMetadataSchema = {
 
 ### On-Chain Verification
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L485-L541)
+**Implementation**: [`validators/contract-validator.ts`](../validators/contract-validator.ts#L60-L100)
 
 **SystemConfig Validation:**
 - Contract existence verification on L1 network
@@ -129,14 +130,14 @@ const rollupMetadataSchema = {
 - Sequencer address comparison (on-chain vs metadata)
 - RPC connectivity and comprehensive error handling
 
-**Native Token Address Validation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L969-L1017)
+**Native Token Address Validation**: [`validators/contract-validator.ts`](../validators/contract-validator.ts#L102-L140)
 - Validates `SystemConfig.nativeTokenAddress()` matches `metadata.nativeToken.l1Address`
 - ERC20 token specific validation (ETH tokens skipped)
 - Ensures on-chain configuration consistency
 
 ### Signature Verification
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L543-L591)
+**Implementation**: [`validators/signature-validator.ts`](../validators/signature-validator.ts#L9-L170)
 
 **Message Format:**
 ```
@@ -165,7 +166,7 @@ Timestamp: {unixTimestamp}
 
 ### File Structure & Naming
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L364-L386)
+**Implementation**: [`validators/network-validator.ts`](../validators/network-validator.ts#L4-L20)
 
 **Validation Rules:**
 - Filename must match SystemConfig address: `{address}.json` (lowercase)
@@ -173,27 +174,27 @@ Timestamp: {unixTimestamp}
 - Case-insensitive address matching with proper normalization
 - Directory structure validation for supported networks
 
-**Network-ChainId Consistency**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L387-L430)
+**Network-ChainId Consistency**: [`validators/network-validator.ts`](../validators/network-validator.ts#L21-L50)
 - Mainnet directory rejects known testnet chainIds
 - Sepolia directory rejects known mainnet chainIds
 - Proper L2 chainId categorization by network type
 
 ### Operation-Based Validation
 
-**PR Title Parsing**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L434-L483)
+**PR Title Parsing**: [`validators/network-validator.ts`](../validators/network-validator.ts#L55-L95)
 
 **Required Format:**
 - `[Rollup] network 0x1234...abcd - L2 Name` (new rollups)
 - `[Update] network 0x1234...abcd - L2 Name` (existing rollups)
 
-**File Existence Logic**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L729-L750)
+**File Existence Logic**: [`validators/file-validator.ts`](../validators/file-validator.ts#L6-L25)
 - **Register operations**: File must NOT exist (prevents overwriting)
 - **Update operations**: File must exist (validates existing rollup)
 - Clear error messages with suggested operation type
 
 ### Immutable Field Protection
 
-**Implementation**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L758-L817)
+**Implementation**: [`validators/file-validator.ts`](../validators/file-validator.ts#L29-L80)
 
 **Protected Fields:**
 - `l1ChainId` - L1 Chain ID
@@ -217,7 +218,7 @@ Timestamp: {unixTimestamp}
 
 ### Complete Validation Pipeline
 
-**Main Orchestration**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L593-L730)
+**Main Orchestration**: [`validators/rollup-validator.ts`](../validators/rollup-validator.ts#L175-L310)
 
 **Multi-Step Validation Sequence:**
 1. Network path extraction and validation

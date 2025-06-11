@@ -11,7 +11,7 @@ This repository manages information for L2 rollups deployed in the Tokamak Netwo
 - **Sequencer-based Authorization**: Only L2 sequencers can register/modify their rollup information
 - **Pull Request Management**: Transparent and verifiable metadata management through PRs
 - **Automated Validation System**: Schema, signature, and authorization validation through GitHub Actions
-- **Staking V2 Integration**: Candidate registration status tracking and L2 detailed information
+- **Third-party Reference**: Provides candidate registration status and L2 detailed information for third-party integration
 - **L2 Termination Management**: Impact tracking on staking when rollups are terminated
 
 ## 🏗️ Supported Rollup Types

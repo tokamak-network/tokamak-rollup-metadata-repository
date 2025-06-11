@@ -24,8 +24,8 @@
   },
 
   "status": "shutdown",
-  "createdAt": "2025-01-01T00:00:00Z",
-  "lastUpdated": "2025-01-06T10:00:00Z",
+  "createdAt": "2025-06-05T12:58:24Z",
+  "lastUpdated": "2025-06-05T12:58:24Z",
 
   "shutdown": {
     "isPlanned": false,
@@ -136,9 +136,7 @@
 
   "metadata": {
     "version": "1.0.0",
-    "createdAt": "2025-01-01T00:00:00Z",
-    "updatedAt": "2025-01-06T10:00:00Z",
-    "signature": "0x8f7d0a2d8a5c36a38f7af6eb3f07e7eebd775ffeb1948c2f9cdbff60fe035bf5763cce24b7d981f3c2f438dc44beaf0bcd8c3fa8936a540813e314b617a2c7cb1c",
+    "signature": "0xf0b70c764e32e008d1fcc8497f7da2caf9baccd163848795fe9734fc8fe8cad65609bacd9957032cd60742801d8de6040e1f1209cbf6ebcb835177542fedd3d41c",
     "signedBy": "0xa65E838e5665f03aa082bed8fA0C0221c35BB61b"
   }
 }
