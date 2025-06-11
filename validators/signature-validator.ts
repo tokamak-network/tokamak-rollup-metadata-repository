@@ -111,10 +111,10 @@ export class SignatureValidator {
             };
           }
 
-          if (signatureAge < -300) { // Allow 5 minutes clock skew in future
+          if (signatureAge < 0) {
             return {
               valid: false,
-              error: 'Signature timestamp is too far in the future. Please check your system time.',
+              error: 'Signature timestamp cannot be in the future.',
             };
           }
 

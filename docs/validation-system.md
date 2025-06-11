@@ -130,7 +130,7 @@ const rollupMetadataSchema = {
 - Sequencer address comparison (on-chain vs metadata)
 - RPC connectivity and comprehensive error handling
 
-**Native Token Address Validation**: [`validators/contract-validator.ts`](../validators/contract-validator.ts#L102-L140)
+**Native Token Address Validation**: [`validators/contract-validator.ts`](../validators/contract-validator.ts#L129-L177)
 - Validates `SystemConfig.nativeTokenAddress()` matches `metadata.nativeToken.l1Address`
 - ERC20 token specific validation (ETH tokens skipped)
 - Ensures on-chain configuration consistency
@@ -160,7 +160,7 @@ Timestamp: {unixTimestamp}
 **Security Features:**
 - **Replay Attack Prevention**: Timestamps prevent signature reuse
 - **Temporal Validity**: Signatures expire after 24 hours
-- **Clock Skew Tolerance**: Allows 5 minutes future timestamp variance
+- **Future Timestamp Prevention**: Blocks any future timestamps
 - **Update Timestamp Validation**: For updates, lastUpdated must be within 1 hour and sequential
 - **Timestamp Consistency**: Signature timestamp must exactly match metadata time fields
 
@@ -174,23 +174,30 @@ Timestamp: {unixTimestamp}
 - Case-insensitive address matching with proper normalization
 - Directory structure validation for supported networks
 
-**Network-ChainId Consistency**: [`validators/network-validator.ts`](../validators/network-validator.ts#L21-L50)
+**Network-ChainId Consistency**: [`validators/network-validator.ts`](../validators/network-validator.ts#L20-L63)
 - Mainnet directory rejects known testnet chainIds
 - Sepolia directory rejects known mainnet chainIds
 - Proper L2 chainId categorization by network type
 
 ### Operation-Based Validation
 
-**PR Title Parsing**: [`validators/network-validator.ts`](../validators/network-validator.ts#L55-L95)
+**PR Title Parsing**: [`validators/network-validator.ts`](../validators/network-validator.ts#L65-L117)
 
 **Required Format:**
 - `[Rollup] network 0x1234...abcd - L2 Name` (new rollups)
 - `[Update] network 0x1234...abcd - L2 Name` (existing rollups)
 
-**File Existence Logic**: [`validators/file-validator.ts`](../validators/file-validator.ts#L6-L25)
-- **Register operations**: File must NOT exist (prevents overwriting)
-- **Update operations**: File must exist (validates existing rollup)
-- Clear error messages with suggested operation type
+**File Existence Logic**: Multiple implementations
+- **GitHub Actions**: [`.github/workflows/validate-rollup-metadata.yml`](../.github/workflows/validate-rollup-metadata.yml#L66-L108)
+  - Git-based file existence checking against main branch
+  - Determines operation type (register/update) based on file change type
+- **Timestamp Validator**: [`validators/timestamp-validator.ts`](../validators/timestamp-validator.ts#L16-L49)
+  - HTTP-based validation using GitHub Raw URL
+  - Register: File must NOT exist in main branch
+  - Update: File must exist in main branch
+- **Local Validator**: [`validators/file-validator.ts`](../validators/file-validator.ts#L9-L26)
+  - Always passes to avoid catch-22 scenarios in local development
+  - Actual validation delegated to CI/CD pipeline
 
 ### Immutable Field Protection
 
@@ -292,7 +299,7 @@ npm run validate:all  # Validate all metadata files
 - Wrong signer address (not matching on-chain sequencer)
 - Message format mismatch (incorrect operation type)
 - **Signature expiration** (older than 24 hours)
-- **Future timestamp** (more than 5 minutes in future)
+- **Future timestamp not allowed**
 
 **4. File Structure Errors**
 - Filename doesn't match SystemConfig address
@@ -367,7 +374,7 @@ Timestamp: {unixTimestamp}
 - Message format deviation (extra spaces, different text)
 - **Signature expiration** (older than 24 hours)
 - **Missing or invalid timestamp** format
-- **Future timestamp** beyond 5-minute tolerance
+- **Future timestamp not allowed**
 ```
 
 ## 🔗 Related Documentation

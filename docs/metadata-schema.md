@@ -560,7 +560,7 @@ Timestamp: {unixTimestamp}
 
 **Validation Rules:**
 - **24-hour expiry**: Signatures expire 24 hours after timestamp
-- **Clock skew tolerance**: Maximum 5 minutes future timestamp allowed
+- **Future timestamp prevention**: No future timestamps allowed
 - **Update constraints**: For updates, lastUpdated must be within 1 hour and sequential
 - **Signer verification**: Must match on-chain SystemConfig.unsafeBlockSigner()
 - **Timestamp consistency**: Signature timestamp must exactly match metadata time fields
