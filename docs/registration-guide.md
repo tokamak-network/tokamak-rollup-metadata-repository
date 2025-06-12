@@ -27,6 +27,8 @@ This guide covers how to create valid rollup metadata files, including field com
 git clone https://github.com/tokamak-network/tokamak-rollup-metadata-repository.git
 cd tokamak-rollup-metadata-repository
 
+git checkout -b feature/add-rollup
+
 # Install dependencies
 npm install
 ```
@@ -51,8 +53,8 @@ const sequencer = await systemConfig.unsafeBlockSigner();
 ### Step 3: Create Metadata File
 
 ```bash
-# 1. Check the example JSON structure
-cat schemas/example-rollup-metadata.json
+# 1. Copy the example JSON structure
+cp schemas/example-rollup-metadata.json /data/sepolia/0x5678901234567890123456789012345678901234.json
 
 # 2. Create your JSON file following the L2RollupMetadata interface
 vim data/sepolia/0x5678901234567890123456789012345678901234.json

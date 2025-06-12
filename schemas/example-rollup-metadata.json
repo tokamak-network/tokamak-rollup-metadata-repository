@@ -2,7 +2,7 @@
   "l1ChainId": 11155111,
   "l2ChainId": 123456789,
   "name": "Example L2",
-  "description": "Example rollup deployed with Tokamak SDK",
+  "description": "Example rollup deployed with TRH SDK",
   "logo": "https://example.com/logo.png",
   "website": "https://example-l2.com",
 
@@ -17,13 +17,13 @@
 
   "nativeToken": {
     "type": "erc20",
-    "symbol": "TKN",
-    "name": "Example Token",
+    "symbol": "TON",
+    "name": "Tokamak Network Token",
     "decimals": 18,
-    "l1Address": "0x1234567890123456789012345678901234567890"
+    "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
   },
 
-  "status": "active",
+  "status": "inactive",
   "createdAt": "2025-01-15T10:00:00Z",
   "lastUpdated": "2025-01-15T10:00:00Z",
 
@@ -49,11 +49,11 @@
       "name": "Example Bridge",
       "type": "native",
       "url": "https://bridge.example-l2.com",
-      "status": "active",
+      "status": "inactive",
       "supportedTokens": [
         {
-          "symbol": "TKN",
-          "l1Address": "0x1234567890123456789012345678901234567890",
+          "symbol": "TON",
+          "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044",
           "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
           "decimals": 18,
           "isNativeToken": true
@@ -74,7 +74,7 @@
       "name": "Example Explorer",
       "url": "https://explorer.example-l2.com",
       "type": "blockscout",
-      "status": "active"
+      "status": "inactive"
     }
   ],
 
