@@ -47,11 +47,26 @@ npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
 
 ```bash
 # New rollup
+[Rollup] {network} {systemConfig_address} - {L2_Name}
+
+# Update existing
+[Update] {network} {systemConfig_address} - {L2_Name}
+```
+
+### Examples:
+```bash
+# New rollup
 [Rollup] sepolia 0x1234567890123456789012345678901234567890 - My L2
 
 # Update existing
 [Update] mainnet 0xabcdef1234567890abcdef1234567890abcdef12 - My L2
 ```
+
+### Format Rules:
+- `{network}`: lowercase network name (e.g., sepolia, mainnet, goerli)
+- `{systemConfig_address}`: lowercase systemConfig contract address
+- `{L2_Name}`: Your L2 rollup name
+- Use `[Rollup]` for new rollups, `[Update]` for existing rollup updates
 
 ## 🔗 Need More Help?
 
