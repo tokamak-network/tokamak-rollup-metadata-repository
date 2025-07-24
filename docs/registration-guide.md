@@ -70,6 +70,8 @@ vim data/sepolia/0x5678901234567890123456789012345678901234.json
 
 Create a signature to prove sequencer ownership:
 
+**Important**: The signer address must match the onchain sequencer address from the SystemConfig contract. Only the current on-chain sequencer can submit metadata.
+
 #### Option A: Using HTML Signature Tool (Recommended)
 
 The easiest way to generate signatures is using the provided HTML tool:
@@ -164,21 +166,32 @@ Add the signature to metadata:
 
 ### Step 5: Local Validation
 
-Run all validations locally before submitting:
+After creating your metadata and generating the signature, validate it locally before submitting a PR:
 
 ```bash
-# Complete validation
-npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
+# Format
+npx ts-node scripts/validate-metadata.ts --pr-title "[Operation] network systemConfig_address - RollupName" data/network/systemConfig_address.json
 
-# Individual validations
-npm run validate:schema data/sepolia/0x5678901234567890123456789012345678901234.json
-npm run validate:onchain data/sepolia/0x5678901234567890123456789012345678901234.json
+# Example for new rollup
+npx ts-node scripts/validate-metadata.ts --pr-title "[Rollup] sepolia 0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9 - Poseidon" data/sepolia/0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9.json
 
-# Signature validation (choose operation type)
-npm run validate:signature:register data/sepolia/0x5678901234567890123456789012345678901234.json
-# OR for updates:
-# npm run validate:signature:update data/sepolia/0x5678901234567890123456789012345678901234.json
+# Example for update
+npx ts-node scripts/validate-metadata.ts --pr-title "[Update] sepolia 0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9 - Poseidon" data/sepolia/0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9.json
 ```
+
+This validation will check:
+- ✅ JSON schema validation
+- ✅ Contract address format validation
+- ✅ OnChain sequencer verification
+- ✅ Sequencer signature verification
+- ✅ Timestamp-based replay protection
+- ✅ File existence validation for operation type
+- ✅ Immutable fields protection (for updates)
+- ✅ Update timestamp validation (for updates)
+- ✅ Network consistency validation
+- ✅ PR title format validation
+
+### Step 6: Submit PR
 
 ## ✅ Validation Checklist
 

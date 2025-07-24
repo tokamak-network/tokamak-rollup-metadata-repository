@@ -155,7 +155,7 @@ export class SignatureValidator {
       if (recoveredAddress.toLowerCase() !== onChainValidation.onChainAddress) {
         return {
           valid: false,
-          error: `Signature verification failed: signer (${recoveredAddress.toLowerCase()}) is not the onchain sequencer (${onChainValidation.onChainAddress})`,
+          error: `Signature verification failed: signer address (${recoveredAddress.toLowerCase()}) does not match the onchain sequencer address (${onChainValidation.onChainAddress}) from SystemConfig contract. Please ensure the signature was created by the correct sequencer account.`,
         };
       }
 

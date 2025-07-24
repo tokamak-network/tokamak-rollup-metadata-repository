@@ -49,6 +49,17 @@ npm run validate -- data/sepolia/0x1234567890123456789012345678901234567890.json
 # Complete validation with PR title (for GitHub Actions)
 npm run validate -- --pr-title "[Rollup] sepolia - 12345 - Example L2" <file>
 
+# Direct validation with ts-node (recommended for development)
+npx ts-node scripts/validate-metadata.ts --pr-title "[Operation] network systemConfig_address - RollupName" data/network/systemConfig_address.json
+
+# Example for new rollup
+npx ts-node scripts/validate-metadata.ts --pr-title "[Rollup] sepolia 0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9 - Poseidon" data/sepolia/0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9.json
+
+# Example for update
+npx ts-node scripts/validate-metadata.ts --pr-title "[Update] sepolia 0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9 - Poseidon" data/sepolia/0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9.json
+
+# Important: The signer address must match the onchain sequencer address from the SystemConfig contract
+
 # Individual validation commands (for development/testing)
 npm run validate:schema <file>
 npm run validate:onchain <file>
