@@ -11,7 +11,7 @@ This guide covers how to create valid rollup metadata files, including field com
 ### Technical Requirements
 - ✅ Deployed rollup with SystemConfig contract
 - ✅ Sequencer private key or signing authority
-- ✅ All L1/L2 contract addresses
+- ✅ **All L1/L2 contract addresses (ALL contracts must be included)**
 - ✅ Network configuration information
 
 ### Environment Setup
@@ -59,6 +59,12 @@ cp schemas/example-rollup-metadata.json data/sepolia/0x5678901234567890123456789
 # 2. Create your JSON file following the L2RollupMetadata interface
 vim data/sepolia/0x5678901234567890123456789012345678901234.json
 ```
+
+> **⚠️ Important**:
+> - **For Thanos optimistic rollups** (`rollupType: "optimistic"` AND `stack.name: "thanos"`): You must include ALL contracts in both `l1Contracts` and `l2Contracts` sections. The example file contains all required contracts - do not remove any of them.
+> - **For other rollup types or stacks**: Only include the contracts that are actually deployed on your network. The example file shows all possible contracts, but you can remove those that don't apply to your rollup.
+>
+> Each contract address must be filled with the actual deployed address on your network.
 
 ### Step 4: Generate Sequencer Signature
 
@@ -181,6 +187,8 @@ Before submitting your PR, ensure:
 ### Technical Validation
 - [ ] Filename matches SystemConfig address (lowercase)
 - [ ] All required fields are populated
+- [ ] **For Thanos optimistic rollups: ALL contracts in l1Contracts and l2Contracts are included**
+- [ ] **For other rollups: Only deployed contracts are included**
 - [ ] JSON is valid and properly formatted
 - [ ] Ethereum addresses are lowercase
 - [ ] URLs are accessible (HTTPS recommended, HTTP allowed)
@@ -293,7 +301,8 @@ Update your rollup metadata when:
 
 ### Important Update Rules
 - **SystemConfig address cannot change**: If your SystemConfig changes, it's a new rollup
-- **Chain ID cannot change**: Chain ID is immutable for a rollup
+- **L1 Chain ID cannot change**: L1 Chain ID is immutable for a rollup
+- **L2 Chain ID can be corrected**: L2 Chain ID can be updated if initially entered incorrectly
 
 ## 🚨 Common Issues and Solutions
 

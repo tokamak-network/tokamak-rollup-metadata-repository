@@ -23,7 +23,6 @@ export interface ValidationRules {
   // Immutable fields (cannot be changed during updates)
   immutableFields: [
     'l1ChainId',
-    'l2ChainId',
     'l1Contracts.systemConfig',
     'rollupType',
     'stack.name',

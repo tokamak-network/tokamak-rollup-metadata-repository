@@ -204,6 +204,27 @@ const rollupMetadataSchema = {
 
 const validateSchema = ajv.compile(rollupMetadataSchema);
 
+// Required contracts for Thanos optimistic rollups
+const THANOS_L1_REQUIRED_CONTRACTS = [
+  'SystemConfig', 'ProxyAdmin', 'AddressManager', 'SuperchainConfig', 'DisputeGameFactory',
+  'L1CrossDomainMessenger', 'L1ERC721Bridge', 'L1StandardBridge', 'OptimismMintableERC20Factory',
+  'OptimismPortal', 'AnchorStateRegistry', 'DelayedWETH', 'L1UsdcBridge', 'L2OutputOracle',
+  'Mips', 'PermissionedDelayedWETH', 'PreimageOracle', 'ProtocolVersions', 'SafeProxyFactory',
+  'SafeSingleton', 'SystemOwnerSafe',
+];
+
+const THANOS_L2_REQUIRED_CONTRACTS = [
+  'ProxyAdmin', 'NativeToken', 'BaseFeeVault', 'CrossL2Inbox', 'DeployerWhitelist', 'EAS',
+  'ETH', 'FiatTokenV2_2', 'GasPriceOracle', 'GovernanceToken', 'L1Block', 'L1BlockNumber',
+  'L1FeeVault', 'L1MessageSender', 'L2CrossDomainMessenger', 'L2ERC721Bridge', 'L2StandardBridge',
+  'L2ToL1MessagePasser', 'L2ToL2CrossDomainMessenger', 'L2UsdcBridge', 'LegacyERC20NativeToken',
+  'LegacyMessagePasser', 'MasterMinter', 'NFTDescriptor', 'NonfungiblePositionManager',
+  'NonfungibleTokenPositionDescriptor', 'OptimismMintableERC20Factory', 'OptimismMintableERC721Factory',
+  'QuoterV2', 'SchemaRegistry', 'SequencerFeeVault', 'SignatureChecker', 'SwapRouter02',
+  'TickLens', 'UniswapInterfaceMulticall', 'UniswapV3Factory', 'UniversalRouter',
+  'UnsupportedProtocol', 'WETH',
+];
+
 /**
  * Schema validation module
  */
@@ -213,10 +234,67 @@ export class SchemaValidator {
    */
   public validateSchema(metadata: unknown): { valid: boolean; errors?: unknown[] } {
     const valid = validateSchema(metadata);
-    return {
-      valid,
-      errors: valid ? undefined : (validateSchema.errors || []),
-    };
+    if (!valid) {
+      return {
+        valid,
+        errors: validateSchema.errors || [],
+      };
+    }
+
+    // Additional conditional validation for Thanos optimistic rollups
+    const conditionalErrors = this.validateConditionalContracts(metadata as any);
+    if (conditionalErrors.length > 0) {
+      return {
+        valid: false,
+        errors: conditionalErrors,
+      };
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Validate conditional contract requirements for Thanos optimistic rollups
+   */
+  private validateConditionalContracts(metadata: any): unknown[] {
+    const errors: unknown[] = [];
+
+    // Check if this is a Thanos optimistic rollup
+    const isThanosOptimistic =
+      metadata.rollupType === 'optimistic' &&
+      metadata.stack?.name === 'thanos';
+
+    if (isThanosOptimistic) {
+      // Validate L1 contracts
+      const l1Contracts = metadata.l1Contracts || {};
+      for (const contract of THANOS_L1_REQUIRED_CONTRACTS) {
+        if (!l1Contracts[contract]) {
+          errors.push({
+            keyword: 'required',
+            instancePath: `/l1Contracts/${contract}`,
+            schemaPath: '#/properties/l1Contracts/required',
+            params: { missingProperty: contract },
+            message: `Missing required L1 contract '${contract}' for Thanos optimistic rollup`,
+          });
+        }
+      }
+
+      // Validate L2 contracts
+      const l2Contracts = metadata.l2Contracts || {};
+      for (const contract of THANOS_L2_REQUIRED_CONTRACTS) {
+        if (!l2Contracts[contract]) {
+          errors.push({
+            keyword: 'required',
+            instancePath: `/l2Contracts/${contract}`,
+            schemaPath: '#/properties/l2Contracts/required',
+            params: { missingProperty: contract },
+            message: `Missing required L2 contract '${contract}' for Thanos optimistic rollup`,
+          });
+        }
+      }
+    }
+
+    return errors;
   }
 }
 

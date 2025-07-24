@@ -20,7 +20,7 @@ describe('RollupMetadataValidator', () => {
         description: 'Test description',
         rollupType: 'optimistic',
         stack: {
-          name: 'thanos',
+          name: 'op-stack',
           version: '1.0.0',
         },
         rpcUrl: 'https://rpc.test-l2.com',
@@ -69,7 +69,7 @@ describe('RollupMetadataValidator', () => {
         name: 'Test L2',
         description: 'Test description',
         rollupType: 'optimistic',
-        stack: { name: 'thanos', version: '1.0.0' },
+        stack: { name: 'op-stack', version: '1.0.0' },
         rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: { type: 'eth', symbol: 'ETH', name: 'Ethereum', decimals: 18 },
         status: 'active',
@@ -272,7 +272,7 @@ describe('RollupMetadataValidator', () => {
         name: 'Test L2',
         description: 'Test description',
         rollupType: 'optimistic',
-        stack: { name: 'thanos', version: '1.0.0' },
+        stack: { name: 'op-stack', version: '1.0.0' },
         rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'eth',
@@ -308,7 +308,7 @@ describe('RollupMetadataValidator', () => {
         name: 'Test L2',
         description: 'Test description',
         rollupType: 'optimistic',
-        stack: { name: 'thanos', version: '1.0.0' },
+        stack: { name: 'op-stack', version: '1.0.0' },
         rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'erc20',
@@ -352,7 +352,7 @@ describe('RollupMetadataValidator', () => {
         name: 'Test L2',
         description: 'Test description',
         rollupType: 'optimistic',
-        stack: { name: 'thanos', version: '1.0.0' },
+        stack: { name: 'op-stack', version: '1.0.0' },
         rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'erc20',
@@ -392,7 +392,7 @@ describe('RollupMetadataValidator', () => {
         name: 'Test L2',
         description: 'Test description',
         rollupType: 'optimistic',
-        stack: { name: 'thanos', version: '1.0.0' },
+        stack: { name: 'op-stack', version: '1.0.0' },
         rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: {
           type: 'erc20',
@@ -585,17 +585,25 @@ describe('RollupMetadataValidator', () => {
       expect(result.errors).toHaveLength(0);
     });
 
-    test('should fail when chainId is changed', () => {
+    test('should fail when L1 chainId is changed', () => {
       const updatedMetadata = {
         ...existingMetadata,
         l1ChainId: 11155112,
-        l2ChainId: 17002,
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
       expect(result.errors.some(error => error.includes('Immutable field \'L1 Chain ID\' cannot be changed'))).toBe(true);
-      expect(result.errors.some(error => error.includes('Immutable field \'L2 Chain ID\' cannot be changed'))).toBe(true);
+    });
+
+    test('should allow L2 chainId to be changed', () => {
+      const updatedMetadata = {
+        ...existingMetadata,
+        l2ChainId: 17002,
+      };
+
+      const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
+      expect(result.valid).toBe(true);
     });
 
     test('should fail when systemConfig address is changed', () => {
@@ -679,16 +687,14 @@ describe('RollupMetadataValidator', () => {
       const updatedMetadata = {
         ...existingMetadata,
         l1ChainId: 11155112,
-        l2ChainId: 17002,
         rollupType: 'zk' as const,
         createdAt: '2025-01-02T00:00:00Z',
       };
 
       const result = validator.validateImmutableFields(updatedMetadata, testFilePath);
       expect(result.valid).toBe(false);
-      expect(result.errors).toHaveLength(4); // Now 4 errors: L1 chain ID, L2 chain ID, rollupType, createdAt
+      expect(result.errors).toHaveLength(3); // Now 3 errors: L1 chain ID, rollupType, createdAt
       expect(result.errors.some(error => error.includes('L1 Chain ID'))).toBe(true);
-      expect(result.errors.some(error => error.includes('L2 Chain ID'))).toBe(true);
       expect(result.errors.some(error => error.includes('Rollup type'))).toBe(true);
       expect(result.errors.some(error => error.includes('Creation timestamp'))).toBe(true);
     });
@@ -812,7 +818,7 @@ describe('RollupMetadataValidator', () => {
         name: 'Test L2',
         description: 'Test description',
         rollupType: 'optimistic',
-        stack: { name: 'thanos', version: '1.0.0' },
+        stack: { name: 'op-stack', version: '1.0.0' },
         rpcUrl: 'https://rpc.test-l2.com',
         nativeToken: { type: 'eth', symbol: 'ETH', name: 'Ethereum', decimals: 18 },
         status: 'active',
@@ -1018,7 +1024,7 @@ describe('RollupMetadataValidator', () => {
           name: 'Test L2',
           description: 'Test description',
           rollupType: 'optimistic',
-          stack: { name: 'thanos', version: '1.0.0' },
+          stack: { name: 'op-stack', version: '1.0.0' },
           rpcUrl: 'https://rpc.test-l2.com',
           nativeToken: { type: 'eth', symbol: 'ETH', name: 'Ethereum', decimals: 18 },
           status: 'active',
@@ -1061,6 +1067,356 @@ describe('RollupMetadataValidator', () => {
         expect(consistencyResult.valid).toBe(false);
         expect(consistencyResult.error).toContain('Timestamp mismatch');
       });
+    });
+  });
+
+  describe('Conditional Contract Validation for Thanos Optimistic Rollups', () => {
+    test('should pass validation for Thanos optimistic rollup with all required contracts', () => {
+      const thanosMetadata: Partial<L2RollupMetadata> = {
+        l1ChainId: 11155111,
+        l2ChainId: 17001,
+        name: 'Test Thanos L2',
+        description: 'Test Thanos optimistic rollup',
+        rollupType: 'optimistic',
+        stack: {
+          name: 'thanos',
+          version: '1.0.0',
+        },
+        rpcUrl: 'https://rpc.test-l2.com',
+        nativeToken: {
+          type: 'eth',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          decimals: 18,
+        },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: {
+          systemConfig: '0x1234567890123456789012345678901234567890',
+          SystemConfig: '0x1234567890123456789012345678901234567890',
+          ProxyAdmin: '0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c',
+          AddressManager: '0x1111111111111111111111111111111111111111',
+          SuperchainConfig: '0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f',
+          DisputeGameFactory: '0x6666666666666666666666666666666666666666',
+          L1CrossDomainMessenger: '0x8888888888888888888888888888888888888888',
+          L1ERC721Bridge: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          L1StandardBridge: '0xcccccccccccccccccccccccccccccccccccccccc',
+          OptimismMintableERC20Factory: '0x1313131313131313131313131313131313131313',
+          OptimismPortal: '0x1515151515151515151515151515151515151515',
+          AnchorStateRegistry: '0x2222222222222222222222222222222222222222',
+          DelayedWETH: '0x4444444444444444444444444444444444444444',
+          L1UsdcBridge: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+          L2OutputOracle: '0x1010101010101010101010101010101010101010',
+          Mips: '0x1212121212121212121212121212121212121212',
+          PermissionedDelayedWETH: '0x1818181818181818181818181818181818181818',
+          PreimageOracle: '0x1919191919191919191919191919191919191919',
+          ProtocolVersions: '0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a',
+          SafeProxyFactory: '0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d',
+          SafeSingleton: '0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e',
+          SystemOwnerSafe: '0x2121212121212121212121212121212121212121',
+        },
+        l2Contracts: {
+          nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          ProxyAdmin: '0x4200000000000000000000000000000000000486',
+          NativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          BaseFeeVault: '0x4200000000000000000000000000000000000486',
+          CrossL2Inbox: '0x4200000000000000000000000000000000000486',
+          DeployerWhitelist: '0x4200000000000000000000000000000000000486',
+          EAS: '0x4200000000000000000000000000000000000486',
+          ETH: '0x4200000000000000000000000000000000000486',
+          FiatTokenV2_2: '0x4200000000000000000000000000000000000486',
+          GasPriceOracle: '0x4200000000000000000000000000000000000486',
+          GovernanceToken: '0x4200000000000000000000000000000000000486',
+          L1Block: '0x4200000000000000000000000000000000000486',
+          L1BlockNumber: '0x4200000000000000000000000000000000000486',
+          L1FeeVault: '0x4200000000000000000000000000000000000486',
+          L1MessageSender: '0x4200000000000000000000000000000000000486',
+          L2CrossDomainMessenger: '0x4200000000000000000000000000000000000486',
+          L2ERC721Bridge: '0x4200000000000000000000000000000000000486',
+          L2StandardBridge: '0x4200000000000000000000000000000000000486',
+          L2ToL1MessagePasser: '0x4200000000000000000000000000000000000486',
+          L2ToL2CrossDomainMessenger: '0x4200000000000000000000000000000000000486',
+          L2UsdcBridge: '0x4200000000000000000000000000000000000486',
+          LegacyERC20NativeToken: '0x4200000000000000000000000000000000000486',
+          LegacyMessagePasser: '0x4200000000000000000000000000000000000486',
+          MasterMinter: '0x4200000000000000000000000000000000000486',
+          NFTDescriptor: '0x4200000000000000000000000000000000000486',
+          NonfungiblePositionManager: '0x4200000000000000000000000000000000000486',
+          NonfungibleTokenPositionDescriptor: '0x4200000000000000000000000000000000000486',
+          OptimismMintableERC20Factory: '0x4200000000000000000000000000000000000486',
+          OptimismMintableERC721Factory: '0x4200000000000000000000000000000000000486',
+          QuoterV2: '0x4200000000000000000000000000000000000486',
+          SchemaRegistry: '0x4200000000000000000000000000000000000486',
+          SequencerFeeVault: '0x4200000000000000000000000000000000000486',
+          SignatureChecker: '0x4200000000000000000000000000000000000486',
+          SwapRouter02: '0x4200000000000000000000000000000000000486',
+          TickLens: '0x4200000000000000000000000000000000000486',
+          UniswapInterfaceMulticall: '0x4200000000000000000000000000000000000486',
+          UniswapV3Factory: '0x4200000000000000000000000000000000000486',
+          UniversalRouter: '0x4200000000000000000000000000000000000486',
+          UnsupportedProtocol: '0x4200000000000000000000000000000000000486',
+          WETH: '0x4200000000000000000000000000000000000486',
+        },
+        bridges: [],
+        explorers: [],
+        sequencer: {
+          address: '0x1234567890123456789012345678901234567890',
+        },
+        staking: {
+          isCandidate: false,
+        },
+        networkConfig: {
+          blockTime: 2,
+          gasLimit: '30000000',
+        },
+        metadata: {
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
+      };
+
+      const result = validator.validateSchema(thanosMetadata);
+      expect(result.valid).toBe(true);
+    });
+
+    test('should fail validation for Thanos optimistic rollup missing required L1 contracts', () => {
+      const thanosMetadata: Partial<L2RollupMetadata> = {
+        l1ChainId: 11155111,
+        l2ChainId: 17001,
+        name: 'Test Thanos L2',
+        description: 'Test Thanos optimistic rollup',
+        rollupType: 'optimistic',
+        stack: {
+          name: 'thanos',
+          version: '1.0.0',
+        },
+        rpcUrl: 'https://rpc.test-l2.com',
+        nativeToken: {
+          type: 'eth',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          decimals: 18,
+        },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: {
+          systemConfig: '0x1234567890123456789012345678901234567890',
+          SystemConfig: '0x1234567890123456789012345678901234567890',
+          // Missing ProxyAdmin, AddressManager, etc.
+        },
+        l2Contracts: {
+          nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          NativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+        },
+        bridges: [],
+        explorers: [],
+        sequencer: {
+          address: '0x1234567890123456789012345678901234567890',
+        },
+        staking: {
+          isCandidate: false,
+        },
+        networkConfig: {
+          blockTime: 2,
+          gasLimit: '30000000',
+        },
+        metadata: {
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
+      };
+
+      const result = validator.validateSchema(thanosMetadata);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toBeDefined();
+      expect(result.errors!.some((error: any) =>
+        error.message && error.message.includes('Missing required L1 contract'),
+      )).toBe(true);
+    });
+
+    test('should fail validation for Thanos optimistic rollup missing required L2 contracts', () => {
+      const thanosMetadata: Partial<L2RollupMetadata> = {
+        l1ChainId: 11155111,
+        l2ChainId: 17001,
+        name: 'Test Thanos L2',
+        description: 'Test Thanos optimistic rollup',
+        rollupType: 'optimistic',
+        stack: {
+          name: 'thanos',
+          version: '1.0.0',
+        },
+        rpcUrl: 'https://rpc.test-l2.com',
+        nativeToken: {
+          type: 'eth',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          decimals: 18,
+        },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: {
+          systemConfig: '0x1234567890123456789012345678901234567890',
+          SystemConfig: '0x1234567890123456789012345678901234567890',
+          ProxyAdmin: '0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c',
+          AddressManager: '0x1111111111111111111111111111111111111111',
+          SuperchainConfig: '0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f',
+          DisputeGameFactory: '0x6666666666666666666666666666666666666666',
+          L1CrossDomainMessenger: '0x8888888888888888888888888888888888888888',
+          L1ERC721Bridge: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          L1StandardBridge: '0xcccccccccccccccccccccccccccccccccccccccc',
+          OptimismMintableERC20Factory: '0x1313131313131313131313131313131313131313',
+          OptimismPortal: '0x1515151515151515151515151515151515151515',
+          AnchorStateRegistry: '0x2222222222222222222222222222222222222222',
+          DelayedWETH: '0x4444444444444444444444444444444444444444',
+          L1UsdcBridge: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+          L2OutputOracle: '0x1010101010101010101010101010101010101010',
+          Mips: '0x1212121212121212121212121212121212121212',
+          PermissionedDelayedWETH: '0x1818181818181818181818181818181818181818',
+          PreimageOracle: '0x1919191919191919191919191919191919191919',
+          ProtocolVersions: '0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a',
+          SafeProxyFactory: '0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d',
+          SafeSingleton: '0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e',
+          SystemOwnerSafe: '0x2121212121212121212121212121212121212121',
+        },
+        l2Contracts: {
+          nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          NativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          // Missing ProxyAdmin, BaseFeeVault, etc.
+        },
+        bridges: [],
+        explorers: [],
+        sequencer: {
+          address: '0x1234567890123456789012345678901234567890',
+        },
+        staking: {
+          isCandidate: false,
+        },
+        networkConfig: {
+          blockTime: 2,
+          gasLimit: '30000000',
+        },
+        metadata: {
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
+      };
+
+      const result = validator.validateSchema(thanosMetadata);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toBeDefined();
+      expect(result.errors!.some((error: any) =>
+        error.message && error.message.includes('Missing required L2 contract'),
+      )).toBe(true);
+    });
+
+    test('should pass validation for non-Thanos optimistic rollup with minimal contracts', () => {
+      const nonThanosMetadata: Partial<L2RollupMetadata> = {
+        l1ChainId: 11155111,
+        l2ChainId: 17001,
+        name: 'Test Non-Thanos L2',
+        description: 'Test non-Thanos optimistic rollup',
+        rollupType: 'optimistic',
+        stack: {
+          name: 'op-stack',
+          version: '1.0.0',
+        },
+        rpcUrl: 'https://rpc.test-l2.com',
+        nativeToken: {
+          type: 'eth',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          decimals: 18,
+        },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: {
+          systemConfig: '0x1234567890123456789012345678901234567890',
+          // Only basic contracts, not all Thanos contracts
+        },
+        l2Contracts: {
+          nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          // Only basic contracts, not all Thanos contracts
+        },
+        bridges: [],
+        explorers: [],
+        sequencer: {
+          address: '0x1234567890123456789012345678901234567890',
+        },
+        staking: {
+          isCandidate: false,
+        },
+        networkConfig: {
+          blockTime: 2,
+          gasLimit: '30000000',
+        },
+        metadata: {
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
+      };
+
+      const result = validator.validateSchema(nonThanosMetadata);
+      expect(result.valid).toBe(true);
+    });
+
+    test('should pass validation for ZK rollup with minimal contracts', () => {
+      const zkMetadata: Partial<L2RollupMetadata> = {
+        l1ChainId: 11155111,
+        l2ChainId: 17001,
+        name: 'Test ZK L2',
+        description: 'Test ZK rollup',
+        rollupType: 'zk',
+        stack: {
+          name: 'thanos',
+          version: '1.0.0',
+        },
+        rpcUrl: 'https://rpc.test-l2.com',
+        nativeToken: {
+          type: 'eth',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          decimals: 18,
+        },
+        status: 'active',
+        createdAt: '2025-01-01T00:00:00Z',
+        lastUpdated: '2025-01-01T00:00:00Z',
+        l1Contracts: {
+          systemConfig: '0x1234567890123456789012345678901234567890',
+          // Only basic contracts, not all Thanos optimistic contracts
+        },
+        l2Contracts: {
+          nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+          // Only basic contracts, not all Thanos optimistic contracts
+        },
+        bridges: [],
+        explorers: [],
+        sequencer: {
+          address: '0x1234567890123456789012345678901234567890',
+        },
+        staking: {
+          isCandidate: false,
+        },
+        networkConfig: {
+          blockTime: 2,
+          gasLimit: '30000000',
+        },
+        metadata: {
+          version: '1.0.0',
+          signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
+          signedBy: '0x1234567890123456789012345678901234567890',
+        },
+      };
+
+      const result = validator.validateSchema(zkMetadata);
+      expect(result.valid).toBe(true);
     });
   });
 });

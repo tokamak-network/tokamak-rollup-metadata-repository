@@ -48,7 +48,6 @@ export class FileValidator {
       // Define immutable fields that cannot be changed during updates
       const immutableFields = [
         { path: 'l1ChainId', name: 'L1 Chain ID' },
-        { path: 'l2ChainId', name: 'L2 Chain ID' },
         { path: 'l1Contracts.systemConfig', name: 'SystemConfig address' },
         { path: 'rollupType', name: 'Rollup type' },
         { path: 'stack.name', name: 'Stack name' },
