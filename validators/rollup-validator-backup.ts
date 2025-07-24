@@ -119,9 +119,9 @@ const rollupMetadataSchema = {
     // L1/L2 contracts are optional, so additionalProperties: true
     l1Contracts: {
       type: 'object',
-      required: ['systemConfig'],
+      required: ['SystemConfig'],
       properties: {
-        systemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+        SystemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
       },
       additionalProperties: true,
     },
@@ -485,7 +485,7 @@ export class RollupMetadataValidator {
   public async validateOnChainSequencer(
     metadata: L2RollupMetadata,
   ): Promise<{ valid: boolean; error?: string; onChainAddress?: string }> {
-    if (!metadata.l1Contracts.systemConfig) {
+    if (!metadata.l1Contracts.SystemConfig) {
       return {
         valid: false,
         error: 'SystemConfig address is required for sequencer validation',
@@ -494,7 +494,7 @@ export class RollupMetadataValidator {
 
     // First, check if contract exists
     const contractExistenceResult = await this.validateContractExistence(
-      metadata.l1Contracts.systemConfig,
+      metadata.l1Contracts.SystemConfig,
     );
     if (!contractExistenceResult.valid) {
       return {
@@ -505,7 +505,7 @@ export class RollupMetadataValidator {
 
     try {
       const onChainSequencerAddress = await this.getOnChainSequencerAddress(
-        metadata.l1Contracts.systemConfig,
+        metadata.l1Contracts.SystemConfig,
       );
 
       if (!onChainSequencerAddress) {
@@ -555,7 +555,7 @@ export class RollupMetadataValidator {
       }
 
       // Reconstruct message for signature verification with dynamic operation
-      const message = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.systemConfig.toLowerCase()}`;
+      const message = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.SystemConfig.toLowerCase()}`;
 
       const recoveredAddress = ethers.verifyMessage(
         message,
@@ -620,8 +620,8 @@ export class RollupMetadataValidator {
         operation = prResult.operation!;
 
         // Verify SystemConfig address match
-        if (prResult.systemConfigAddress !== metadata.l1Contracts.systemConfig?.toLowerCase()) {
-          errors.push(`PR title SystemConfig address (${prResult.systemConfigAddress}) does not match metadata SystemConfig address (${metadata.l1Contracts.systemConfig})`);
+        if (prResult.systemConfigAddress !== metadata.l1Contracts.SystemConfig?.toLowerCase()) {
+          errors.push(`PR title SystemConfig address (${prResult.systemConfigAddress}) does not match metadata SystemConfig address (${metadata.l1Contracts.SystemConfig})`);
         }
 
         // Verify network match (now always provided in PR title)
@@ -653,8 +653,8 @@ export class RollupMetadataValidator {
 
     // 3. Filename validation
     const filename = filepath.split('/').pop() || '';
-    if (metadata.l1Contracts.systemConfig && !this.validateFilename(filename, metadata.l1Contracts.systemConfig)) {
-      errors.push(`Filename should be ${metadata.l1Contracts.systemConfig.toLowerCase()}.json, got ${filename}`);
+    if (metadata.l1Contracts.SystemConfig && !this.validateFilename(filename, metadata.l1Contracts.SystemConfig)) {
+      errors.push(`Filename should be ${metadata.l1Contracts.SystemConfig.toLowerCase()}.json, got ${filename}`);
     }
 
     // 4. Onchain sequencer validation and signature verification with dynamic operation
@@ -768,7 +768,7 @@ export class RollupMetadataValidator {
       const immutableFields = [
         { path: 'l1ChainId', name: 'L1 Chain ID' },
         { path: 'l2ChainId', name: 'L2 Chain ID' },
-        { path: 'l1Contracts.systemConfig', name: 'SystemConfig address' },
+        { path: 'l1Contracts.SystemConfig', name: 'SystemConfig address' },
         { path: 'rollupType', name: 'Rollup type' },
         { path: 'stack.name', name: 'Stack name' },
         { path: 'createdAt', name: 'Creation timestamp' },
@@ -895,10 +895,10 @@ export class RollupMetadataValidator {
 
       // Verify rollupConfig parameter matches SystemConfig address
       const rollupConfigParam = decodedData.args[0]; // first parameter
-      if (rollupConfigParam.toLowerCase() !== metadata.l1Contracts.systemConfig.toLowerCase()) {
+      if (rollupConfigParam.toLowerCase() !== metadata.l1Contracts.SystemConfig.toLowerCase()) {
         return {
           valid: false,
-          error: `rollupConfig parameter (${rollupConfigParam}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`,
+          error: `rollupConfig parameter (${rollupConfigParam}) does not match SystemConfig address (${metadata.l1Contracts.SystemConfig})`,
         };
       }
 
@@ -940,10 +940,10 @@ export class RollupMetadataValidator {
 
       // Verify event rollupConfig matches SystemConfig
       const eventRollupConfig = parsedEvent.args.rollupConfig;
-      if (eventRollupConfig.toLowerCase() !== metadata.l1Contracts.systemConfig.toLowerCase()) {
+      if (eventRollupConfig.toLowerCase() !== metadata.l1Contracts.SystemConfig.toLowerCase()) {
         return {
           valid: false,
-          error: `Event rollupConfig (${eventRollupConfig}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`,
+          error: `Event rollupConfig (${eventRollupConfig}) does not match SystemConfig address (${metadata.l1Contracts.SystemConfig})`,
         };
       }
 
@@ -981,7 +981,7 @@ export class RollupMetadataValidator {
 
     try {
       const systemConfigContract = new Contract(
-        metadata.l1Contracts.systemConfig,
+        metadata.l1Contracts.SystemConfig,
         SYSTEM_CONFIG_ABI,
         this.provider,
       );

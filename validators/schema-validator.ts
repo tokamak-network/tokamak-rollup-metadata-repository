@@ -59,13 +59,20 @@ const rollupMetadataSchema = {
     // L1/L2 contracts are optional, so additionalProperties: true
     l1Contracts: {
       type: 'object',
-      required: ['systemConfig'],
+      required: ['SystemConfig'],
       properties: {
-        systemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+        SystemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
       },
       additionalProperties: true,
     },
-    l2Contracts: { type: 'object' },
+    l2Contracts: {
+      type: 'object',
+      required: ['NativeToken'],
+      properties: {
+        NativeToken: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+      },
+      additionalProperties: true,
+    },
     bridges: {
       type: 'array',
       items: {
@@ -204,6 +211,37 @@ const rollupMetadataSchema = {
 
 const validateSchema = ajv.compile(rollupMetadataSchema);
 
+// Required contracts for Thanos optimistic rollups
+const THANOS_L1_REQUIRED_CONTRACTS = [
+  'SystemConfig', 'ProxyAdmin', 'AddressManager', 'SuperchainConfig', 'DisputeGameFactory',
+  'L1CrossDomainMessenger', 'L1ERC721Bridge', 'L1StandardBridge', 'OptimismMintableERC20Factory',
+  'OptimismPortal', 'AnchorStateRegistry', 'DelayedWETH', 'L1UsdcBridge', 'L2OutputOracle',
+  'Mips', 'PermissionedDelayedWETH', 'PreimageOracle', 'ProtocolVersions', 'SafeProxyFactory',
+  'SafeSingleton', 'SystemOwnerSafe',
+];
+
+const THANOS_L2_REQUIRED_CONTRACTS = [
+  'NativeToken',
+  'WETH',
+  'L2ToL1MessagePasser',
+  'DeployerWhitelist',
+  'L2CrossDomainMessenger',
+  'GasPriceOracle',
+  'L2StandardBridge',
+  'SequencerFeeVault',
+  'OptimismMintableERC20Factory',
+  'L1BlockNumber',
+  'L1Block',
+  'GovernanceToken',
+  'LegacyMessagePasser',
+  'L2ERC721Bridge',
+  'OptimismMintableERC721Factory',
+  'ProxyAdmin',
+  'BaseFeeVault',
+  'L1FeeVault',
+  'ETH',
+];
+
 /**
  * Schema validation module
  */
@@ -213,10 +251,67 @@ export class SchemaValidator {
    */
   public validateSchema(metadata: unknown): { valid: boolean; errors?: unknown[] } {
     const valid = validateSchema(metadata);
-    return {
-      valid,
-      errors: valid ? undefined : (validateSchema.errors || []),
-    };
+    if (!valid) {
+      return {
+        valid,
+        errors: validateSchema.errors || [],
+      };
+    }
+
+    // Additional conditional validation for Thanos optimistic rollups
+    const conditionalErrors = this.validateConditionalContracts(metadata as any);
+    if (conditionalErrors.length > 0) {
+      return {
+        valid: false,
+        errors: conditionalErrors,
+      };
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Validate conditional contract requirements for Thanos optimistic rollups
+   */
+  private validateConditionalContracts(metadata: any): unknown[] {
+    const errors: unknown[] = [];
+
+    // Check if this is a Thanos optimistic rollup
+    const isThanosOptimistic =
+      metadata.rollupType === 'optimistic' &&
+      metadata.stack?.name === 'thanos';
+
+    if (isThanosOptimistic) {
+      // Validate L1 contracts
+      const l1Contracts = metadata.l1Contracts || {};
+      for (const contract of THANOS_L1_REQUIRED_CONTRACTS) {
+        if (!l1Contracts[contract]) {
+          errors.push({
+            keyword: 'required',
+            instancePath: `/l1Contracts/${contract}`,
+            schemaPath: '#/properties/l1Contracts/required',
+            params: { missingProperty: contract },
+            message: `Missing required L1 contract '${contract}' for Thanos optimistic rollup`,
+          });
+        }
+      }
+
+      // Validate L2 contracts
+      const l2Contracts = metadata.l2Contracts || {};
+      for (const contract of THANOS_L2_REQUIRED_CONTRACTS) {
+        if (!l2Contracts[contract]) {
+          errors.push({
+            keyword: 'required',
+            instancePath: `/l2Contracts/${contract}`,
+            schemaPath: '#/properties/l2Contracts/required',
+            params: { missingProperty: contract },
+            message: `Missing required L2 contract '${contract}' for Thanos optimistic rollup`,
+          });
+        }
+      }
+    }
+
+    return errors;
   }
 }
 

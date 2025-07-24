@@ -74,7 +74,7 @@ export class ContractValidator {
   public async validateOnChainSequencer(
     metadata: L2RollupMetadata,
   ): Promise<{ valid: boolean; error?: string; onChainAddress?: string }> {
-    if (!metadata.l1Contracts.systemConfig) {
+    if (!metadata.l1Contracts.SystemConfig) {
       return {
         valid: false,
         error: 'SystemConfig address is required for sequencer validation',
@@ -83,7 +83,7 @@ export class ContractValidator {
 
     // First, check if contract exists
     const contractExistenceResult = await this.validateContractExistence(
-      metadata.l1Contracts.systemConfig,
+      metadata.l1Contracts.SystemConfig,
     );
     if (!contractExistenceResult.valid) {
       return {
@@ -94,7 +94,7 @@ export class ContractValidator {
 
     try {
       const onChainSequencerAddress = await this.getOnChainSequencerAddress(
-        metadata.l1Contracts.systemConfig,
+        metadata.l1Contracts.SystemConfig,
       );
 
       if (!onChainSequencerAddress) {
@@ -151,7 +151,7 @@ export class ContractValidator {
 
     try {
       const systemConfigContract = new Contract(
-        metadata.l1Contracts.systemConfig,
+        metadata.l1Contracts.SystemConfig,
         SYSTEM_CONFIG_ABI,
         this.provider,
       );
@@ -249,10 +249,10 @@ export class ContractValidator {
 
       // Verify rollupConfig parameter matches SystemConfig address
       const rollupConfigParam = decodedData.args[0]; // first parameter
-      if (rollupConfigParam.toLowerCase() !== metadata.l1Contracts.systemConfig.toLowerCase()) {
+      if (rollupConfigParam.toLowerCase() !== metadata.l1Contracts.SystemConfig.toLowerCase()) {
         return {
           valid: false,
-          error: `rollupConfig parameter (${rollupConfigParam}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`,
+          error: `rollupConfig parameter (${rollupConfigParam}) does not match SystemConfig address (${metadata.l1Contracts.SystemConfig})`,
         };
       }
 
@@ -294,10 +294,10 @@ export class ContractValidator {
 
       // Verify event rollupConfig matches SystemConfig
       const eventRollupConfig = parsedEvent.args.rollupConfig;
-      if (eventRollupConfig.toLowerCase() !== metadata.l1Contracts.systemConfig.toLowerCase()) {
+      if (eventRollupConfig.toLowerCase() !== metadata.l1Contracts.SystemConfig.toLowerCase()) {
         return {
           valid: false,
-          error: `Event rollupConfig (${eventRollupConfig}) does not match SystemConfig address (${metadata.l1Contracts.systemConfig})`,
+          error: `Event rollupConfig (${eventRollupConfig}) does not match SystemConfig address (${metadata.l1Contracts.SystemConfig})`,
         };
       }
 

@@ -12,6 +12,7 @@ The validation system provides multi-layered security through JSON schema valida
 - **JSON Structure**: Validates against defined schema with required fields and data types
 - **Format Rules**: Validates URLs, addresses, timestamps, and enum values
 - **Field Completeness**: Ensures all mandatory fields are present and properly formatted
+- **Conditional Contract Validation**: For Thanos optimistic rollups, validates all contracts are included
 
 ### Layer 2: On-Chain Verification
 - **Contract Existence**: Verifies SystemConfig contract deployment on L1
@@ -119,6 +120,7 @@ const rollupMetadataSchema = {
 - Address format validation with EIP-55 checksum support
 - URL format validation for HTTP/HTTPS and WebSocket protocols
 - Enum validation for rollup types and network configurations
+- **Conditional contract validation**: All contracts required for Thanos optimistic rollups only
 
 ### On-Chain Verification
 
@@ -205,11 +207,12 @@ Timestamp: {unixTimestamp}
 
 **Protected Fields:**
 - `l1ChainId` - L1 Chain ID
-- `l2ChainId` - L2 Chain ID
-- `l1Contracts.systemConfig` - SystemConfig address
+- `l1Contracts.SystemConfig` - SystemConfig address
 - `rollupType` - Rollup type (optimistic, zk, etc.)
 - `stack.name` - Stack name
 - `createdAt` - Creation timestamp
+
+**Note**: L2 Chain ID can be corrected during updates if initially entered incorrectly.
 
 **Additional Staking Protections:**
 - `staking.registrationTxHash` - Registration transaction hash (when candidate)
@@ -282,10 +285,11 @@ npm run validate:all  # Validate all metadata files
 ### Common Validation Errors
 
 **1. Schema Validation Errors**
-- Missing required fields (`l1ChainId`, `l2ChainId`, `name`, `systemConfig`, etc.)
+- Missing required fields (`l1ChainId`, `l2ChainId`, `name`, `SystemConfig`, etc.)
 - Invalid data types (string instead of number, etc.)
 - Format violations (invalid URLs, malformed addresses)
 - Enum value violations (unsupported rollup types)
+- **Missing contracts for Thanos optimistic rollups** (when `rollupType: "optimistic"` AND `stack.name: "thanos"`)
 
 **2. On-Chain Validation Errors**
 - SystemConfig contract not found at specified address
@@ -337,12 +341,27 @@ Example PR Titles:
 - Update: `[Update] mainnet 0x5678...ef90 - Updated L2 Info`
 ```
 
+**Contract Validation Issues:**
+```
+### Contract Requirements by Rollup Type:
+
+**Thanos Optimistic Rollups** (`rollupType: "optimistic"` AND `stack.name: "thanos"`):
+- ALL contracts in l1Contracts and l2Contracts must be included
+- No contracts can be omitted
+- Use the complete example file as template
+
+**Other Rollup Types or Stacks**:
+- Only include contracts that are actually deployed
+- Remove contracts that don't apply to your rollup
+- Example file shows all possible contracts but they're optional
+```
+
 **Immutable Field Protection:**
 ```
 ### Protected Fields (Cannot be changed):
 
 Core Identity:
-- l1ChainId, l2ChainId, l1Contracts.systemConfig, rollupType, stack.name
+- l1ChainId, l2ChainId, l1Contracts.SystemConfig, rollupType, stack.name
 
 Timestamps:
 - createdAt (creation timestamp)

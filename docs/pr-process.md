@@ -24,7 +24,20 @@ npm install
 npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
 ```
 
-### 4. Create PR
+### 4. Signature Validation
+**Important**: The signer address must match the onchain sequencer address from the SystemConfig contract.
+
+After creating your metadata, validate it locally before submitting a PR:
+
+```bash
+# Format
+npx ts-node scripts/validate-metadata.ts --pr-title "[Operation] network systemConfig_address - RollupName" data/network/systemConfig_address.json
+
+# Example
+npx ts-node scripts/validate-metadata.ts --pr-title "[Update] sepolia 0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9 - Poseidon" data/sepolia/0xbca49844a2982c5e87cb3f813a4f4e94e46d44f9.json
+```
+
+### 5. Create PR
 - **Title format**: `[Rollup] sepolia 0x1234567890123456789012345678901234567890 - My L2`
 - **Template checklist**: Complete all items in PR template
 - **That's it!** GitHub Actions handles the rest
@@ -47,11 +60,26 @@ npm run validate data/sepolia/0x1234567890123456789012345678901234567890.json
 
 ```bash
 # New rollup
+[Rollup] {network} {systemConfig_address} - {L2_Name}
+
+# Update existing
+[Update] {network} {systemConfig_address} - {L2_Name}
+```
+
+### Examples:
+```bash
+# New rollup
 [Rollup] sepolia 0x1234567890123456789012345678901234567890 - My L2
 
 # Update existing
 [Update] mainnet 0xabcdef1234567890abcdef1234567890abcdef12 - My L2
 ```
+
+### Format Rules:
+- `{network}`: lowercase network name (e.g., sepolia, mainnet, goerli)
+- `{systemConfig_address}`: lowercase systemConfig contract address
+- `{L2_Name}`: Your L2 rollup name
+- Use `[Rollup]` for new rollups, `[Update]` for existing rollup updates
 
 ## 🔗 Need More Help?
 

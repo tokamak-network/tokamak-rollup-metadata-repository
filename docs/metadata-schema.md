@@ -228,32 +228,63 @@ This document defines the JSON schema for rollup metadata, including all require
 #### l1Contracts
 - **Type**: `object`
 - **Required**: Yes
-- **Description**: All deployed L1 contract addresses
+- **Description**: L1 contract addresses. For Thanos optimistic rollups (`rollupType: "optimistic"` AND `stack.name: "thanos"`), all contracts must be included. For other rollup types, only include deployed contracts.
 
 ```json
 {
   "l1Contracts": {
-    "systemConfig": "0x1234567890123456789012345678901234567890",
-    "l1StandardBridge": "0x2345678901234567890123456789012345678901",
-    "optimismPortal": "0x3456789012345678901234567890123456789012",
-    "l2OutputOracle": "0x4567890123456789012345678901234567890123",
-    "disputeGameFactory": "0x5678901234567890123456789012345678901234",
-    "l1CrossDomainMessenger": "0x6789012345678901234567890123456789012345",
-    "l1ERC721Bridge": "0x7890123456789012345678901234567890123456",
-    "addressManager": "0x8901234567890123456789012345678901234567",
-    "optimismMintableERC20Factory": "0x9012345678901234567890123456789012345678",
-    "optimismMintableERC721Factory": "0xa123456789012345678901234567890123456789",
-    "superchainConfig": "0xb234567890123456789012345678901234567890",
-    "l1UsdcBridge": "0xc345678901234567890123456789012345678901",
-    "l1Usdc": "0xd456789012345678901234567890123456789012"
+    "SystemConfig": "0x1234567890123456789012345678901234567890",
+    "proxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+    "addressManager": "0x1111111111111111111111111111111111111111",
+    "superchainConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+    "disputeGameFactory": "0x6666666666666666666666666666666666666666",
+    "l1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
+    "l1ERC721Bridge": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "l1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "optimismMintableERC20Factory": "0x1313131313131313131313131313131313131313",
+    "optimismPortal": "0x1515151515151515151515151515151515151515",
+    "anchorStateRegistry": "0x2222222222222222222222222222222222222222",
+    "delayedWETH": "0x4444444444444444444444444444444444444444",
+    "l1UsdcBridge": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "l2OutputOracle": "0x1010101010101010101010101010101010101010",
+    "mips": "0x1212121212121212121212121212121212121212",
+    "permissionedDelayedWETH": "0x1818181818181818181818181818181818181818",
+    "preimageOracle": "0x1919191919191919191919191919191919191919",
+    "protocolVersions": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+    "safeProxyFactory": "0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d",
+    "safeSingleton": "0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
+    "systemOwnerSafe": "0x2121212121212121212121212121212121212121"
   }
 }
 ```
 
 **Required Properties:**
-- `systemConfig`: Core SystemConfig contract (used as filename identifier)
+- `SystemConfig`: Core SystemConfig contract (used as filename identifier)
 
-**Optional Properties:**
+**Required Properties (when rollupType is "optimistic" AND stack.name is "thanos"):**
+- `SystemConfig`: Core SystemConfig contract (used as filename identifier)
+- `ProxyAdmin`: Proxy admin contract
+- `AddressManager`: Address manager contract
+- `SuperchainConfig`: Superchain configuration contract
+- `DisputeGameFactory`: Dispute game factory contract
+- `L1CrossDomainMessenger`: L1 cross-domain messenger contract
+- `L1ERC721Bridge`: L1 ERC721 bridge contract
+- `L1StandardBridge`: L1 standard bridge contract
+- `OptimismMintableERC20Factory`: Optimism mintable ERC20 factory contract
+- `OptimismPortal`: Optimism portal contract
+- `AnchorStateRegistry`: Anchor state registry contract
+- `DelayedWETH`: Delayed WETH contract
+- `L1UsdcBridge`: L1 USDC bridge contract
+- `L2OutputOracle`: L2 output oracle contract
+- `Mips`: MIPS contract
+- `PermissionedDelayedWETH`: Permissioned delayed WETH contract
+- `PreimageOracle`: Preimage oracle contract
+- `ProtocolVersions`: Protocol versions contract
+- `SafeProxyFactory`: Safe proxy factory contract
+- `SafeSingleton`: Safe singleton contract
+- `SystemOwnerSafe`: System owner safe contract
+
+**Optional Properties (for other rollup types or stacks):**
 - `l1StandardBridge`, `optimismPortal`, `l2OutputOracle`: Optimistic rollup contracts
 - `disputeGameFactory`, `l1CrossDomainMessenger`, `l1ERC721Bridge`: Bridge contracts
 - `addressManager`: Legacy address manager
@@ -269,36 +300,56 @@ This document defines the JSON schema for rollup metadata, including all require
 #### l2Contracts
 - **Type**: `object`
 - **Required**: Yes
-- **Description**: All deployed L2 contract addresses
+- **Description**: L2 contract addresses. For Thanos optimistic rollups (`rollupType: "optimistic"` AND `stack.name: "thanos"`), all contracts must be included. For other rollup types, only include deployed contracts.
 
 ```json
 {
   "l2Contracts": {
-    "nativeToken": "0xdeaddeaddeaddeaddeaddeaddeaddeaddeaddead",
-    "l2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
-    "l2StandardBridge": "0x4200000000000000000000000000000000000010",
-    "l1Block": "0x4200000000000000000000000000000000000015",
-    "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
-    "gasPriceOracle": "0x420000000000000000000000000000000000000f",
-    "l2ERC721Bridge": "0x4200000000000000000000000000000000000014",
-    "l1FeeVault": "0x4200000000000000000000000000000000000011",
-    "sequencerFeeVault": "0x4200000000000000000000000000000000000012",
-    "baseFeeVault": "0x4200000000000000000000000000000000000019",
-    "l2UsdcBridge": "0x4200000000000000000000000000000000000018",
-    "l2Usdc": "0x4200000000000000000000000000000000000017",
-    "wrappedETH": "0x4200000000000000000000000000000000000006",
-    "polygonZkEVMBridge": "0x4200000000000000000000000000000000000005",
-    "polygonZkEVMGlobalExitRoot": "0x4200000000000000000000000000000000000004",
-    "multicall": "0x4200000000000000000000000000000000000003",
-    "create2Deployer": "0x4200000000000000000000000000000000000002"
+    "NativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+    "WETH": "0x4200000000000000000000000000000000000006",
+    "L2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "DeployerWhitelist": "0x4200000000000000000000000000000000000002",
+    "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "GasPriceOracle": "0x420000000000000000000000000000000000000F",
+    "L2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "SequencerFeeVault": "0x4200000000000000000000000000000000000011",
+    "OptimismMintableERC20Factory": "0x4200000000000000000000000000000000000012",
+    "L1BlockNumber": "0x4200000000000000000000000000000000000013",
+    "L1Block": "0x4200000000000000000000000000000000000015",
+    "GovernanceToken": "0x4200000000000000000000000000000000000042",
+    "LegacyMessagePasser": "0x4200000000000000000000000000000000000000",
+    "L2ERC721Bridge": "0x4200000000000000000000000000000000000014",
+    "OptimismMintableERC721Factory": "0x4200000000000000000000000000000000000017",
+    "ProxyAdmin": "0x4200000000000000000000000000000000000018",
+    "BaseFeeVault": "0x4200000000000000000000000000000000000019",
+    "L1FeeVault": "0x420000000000000000000000000000000000001a",
+    "ETH": "0x4200000000000000000000000000000000000486"
   }
 }
 ```
 
-**Required Properties:**
-- `nativeToken`: L2 native token contract address
+**Required Properties (when rollupType is "optimistic" AND stack.name is "thanos"):**
+- `NativeToken`: L2 native token contract address
+- `WETH`: WETH contract
+- `L2ToL1MessagePasser`: L2 to L1 message passer contract
+- `DeployerWhitelist`: Deployer whitelist contract
+- `L2CrossDomainMessenger`: L2 cross-domain messenger contract
+- `GasPriceOracle`: Gas price oracle contract
+- `L2StandardBridge`: L2 standard bridge contract
+- `SequencerFeeVault`: Sequencer fee vault contract
+- `OptimismMintableERC20Factory`: Optimism mintable ERC20 factory contract
+- `L1BlockNumber`: L1 block number contract
+- `L1Block`: L1 block contract
+- `GovernanceToken`: Governance token contract
+- `LegacyMessagePasser`: Legacy message passer contract
+- `L2ERC721Bridge`: L2 ERC721 bridge contract
+- `OptimismMintableERC721Factory`: Optimism mintable ERC721 factory contract
+- `ProxyAdmin`: Proxy admin contract
+- `BaseFeeVault`: Base fee vault contract
+- `L1FeeVault`: L1 fee vault contract
+- `ETH`: ETH contract
 
-**Optional Properties:**
+**Optional Properties (for other rollup types or stacks):**
 - `l2CrossDomainMessenger`, `l2StandardBridge`: L2 bridge contracts
 - `l1Block`, `l2ToL1MessagePasser`: L2 system contracts
 - `gasPriceOracle`: Gas price management contract
@@ -690,38 +741,48 @@ Timestamp: {unixTimestamp}
   "createdAt": "2025-01-01T00:00:00Z",
   "lastUpdated": "2025-01-01T12:00:00Z",
   "l1Contracts": {
-    "systemConfig": "0x1234567890123456789012345678901234567890",
-    "l1StandardBridge": "0x2345678901234567890123456789012345678901",
-    "optimismPortal": "0x3456789012345678901234567890123456789012",
-    "l2OutputOracle": "0x4567890123456789012345678901234567890123",
-    "disputeGameFactory": "0x5678901234567890123456789012345678901234",
-    "l1CrossDomainMessenger": "0x6789012345678901234567890123456789012345",
-    "l1ERC721Bridge": "0x7890123456789012345678901234567890123456",
-    "addressManager": "0x8901234567890123456789012345678901234567",
-    "optimismMintableERC20Factory": "0x9012345678901234567890123456789012345678",
-    "optimismMintableERC721Factory": "0xa123456789012345678901234567890123456789",
-    "superchainConfig": "0xb234567890123456789012345678901234567890",
-    "l1UsdcBridge": "0xc345678901234567890123456789012345678901",
-    "l1Usdc": "0xd456789012345678901234567890123456789012"
+    "SystemConfig": "0x1234567890123456789012345678901234567890",
+    "proxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+    "addressManager": "0x1111111111111111111111111111111111111111",
+    "superchainConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+    "disputeGameFactory": "0x6666666666666666666666666666666666666666",
+    "l1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
+    "l1ERC721Bridge": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "l1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "optimismMintableERC20Factory": "0x1313131313131313131313131313131313131313",
+    "optimismPortal": "0x1515151515151515151515151515151515151515",
+    "anchorStateRegistry": "0x2222222222222222222222222222222222222222",
+    "delayedWETH": "0x4444444444444444444444444444444444444444",
+    "l1UsdcBridge": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "l2OutputOracle": "0x1010101010101010101010101010101010101010",
+    "mips": "0x1212121212121212121212121212121212121212",
+    "permissionedDelayedWETH": "0x1818181818181818181818181818181818181818",
+    "preimageOracle": "0x1919191919191919191919191919191919191919",
+    "protocolVersions": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+    "safeProxyFactory": "0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d",
+    "safeSingleton": "0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
+    "systemOwnerSafe": "0x2121212121212121212121212121212121212121"
   },
   "l2Contracts": {
-    "nativeToken": "0xdeaddeaddeaddeaddeaddeaddeaddeaddeaddead",
-    "l2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
-    "l2StandardBridge": "0x4200000000000000000000000000000000000010",
-    "l1Block": "0x4200000000000000000000000000000000000015",
-    "l2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
-    "gasPriceOracle": "0x420000000000000000000000000000000000000f",
-    "l2ERC721Bridge": "0x4200000000000000000000000000000000000014",
-    "l1FeeVault": "0x4200000000000000000000000000000000000011",
-    "sequencerFeeVault": "0x4200000000000000000000000000000000000012",
-    "baseFeeVault": "0x4200000000000000000000000000000000000019",
-    "l2UsdcBridge": "0x4200000000000000000000000000000000000018",
-    "l2Usdc": "0x4200000000000000000000000000000000000017",
-    "wrappedETH": "0x4200000000000000000000000000000000000006",
-    "polygonZkEVMBridge": "0x4200000000000000000000000000000000000005",
-    "polygonZkEVMGlobalExitRoot": "0x4200000000000000000000000000000000000004",
-    "multicall": "0x4200000000000000000000000000000000000003",
-    "create2Deployer": "0x4200000000000000000000000000000000000002"
+    "NativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+    "WETH": "0x4200000000000000000000000000000000000006",
+    "L2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "DeployerWhitelist": "0x4200000000000000000000000000000000000002",
+    "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "GasPriceOracle": "0x420000000000000000000000000000000000000F",
+    "L2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "SequencerFeeVault": "0x4200000000000000000000000000000000000011",
+    "OptimismMintableERC20Factory": "0x4200000000000000000000000000000000000012",
+    "L1BlockNumber": "0x4200000000000000000000000000000000000013",
+    "L1Block": "0x4200000000000000000000000000000000000015",
+    "GovernanceToken": "0x4200000000000000000000000000000000000042",
+    "LegacyMessagePasser": "0x4200000000000000000000000000000000000000",
+    "L2ERC721Bridge": "0x4200000000000000000000000000000000000014",
+    "OptimismMintableERC721Factory": "0x4200000000000000000000000000000000000017",
+    "ProxyAdmin": "0x4200000000000000000000000000000000000018",
+    "BaseFeeVault": "0x4200000000000000000000000000000000000019",
+    "L1FeeVault": "0x420000000000000000000000000000000000001a",
+    "ETH": "0x4200000000000000000000000000000000000486"
   },
   "bridges": [
     {
