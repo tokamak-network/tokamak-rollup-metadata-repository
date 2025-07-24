@@ -207,7 +207,7 @@ Timestamp: {unixTimestamp}
 
 **Protected Fields:**
 - `l1ChainId` - L1 Chain ID
-- `l1Contracts.systemConfig` - SystemConfig address
+- `l1Contracts.SystemConfig` - SystemConfig address
 - `rollupType` - Rollup type (optimistic, zk, etc.)
 - `stack.name` - Stack name
 - `createdAt` - Creation timestamp
@@ -285,7 +285,7 @@ npm run validate:all  # Validate all metadata files
 ### Common Validation Errors
 
 **1. Schema Validation Errors**
-- Missing required fields (`l1ChainId`, `l2ChainId`, `name`, `systemConfig`, etc.)
+- Missing required fields (`l1ChainId`, `l2ChainId`, `name`, `SystemConfig`, etc.)
 - Invalid data types (string instead of number, etc.)
 - Format violations (invalid URLs, malformed addresses)
 - Enum value violations (unsupported rollup types)
@@ -361,7 +361,7 @@ Example PR Titles:
 ### Protected Fields (Cannot be changed):
 
 Core Identity:
-- l1ChainId, l2ChainId, l1Contracts.systemConfig, rollupType, stack.name
+- l1ChainId, l2ChainId, l1Contracts.SystemConfig, rollupType, stack.name
 
 Timestamps:
 - createdAt (creation timestamp)

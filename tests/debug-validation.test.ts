@@ -29,10 +29,10 @@ describe('Debug Validation', () => {
       createdAt: '2025-01-01T00:00:00Z',
       lastUpdated: '2025-01-01T00:00:00Z',
       l1Contracts: {
-        systemConfig: '0x1234567890123456789012345678901234567890',
+        SystemConfig: '0x1234567890123456789012345678901234567890',
       },
       l2Contracts: {
-        nativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
+        NativeToken: '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000',
       },
       bridges: [],
       explorers: [],

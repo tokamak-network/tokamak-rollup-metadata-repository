@@ -11,7 +11,7 @@ This guide covers how to create valid rollup metadata files, including field com
 ### Technical Requirements
 - ✅ Deployed rollup with SystemConfig contract
 - ✅ Sequencer private key or signing authority
-- ✅ **All L1/L2 contract addresses (ALL contracts must be included)**
+- ✅ **All L1/L2 contract addresses (For Thanos optimistic rollups, ALL contracts in l1Contracts and l2Contracts must be included. For other rollups, only deployed contracts are required.)**
 - ✅ Network configuration information
 
 ### Environment Setup
@@ -129,14 +129,14 @@ const registerMessage = `Tokamak Rollup Registry
 L1 Chain ID: ${l1ChainId}
 L2 Chain ID: ${l2ChainId}
 Operation: register
-SystemConfig: ${systemConfig.toLowerCase()}
+SystemConfig: ${SystemConfig.toLowerCase()}
 Timestamp: ${timestamp}`;
 
 const updateMessage = `Tokamak Rollup Registry
 L1 Chain ID: ${l1ChainId}
 L2 Chain ID: ${l2ChainId}
 Operation: update
-SystemConfig: ${systemConfig.toLowerCase()}
+SystemConfig: ${SystemConfig.toLowerCase()}
 Timestamp: ${timestamp}`;
 
 // Generate signature using MetaMask or ethers.js
@@ -292,7 +292,7 @@ Update your rollup metadata when:
 
 ### Update Process
 
-1. **Locate existing file**: Find your current metadata in `data/<network>/<systemConfig>.json`
+1. **Locate existing file**: Find your current metadata in `data/<network>/<SystemConfig>.json`
 2. **Make necessary changes**: Update only the fields that have changed
 3. **Generate new signature**: Use `Operation: update` in the signature message with current timestamp
 4. **Create update PR**: Use `[Update]` prefix in PR title

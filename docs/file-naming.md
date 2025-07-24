@@ -111,7 +111,7 @@ metadata/sepolia/0x1234567890123456789012345678901234567890.json  # Wrong base d
 All three elements must match:
 
 1. **Filename**: `0x1234567890123456789012345678901234567890.json`
-2. **Metadata Field**: `l1Contracts.systemConfig: "0x1234567890123456789012345678901234567890"`
+2. **Metadata Field**: `l1Contracts.SystemConfig: "0x1234567890123456789012345678901234567890"`
 3. **PR Title**: `[Rollup] sepolia - 0x1234567890123456789012345678901234567890 - My L2`
 
 > 📖 **For validation details**: See [Validation System](validation-system.md)

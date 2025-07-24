@@ -23,7 +23,7 @@ export interface ValidationRules {
   // Immutable fields (cannot be changed during updates)
   immutableFields: [
     'l1ChainId',
-    'l1Contracts.systemConfig',
+    'l1Contracts.SystemConfig',
     'rollupType',
     'stack.name',
     'createdAt'
@@ -94,32 +94,41 @@ export interface L2RollupMetadata {
   // L1 contract information (varies by rollup type)
   l1Contracts: {
     // 🔑 SystemConfig (Core for all Tokamak rollups - referred to as "RollupConfig" in Staking)
-    systemConfig: string; // Required: used as filename, Staking V2 identifier
+    SystemConfig: string; // Required: used as filename, Staking V2 identifier
 
     // === Optimistic Rollup (Thanos) contracts ===
-    addressManager?: string;
-    l1CrossDomainMessenger?: string;
-    l1StandardBridge?: string;
-    l1ERC721Bridge?: string;
-    optimismPortal?: string;
-    l2OutputOracle?: string;
-    disputeGameFactory?: string;
-    optimismMintableERC20Factory?: string;
-    optimismMintableERC721Factory?: string;
-    superchainConfig?: string;
-    l1UsdcBridge?: string;
-    l1Usdc?: string;
+    AddressManager?: string;
+    L1CrossDomainMessenger?: string;
+    L1StandardBridge?: string;
+    L1ERC721Bridge?: string;
+    OptimismPortal?: string;
+    L2OutputOracle?: string;
+    DisputeGameFactory?: string;
+    OptimismMintableERC20Factory?: string;
+    OptimismMintableERC721Factory?: string;
+    SuperchainConfig?: string;
+    L1UsdcBridge?: string;
+    L1Usdc?: string;
+    AnchorStateRegistry?: string;
+    DelayedWETH?: string;
+    Mips?: string;
+    PermissionedDelayedWETH?: string;
+    PreimageOracle?: string;
+    ProtocolVersions?: string;
+    SafeProxyFactory?: string;
+    SafeSingleton?: string;
+    SystemOwnerSafe?: string;
+    ProxyAdmin?: string;
 
     // === Future ZK Rollup contracts ===
-    zkVerifier?: string;
-    rollupProcessor?: string;
-    exitRoot?: string;
-    globalExitRootManager?: string;
-    polygonDataCommittee?: string;
+    ZkVerifier?: string;
+    RollupProcessor?: string;
+    ExitRoot?: string;
+    GlobalExitRootManager?: string;
+    PolygonDataCommittee?: string;
 
     // === Common/Other contracts ===
-    rollupManager?: string;
-    proxyAdmin?: string;
+    RollupManager?: string;
 
     // Extensible structure
     [contractName: string]: string | undefined;
@@ -127,32 +136,33 @@ export interface L2RollupMetadata {
 
   // L2 contract information (varies by rollup type)
   l2Contracts: {
-    nativeToken: string;  // 0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000
-
-    // === Optimistic Rollup (Thanos) contracts ===
-    l2CrossDomainMessenger?: string;
-    l2StandardBridge?: string;
-    l2ERC721Bridge?: string;
-    gasPriceOracle?: string;
-    l1Block?: string;
-    l2ToL1MessagePasser?: string;
-    l1FeeVault?: string;
-    sequencerFeeVault?: string;
-    baseFeeVault?: string;
-    l2UsdcBridge?: string;
-    l2Usdc?: string;
-
-    // === ETH wrapping contract when native token is ERC20 ===
-    // When L2 native token is ERC20, ETH becomes an ERC20 contract
-    wrappedETH?: string; // ETH wrapped as ERC20 address (when native token is ERC20)
+    NativeToken: string;  // 0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000
+    WETH?: string;
+    L2ToL1MessagePasser?: string;
+    DeployerWhitelist?: string;
+    L2CrossDomainMessenger?: string;
+    GasPriceOracle?: string;
+    L2StandardBridge?: string;
+    SequencerFeeVault?: string;
+    OptimismMintableERC20Factory?: string;
+    L1BlockNumber?: string;
+    L1Block?: string;
+    GovernanceToken?: string;
+    LegacyMessagePasser?: string;
+    L2ERC721Bridge?: string;
+    OptimismMintableERC721Factory?: string;
+    ProxyAdmin?: string;
+    BaseFeeVault?: string;
+    L1FeeVault?: string;
+    ETH?: string;
 
     // === Future ZK Rollup contracts ===
-    polygonZkEVMBridge?: string;
-    polygonZkEVMGlobalExitRoot?: string;
+    PolygonZkEVMBridge?: string;
+    PolygonZkEVMGlobalExitRoot?: string;
 
     // === Common contracts ===
-    multicall?: string;
-    create2Deployer?: string;
+    Multicall?: string;
+    Create2Deployer?: string;
 
     // Extensible structure
     [contractName: string]: string | undefined;
