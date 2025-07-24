@@ -11,7 +11,7 @@ This guide covers how to create valid rollup metadata files, including field com
 ### Technical Requirements
 - ✅ Deployed rollup with SystemConfig contract
 - ✅ Sequencer private key or signing authority
-- ✅ **All L1/L2 contract addresses (ALL contracts must be included)**
+- ✅ **All L1/L2 contract addresses (For Thanos optimistic rollups, ALL contracts in l1Contracts and l2Contracts must be included. For other rollups, only deployed contracts are required.)**
 - ✅ Network configuration information
 
 ### Environment Setup
