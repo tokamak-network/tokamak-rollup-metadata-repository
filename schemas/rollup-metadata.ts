@@ -156,9 +156,6 @@ export interface L2RollupMetadata {
     L1FeeVault?: string;
     ETH?: string;
 
-    // === ETH wrapping contract when native token is ERC20 ===
-    WrappedETH?: string; // ETH wrapped as ERC20 address (when native token is ERC20)
-
     // === Future ZK Rollup contracts ===
     PolygonZkEVMBridge?: string;
     PolygonZkEVMGlobalExitRoot?: string;
