@@ -63,7 +63,7 @@ async function main() {
 
     // 5. Validate SystemConfig contract existence
     console.log('🔗 Checking SystemConfig contract...');
-    const contractResult = await validator.validateContractExistence(metadata.l1Contracts.systemConfig);
+    const contractResult = await validator.validateContractExistence(metadata.l1Contracts.SystemConfig);
     if (contractResult.valid) {
       console.log('  ✅ SystemConfig contract exists');
     } else {

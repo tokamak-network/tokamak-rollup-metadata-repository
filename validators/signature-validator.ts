@@ -42,8 +42,8 @@ export class SignatureValidator {
         // Try to recover message with timestamp format first
         // Check if this signature was created with timestamp format
         // We'll try both formats and see which one recovers to the correct address
-        const timestampMessage = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.systemConfig.toLowerCase()}\nTimestamp: `;
-        const legacyMessage = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.systemConfig.toLowerCase()}`;
+        const timestampMessage = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.SystemConfig.toLowerCase()}\nTimestamp: `;
+        const legacyMessage = `Tokamak Rollup Registry\nL1 Chain ID: ${metadata.l1ChainId}\nL2 Chain ID: ${metadata.l2ChainId}\nOperation: ${operation}\nSystemConfig: ${metadata.l1Contracts.SystemConfig.toLowerCase()}`;
 
         // Try legacy format first for backward compatibility
         try {

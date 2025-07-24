@@ -59,13 +59,20 @@ const rollupMetadataSchema = {
     // L1/L2 contracts are optional, so additionalProperties: true
     l1Contracts: {
       type: 'object',
-      required: ['systemConfig'],
+      required: ['SystemConfig'],
       properties: {
-        systemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+        SystemConfig: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
       },
       additionalProperties: true,
     },
-    l2Contracts: { type: 'object' },
+    l2Contracts: {
+      type: 'object',
+      required: ['NativeToken'],
+      properties: {
+        NativeToken: { type: 'string', pattern: '^0x[a-fA-F0-9]{40}$' },
+      },
+      additionalProperties: true,
+    },
     bridges: {
       type: 'array',
       items: {
@@ -214,15 +221,25 @@ const THANOS_L1_REQUIRED_CONTRACTS = [
 ];
 
 const THANOS_L2_REQUIRED_CONTRACTS = [
-  'ProxyAdmin', 'NativeToken', 'BaseFeeVault', 'CrossL2Inbox', 'DeployerWhitelist', 'EAS',
-  'ETH', 'FiatTokenV2_2', 'GasPriceOracle', 'GovernanceToken', 'L1Block', 'L1BlockNumber',
-  'L1FeeVault', 'L1MessageSender', 'L2CrossDomainMessenger', 'L2ERC721Bridge', 'L2StandardBridge',
-  'L2ToL1MessagePasser', 'L2ToL2CrossDomainMessenger', 'L2UsdcBridge', 'LegacyERC20NativeToken',
-  'LegacyMessagePasser', 'MasterMinter', 'NFTDescriptor', 'NonfungiblePositionManager',
-  'NonfungibleTokenPositionDescriptor', 'OptimismMintableERC20Factory', 'OptimismMintableERC721Factory',
-  'QuoterV2', 'SchemaRegistry', 'SequencerFeeVault', 'SignatureChecker', 'SwapRouter02',
-  'TickLens', 'UniswapInterfaceMulticall', 'UniswapV3Factory', 'UniversalRouter',
-  'UnsupportedProtocol', 'WETH',
+  'NativeToken',
+  'WETH',
+  'L2ToL1MessagePasser',
+  'DeployerWhitelist',
+  'L2CrossDomainMessenger',
+  'GasPriceOracle',
+  'L2StandardBridge',
+  'SequencerFeeVault',
+  'OptimismMintableERC20Factory',
+  'L1BlockNumber',
+  'L1Block',
+  'GovernanceToken',
+  'LegacyMessagePasser',
+  'L2ERC721Bridge',
+  'OptimismMintableERC721Factory',
+  'ProxyAdmin',
+  'BaseFeeVault',
+  'L1FeeVault',
+  'ETH',
 ];
 
 /**

@@ -222,8 +222,8 @@ export class RollupMetadataValidator {
         operation = prResult.operation!;
 
         // Verify SystemConfig address match
-        if (prResult.systemConfigAddress !== metadata.l1Contracts.systemConfig?.toLowerCase()) {
-          errors.push(`PR title SystemConfig address (${prResult.systemConfigAddress}) does not match metadata SystemConfig address (${metadata.l1Contracts.systemConfig})`);
+        if (prResult.systemConfigAddress !== metadata.l1Contracts.SystemConfig?.toLowerCase()) {
+          errors.push(`PR title SystemConfig address (${prResult.systemConfigAddress}) does not match metadata SystemConfig address (${metadata.l1Contracts.SystemConfig})`);
         }
 
         // Verify network match (now always provided in PR title)
@@ -240,8 +240,8 @@ export class RollupMetadataValidator {
 
     // 3. Filename validation
     const filename = filepath.split('/').pop() || '';
-    if (metadata.l1Contracts.systemConfig && !this.validateFilename(filename, metadata.l1Contracts.systemConfig)) {
-      errors.push(`Filename should be ${metadata.l1Contracts.systemConfig.toLowerCase()}.json, got ${filename}`);
+    if (metadata.l1Contracts.SystemConfig && !this.validateFilename(filename, metadata.l1Contracts.SystemConfig)) {
+      errors.push(`Filename should be ${metadata.l1Contracts.SystemConfig.toLowerCase()}.json, got ${filename}`);
     }
 
     // 4. Onchain sequencer validation and signature verification with dynamic operation
