@@ -241,10 +241,6 @@ export interface L2RollupMetadata {
     baseFeePerGas?: string;
     priorityFeePerGas?: string;
 
-    // === Optimistic Rollup batch/submission settings ===
-    batchSubmissionFrequency?: number; // seconds - batch submission interval (default: 1440s)
-    outputRootFrequency?: number; // seconds - output root submission interval (default: 240s)
-
     // Future ZK Rollup specific settings
     batchTimeout?: number;
     trustedAggregatorTimeout?: number;
@@ -264,6 +260,10 @@ export interface L2RollupMetadata {
       l2OutputOracleAddress: string; // For checking OutputProposed events (core of withdrawal monitoring)
       outputProposedEventTopic?: string; // Event topic hash (default is standard OutputProposed event)
     };
+
+    // === Optimistic Rollup batch/submission settings ===
+    batchSubmissionFrequency?: number; // seconds - batch submission interval (default: 1440s)
+    outputRootFrequency?: number; // seconds - output root submission interval (default: 240s)
   };
 
   // Metadata information

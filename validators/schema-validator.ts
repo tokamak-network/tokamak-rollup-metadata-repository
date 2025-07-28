@@ -164,8 +164,6 @@ const rollupMetadataSchema = {
         gasLimit: { type: 'string' },
         baseFeePerGas: { type: 'string' },
         priorityFeePerGas: { type: 'string' },
-        batchSubmissionFrequency: { type: 'number', minimum: 1 },
-        outputRootFrequency: { type: 'number', minimum: 1 },
         batchTimeout: { type: 'number' },
         trustedAggregatorTimeout: { type: 'number' },
         forceBatchTimeout: { type: 'number' },
@@ -185,6 +183,8 @@ const rollupMetadataSchema = {
             outputProposedEventTopic: { type: 'string' },
           },
         },
+        batchSubmissionFrequency: { type: 'number', minimum: 1 },
+        outputRootFrequency: { type: 'number', minimum: 1 },
       },
     },
     shutdown: {

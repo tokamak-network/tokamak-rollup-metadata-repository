@@ -121,19 +121,22 @@ Your monitoring system needs access to these parameters from rollup metadata:
 
 ```json
 {
-  "networkConfig": {
-    "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240
-  },
   "withdrawalConfig": {
     "challengePeriod": 12,
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x...",
       "outputProposedEventTopic": "0x..."
-    }
+    },
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
   }
 }
 ```
+
+**Key Parameters:**
+- `challengePeriod`: Challenge period duration (seconds)
+- `batchSubmissionFrequency`: Batch submission interval (seconds)
+- `outputRootFrequency`: Output root submission interval (seconds)
 
 ### Required Contract Information
 

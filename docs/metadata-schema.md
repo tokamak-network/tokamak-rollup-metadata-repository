@@ -234,26 +234,26 @@ This document defines the JSON schema for rollup metadata, including all require
 {
   "l1Contracts": {
     "SystemConfig": "0x1234567890123456789012345678901234567890",
-    "proxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
-    "addressManager": "0x1111111111111111111111111111111111111111",
-    "superchainConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
-    "disputeGameFactory": "0x6666666666666666666666666666666666666666",
-    "l1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
-    "l1ERC721Bridge": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "l1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
-    "optimismMintableERC20Factory": "0x1313131313131313131313131313131313131313",
-    "optimismPortal": "0x1515151515151515151515151515151515151515",
-    "anchorStateRegistry": "0x2222222222222222222222222222222222222222",
-    "delayedWETH": "0x4444444444444444444444444444444444444444",
-    "l1UsdcBridge": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "l2OutputOracle": "0x1010101010101010101010101010101010101010",
-    "mips": "0x1212121212121212121212121212121212121212",
-    "permissionedDelayedWETH": "0x1818181818181818181818181818181818181818",
-    "preimageOracle": "0x1919191919191919191919191919191919191919",
-    "protocolVersions": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
-    "safeProxyFactory": "0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d",
-    "safeSingleton": "0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
-    "systemOwnerSafe": "0x2121212121212121212121212121212121212121"
+    "ProxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+    "AddressManager": "0x1111111111111111111111111111111111111111",
+    "SuperchainConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+    "DisputeGameFactory": "0x6666666666666666666666666666666666666666",
+    "L1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
+    "L1ERC721Bridge": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "L1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "OptimismMintableERC20Factory": "0x1313131313131313131313131313131313131313",
+    "OptimismPortal": "0x1515151515151515151515151515151515151515",
+    "AnchorStateRegistry": "0x2222222222222222222222222222222222222222",
+    "DelayedWETH": "0x4444444444444444444444444444444444444444",
+    "L1UsdcBridge": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "L2OutputOracle": "0x1010101010101010101010101010101010101010",
+    "Mips": "0x1212121212121212121212121212121212121212",
+    "PermissionedDelayedWETH": "0x1818181818181818181818181818181818181818",
+    "PreimageOracle": "0x1919191919191919191919191919191919191919",
+    "ProtocolVersions": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+    "SafeProxyFactory": "0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d",
+    "SafeSingleton": "0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
+    "SystemOwnerSafe": "0x2121212121212121212121212121212121212121"
   }
 }
 ```
@@ -529,7 +529,9 @@ This document defines the JSON schema for rollup metadata, including all require
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6"
-    }
+    },
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
   }
 }
 ```
@@ -537,6 +539,8 @@ This document defines the JSON schema for rollup metadata, including all require
 **Time Values (in seconds):**
 - `challengePeriod`: 120 (2 minutes)
 - `expectedWithdrawalDelay`: 1560 (26 minutes total)
+- `batchSubmissionFrequency`: 1440 (24 minutes, batch submission interval)
+- `outputRootFrequency`: 240 (4 minutes, output root submission interval)
 
 ### Network Configuration
 
@@ -552,8 +556,6 @@ This document defines the JSON schema for rollup metadata, including all require
     "gasLimit": "30000000",
     "baseFeePerGas": "1000000000",
     "priorityFeePerGas": "1000000000",
-    "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240,
     "batchTimeout": 3600,
     "trustedAggregatorTimeout": 7200,
     "forceBatchTimeout": 86400
@@ -566,8 +568,6 @@ This document defines the JSON schema for rollup metadata, including all require
 - `gasLimit`: Block gas limit
 - `baseFeePerGas`: Base fee per gas (optional)
 - `priorityFeePerGas`: Priority fee per gas (optional)
-- `batchSubmissionFrequency`: Batch submission interval in seconds (optional, default: 1440s)
-- `outputRootFrequency`: Output root proposal interval in seconds (optional, default: 240s)
 - `batchTimeout`: ZK batch timeout in seconds (optional, for future ZK rollups)
 - `trustedAggregatorTimeout`: Trusted aggregator timeout in seconds (optional, for future ZK rollups)
 - `forceBatchTimeout`: Force batch timeout in seconds (optional, for future ZK rollups)
@@ -742,26 +742,26 @@ Timestamp: {unixTimestamp}
   "lastUpdated": "2025-01-01T12:00:00Z",
   "l1Contracts": {
     "SystemConfig": "0x1234567890123456789012345678901234567890",
-    "proxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
-    "addressManager": "0x1111111111111111111111111111111111111111",
-    "superchainConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
-    "disputeGameFactory": "0x6666666666666666666666666666666666666666",
-    "l1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
-    "l1ERC721Bridge": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "l1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
-    "optimismMintableERC20Factory": "0x1313131313131313131313131313131313131313",
-    "optimismPortal": "0x1515151515151515151515151515151515151515",
-    "anchorStateRegistry": "0x2222222222222222222222222222222222222222",
-    "delayedWETH": "0x4444444444444444444444444444444444444444",
-    "l1UsdcBridge": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "l2OutputOracle": "0x1010101010101010101010101010101010101010",
-    "mips": "0x1212121212121212121212121212121212121212",
-    "permissionedDelayedWETH": "0x1818181818181818181818181818181818181818",
-    "preimageOracle": "0x1919191919191919191919191919191919191919",
-    "protocolVersions": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
-    "safeProxyFactory": "0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d",
-    "safeSingleton": "0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
-    "systemOwnerSafe": "0x2121212121212121212121212121212121212121"
+    "ProxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+    "AddressManager": "0x1111111111111111111111111111111111111111",
+    "SuperchainConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+    "DisputeGameFactory": "0x6666666666666666666666666666666666666666",
+    "L1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
+    "L1ERC721Bridge": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "L1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "OptimismMintableERC20Factory": "0x1313131313131313131313131313131313131313",
+    "OptimismPortal": "0x1515151515151515151515151515151515151515",
+    "AnchorStateRegistry": "0x2222222222222222222222222222222222222222",
+    "DelayedWETH": "0x4444444444444444444444444444444444444444",
+    "L1UsdcBridge": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "L2OutputOracle": "0x1010101010101010101010101010101010101010",
+    "Mips": "0x1212121212121212121212121212121212121212",
+    "PermissionedDelayedWETH": "0x1818181818181818181818181818181818181818",
+    "PreimageOracle": "0x1919191919191919191919191919191919191919",
+    "ProtocolVersions": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+    "SafeProxyFactory": "0x1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d",
+    "SafeSingleton": "0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
+    "SystemOwnerSafe": "0x2121212121212121212121212121212121212121"
   },
   "l2Contracts": {
     "NativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
@@ -849,8 +849,6 @@ Timestamp: {unixTimestamp}
     "gasLimit": "30000000",
     "baseFeePerGas": "1000000000",
     "priorityFeePerGas": "1000000000",
-    "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240,
     "batchTimeout": 3600,
     "trustedAggregatorTimeout": 7200,
     "forceBatchTimeout": 86400
@@ -861,7 +859,9 @@ Timestamp: {unixTimestamp}
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6"
-    }
+    },
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
   },
   "metadata": {
     "version": "1.0.0",

@@ -121,9 +121,7 @@
     "blockTime": 2,
     "gasLimit": "30000000",
     "baseFeePerGas": "1000000000",
-    "priorityFeePerGas": "1000000000",
-    "batchSubmissionFrequency": 1440,
-    "outputRootFrequency": 240
+    "priorityFeePerGas": "1000000000"
   },
 
   "withdrawalConfig": {
@@ -132,7 +130,9 @@
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x4567890123456789012345678901234567890123",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87e0fe95c7b7bde0e7e2e1a6a20f3e9eba10b7f97c12345"
-    }
+    },
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
   },
 
   "supportResources": {

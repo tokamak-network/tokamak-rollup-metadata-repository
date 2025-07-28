@@ -831,6 +831,15 @@ describe('RollupMetadataValidator', () => {
         sequencer: { address: '0x1234567890123456789012345678901234567890' },
         staking: { isCandidate: false },
         networkConfig: { blockTime: 2, gasLimit: '30000000' },
+        withdrawalConfig: {
+          challengePeriod: 120,
+          expectedWithdrawalDelay: 1560,
+          monitoringInfo: {
+            l2OutputOracleAddress: '0x4567890123456789012345678901234567890123',
+          },
+          batchSubmissionFrequency: 1440,
+          outputRootFrequency: 240,
+        },
         metadata: {
           version: '1.0.0',
           signature: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
@@ -858,8 +867,8 @@ describe('RollupMetadataValidator', () => {
       });
 
       test('should pass when lastUpdated is recent and sequential (with real file)', async () => {
-        // Use a newer timestamp than the real file's lastUpdated (2025-01-06T10:00:00Z)
-        const newerTimestamp = new Date('2025-06-06T12:00:00Z').toISOString(); // Much newer than existing
+        // Use a newer timestamp than the real file's lastUpdated (2025-06-05T12:58:24Z)
+        const newerTimestamp = new Date(Date.now() - 300000).toISOString(); // 5 minutes ago (within 1 hour)
         const updatedMetadata: Partial<L2RollupMetadata> = {
           ...existingMetadata,
           lastUpdated: newerTimestamp,

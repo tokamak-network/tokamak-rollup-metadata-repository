@@ -229,6 +229,22 @@ Before submitting your PR, ensure:
 
 ## 🔧 Advanced Configuration
 
+
+### Network Configuration
+
+Basic network parameters:
+
+```json
+{
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "30000000",
+    "baseFeePerGas": "1000000000",
+    "priorityFeePerGas": "1000000000"
+  }
+}
+```
+
 ### Withdrawal Configuration
 
 For withdrawal monitoring, add `withdrawalConfig`:
@@ -241,20 +257,7 @@ For withdrawal monitoring, add `withdrawalConfig`:
     "monitoringInfo": {
       "l2OutputOracleAddress": "0x...",
       "outputProposedEventTopic": "0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6"
-    }
-  }
-}
-```
-
-### Network Configuration
-
-Include batch submission and output root frequencies:
-
-```json
-{
-  "networkConfig": {
-    "blockTime": 2,
-    "gasLimit": "30000000",
+    },
     "batchSubmissionFrequency": 1440,
     "outputRootFrequency": 240
   }
