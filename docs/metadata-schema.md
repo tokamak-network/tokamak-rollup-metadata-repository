@@ -519,7 +519,7 @@ This document defines the JSON schema for rollup metadata, including all require
 ### withdrawalConfig
 - **Type**: `object`
 - **Required**: No
-- **Description**: Withdrawal monitoring and delay parameters
+- **Description**: Withdrawal monitoring and delay parameters for rollups
 
 ```json
 {
@@ -536,11 +536,31 @@ This document defines the JSON schema for rollup metadata, including all require
 }
 ```
 
-**Time Values (in seconds):**
-- `challengePeriod`: 120 (2 minutes)
-- `expectedWithdrawalDelay`: 1560 (26 minutes total)
-- `batchSubmissionFrequency`: 1440 (24 minutes, batch submission interval)
-- `outputRootFrequency`: 240 (4 minutes, output root submission interval)
+**Required Properties:**
+- `challengePeriod`: Challenge period duration in seconds (security delay for dispute resolution)
+- `expectedWithdrawalDelay`: Calculated total withdrawal delay time in seconds
+- `monitoringInfo`: L2OutputOracle monitoring configuration object
+
+**Optional Properties:**
+- `batchSubmissionFrequency`: Batch submission interval in seconds (optional, default: 1440s)
+- `outputRootFrequency`: Output root submission interval in seconds (optional, default: 240s)
+
+**monitoringInfo Object Properties:**
+- `l2OutputOracleAddress`: L1-deployed L2OutputOracle contract address for monitoring output proposals (optional, l1Contracts.L2OutputOracle)
+- `outputProposedEventTopic`: Event topic hash for filtering OutputProposed events (optional, default: standard Optimism Stack event)
+
+**Optimism Stack Standard Values (in seconds):**
+- `challengePeriod`: 120 (2 minutes) - Security delay for dispute resolution
+- `expectedWithdrawalDelay`: 1560 (26 minutes total) - Calculated as max(batchSubmissionFrequency, outputRootFrequency) + challengePeriod
+- `batchSubmissionFrequency`: 1440 (24 minutes, batch submission interval) - Maximum time between L2→L1 batch submissions
+- `outputRootFrequency`: 240 (4 minutes, output root submission interval) - Maximum time between output root proposals
+
+**Optimism Stack Integration:**
+- Compatible with standard Optimism Stack L2OutputOracle contracts
+- Uses standard `OutputProposed` event signature: `keccak256("OutputProposed(bytes32,uint256,uint256,uint256)")`
+- Default `outputProposedEventTopic`: `0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6`
+- Supports automatic withdrawal monitoring and time estimation
+- The `expectedWithdrawalDelay` is calculated automatically based on other timing parameters
 
 ### Network Configuration
 

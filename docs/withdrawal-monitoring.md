@@ -187,8 +187,9 @@ Your monitoring system needs access to these parameters from rollup metadata:
 - `batchSubmissionFrequency`: Batch submission interval (seconds) - Maximum time between L2→L1 batch submissions
 - `outputRootFrequency`: Output root submission interval (seconds) - Maximum time between output root proposals
 
-**Configuration Location:**
-These parameters are now located in the `withdrawalConfig` object within the rollup metadata, making them easier to find and manage alongside other withdrawal-related settings.
+**L2OutputOracle Contract Parameters:**
+- `l2OutputOracleAddress`: L1-deployed L2OutputOracle contract address for monitoring output proposals
+- `outputProposedEventTopic`: Event topic hash for filtering OutputProposed events (optional, uses standard Optimism Stack event if not specified)
 
 ### Required Contract Information
 
@@ -211,6 +212,102 @@ These parameters are now located in the `withdrawalConfig` object within the rol
 2. **in_challenge_period**: Output proposed, waiting for challenge period
 3. **ready**: Challenge period complete, withdrawal can be finalized
 4. **completed**: Withdrawal has been finalized on L1
+
+## L2OutputOracle Contract
+
+The **L2OutputOracle** contract is a critical component deployed on L1 that manages the withdrawal process for optimistic rollups. This contract serves as the bridge between L2 state and L1 verification.
+
+### Contract Responsibilities
+
+#### 1. Output Root Proposals
+- **Purpose**: Proposes L2 block state roots to L1, making rollup state changes verifiable on L1
+- **Function**: Acts as "snapshots" of L2 state at regular intervals
+- **Security**: Ensures L2 state transitions are cryptographically verifiable on L1
+
+#### 2. Challenge Period Management
+- **Purpose**: Provides dispute period for proposed output roots
+- **Security Mechanism**: Prevents malicious proposals through time-based security
+- **State Management**: Keeps output roots in "pending" state during challenge period
+- **Finalization**: Outputs become final after challenge period expires
+
+#### 3. Event Emission
+- **Event**: `OutputProposed` events when new output roots are proposed
+- **Monitoring**: Enables withdrawal monitoring systems to track proposals
+- **Timing**: Includes output root, L2 block number, and timestamp in events
+- **Usage**: Calculates withdrawal readiness timing based on event data
+
+### Contract Location and Deployment
+
+- **Network**: L1 deployment (Ethereum mainnet, Sepolia, etc.)
+- **Purpose**: L2→L1 output root management and withdrawal security
+- **Relation**: Connected to `l1Contracts.L2OutputOracle` field in metadata
+- **Address Consistency**: Must match `withdrawalConfig.monitoringInfo.l2OutputOracleAddress`
+
+### Event System
+
+#### OutputProposed Event
+```solidity
+event OutputProposed(
+    bytes32 indexed outputRoot,
+    uint256 indexed l2OutputIndex,
+    uint256 indexed l2BlockNumber,
+    uint256 l1Timestamp
+)
+```
+
+#### Event Parameters
+- `outputRoot`: Proposed L2 state hash (bytes32)
+- `l2OutputIndex`: Sequential proposal index (uint256)
+- `l2BlockNumber`: Corresponding L2 block number (uint256)
+- `l1Timestamp`: Proposal timestamp on L1 (uint256)
+
+#### Event Topic Details
+- **Event Signature**: `"OutputProposed(bytes32,uint256,uint256,uint256)"`
+- **Topic Hash**: `keccak256("OutputProposed(bytes32,uint256,uint256,uint256)")`
+- **Standard Hash**: `0x4ee37ac2c786ec85e87592d3c5c8a1dd66f8496dda3f125d9ea8ca5f657629b6`
+- **Usage**: Filters L1 logs for `OutputProposed` events to track output proposals
+
+### Monitoring Integration
+
+#### Event Filtering
+```javascript
+// Filter for OutputProposed events
+const filter = {
+    address: l2OutputOracleAddress,
+    topics: [
+        outputProposedEventTopic, // Standard topic hash
+        null, // outputRoot (indexed)
+        null, // l2OutputIndex (indexed)
+        null  // l2BlockNumber (indexed)
+    ]
+};
+```
+
+#### Withdrawal Tracking
+```javascript
+// Track withdrawal readiness based on output proposals
+function trackWithdrawalWithOutput(outputL1Timestamp, challengePeriod) {
+    const readyTime = outputL1Timestamp + challengePeriod;
+    return {
+        outputProposedAt: outputL1Timestamp,
+        challengeEndsAt: readyTime,
+        isReady: Date.now() >= readyTime
+    };
+}
+```
+
+### Security Considerations
+
+#### Challenge Period Purpose
+- **Dispute Resolution**: Allows time for fraud proofs to be submitted
+- **Malicious Prevention**: Prevents rapid malicious output proposals
+- **Finality Assurance**: Ensures output roots are final after challenge period
+
+#### Output Root Verification
+- **Cryptographic Proof**: Each output root represents a verified L2 state
+- **Sequential Ordering**: Outputs must be proposed in sequential order
+- **Block Number Mapping**: Links L2 blocks to specific output proposals
+
 
 ### Error Handling
 
