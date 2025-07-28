@@ -29,12 +29,16 @@ expectedWithdrawalDelay = Math.max(batchSubmissionFrequency, outputRootFrequency
 
 ### Monitoring Timeline Phases
 
+The withdrawal process follows these sequential phases, each with specific timing constraints:
+
 1. **Withdrawal Initiated**: User submits withdrawal transaction on L2
 2. **Batch Inclusion**: Transaction included in L2 batch
-3. **L1 Batch Submission**: Batch submitted to L1 (up to batchSubmissionFrequency delay)
-4. **Output Root Proposal**: Output root proposed on L1 (up to outputRootFrequency delay)
-5. **Challenge Period**: Security waiting period (challengePeriod duration)
+3. **L1 Batch Submission**: Batch submitted to L1 (up to `batchSubmissionFrequency` delay)
+4. **Output Root Proposal**: Output root proposed on L1 (up to `outputRootFrequency` delay)
+5. **Challenge Period**: Security waiting period (`challengePeriod` duration)
 6. **Withdrawal Ready**: User can complete withdrawal on L1
+
+> **Note**: The actual timing may vary based on network conditions, gas prices, and sequencer behavior. The `batchSubmissionFrequency` and `outputRootFrequency` represent maximum delays.
 
 ```mermaid
 graph TD
@@ -45,9 +49,54 @@ graph TD
     E --> F[Challenge Period Ends]
     F --> G[Withdrawal Available]
 
-    C -.->|Up to batchSubmissionFrequency| D
-    D -.->|challengePeriod| F
+    %% Timing constraints
+    C -.->|Up to batchSubmissionFrequency delay| D
+    D -.->|challengePeriod duration| F
+
+    %% Styling
+    classDef userAction fill:#e1f5fe
+    classDef l2Action fill:#f3e5f5
+    classDef l1Action fill:#e8f5e8
+    classDef securityAction fill:#fff3e0
+    classDef finalAction fill:#fce4ec
+
+    class A userAction
+    class B,C l2Action
+    class D l1Action
+    class E,F securityAction
+    class G finalAction
 ```
+
+### Timing Diagram
+
+The following diagram shows a typical withdrawal timeline with realistic timing:
+
+```mermaid
+gantt
+    title Withdrawal Timeline (Typical Values)
+    dateFormat X
+    axisFormat %s
+
+    section L2 Processing
+    Transaction Included    :done, t1, 0, 2
+    Batch Submission       :done, t2, 2, 4
+
+    section L1 Processing
+    Output Root Proposed   :done, t3, 4, 6
+
+    section Security
+    Challenge Period       :active, t4, 6, 18
+
+    section Completion
+    Withdrawal Available   :milestone, t5, 18, 18
+```
+
+**Timing Breakdown:**
+- **L2 Processing**: ~2-4 seconds (immediate block inclusion)
+- **Batch Submission**: Up to `batchSubmissionFrequency` (typically 1440s = 24 minutes)
+- **Output Root Proposal**: Up to `outputRootFrequency` (typically 240s = 4 minutes)
+- **Challenge Period**: `challengePeriod` duration (typically 120s = 2 minutes)
+- **Total Expected Delay**: `expectedWithdrawalDelay` (typically ~26 minutes)
 
 ## Essential Monitoring Methods
 
@@ -134,9 +183,12 @@ Your monitoring system needs access to these parameters from rollup metadata:
 ```
 
 **Key Parameters:**
-- `challengePeriod`: Challenge period duration (seconds)
-- `batchSubmissionFrequency`: Batch submission interval (seconds)
-- `outputRootFrequency`: Output root submission interval (seconds)
+- `challengePeriod`: Challenge period duration (seconds) - Security delay for dispute resolution
+- `batchSubmissionFrequency`: Batch submission interval (seconds) - Maximum time between L2→L1 batch submissions
+- `outputRootFrequency`: Output root submission interval (seconds) - Maximum time between output root proposals
+
+**Configuration Location:**
+These parameters are now located in the `withdrawalConfig` object within the rollup metadata, making them easier to find and manage alongside other withdrawal-related settings.
 
 ### Required Contract Information
 
