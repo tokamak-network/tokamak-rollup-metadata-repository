@@ -1,0 +1,142 @@
+{
+  "l1ChainId": 11155111,
+  "l2ChainId": 111551131851,
+  "name": "theo08201",
+  "description": "Example rollup deployed with TRH SDK",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example-l2.com",
+  "rollupType": "optimistic",
+  "stack": {
+    "name": "thanos",
+    "version": "v1.0.1-0.20250819135011-c720713db10f"
+  },
+  "rpcUrl": "http://k8s-opgeth-c918c7d1bf-76753814.ap-northeast-2.elb.amazonaws.com",
+  "wsUrl": "ws://k8s-opgeth-c918c7d1bf-76753814.ap-northeast-2.elb.amazonaws.com",
+  "nativeToken": {
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "Tokamak Network Token",
+    "decimals": 18,
+    "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
+  },
+  "status": "active",
+  "createdAt": "2025-08-20T10:02:32Z",
+  "lastUpdated": "2025-08-20T10:02:32Z",
+  "l1Contracts": {
+    "ProxyAdmin": "0x8F05464883D52Cd0C8BbA6eD35a4Ed168a93399a",
+    "SystemConfig": "0x3ae12Cf9DfC14BBF3B84930762c19a0873ca2995",
+    "AddressManager": "0xfa4A9865b3e8812Ac6C39E79579af8bCab7fC60a",
+    "SuperchainConfig": "0x66125A7A5B59cfB998BD7Ac62eEe7E0D44Acc0Bc",
+    "DisputeGameFactory": "0x500a173D06793a0951b67926b99043524E77372C",
+    "L1CrossDomainMessenger": "0xb275aA1c9475B78C17605c80645c6f5E6Cf68AA8",
+    "L1ERC721Bridge": "0xF73cBE113e908E4d3c45574F8664FC6ed7A06a4a",
+    "L1StandardBridge": "0xb554b3db97Bc3dECd8dDD7D526BF00cafF1ac045",
+    "OptimismMintableERC20Factory": "0x7D4D8F4c43112E0e7baF1EbBf8c95510631c8787",
+    "OptimismPortal": "0x7eda29703D6fF01760AB371fb56a7b4498Ac1af7",
+    "AnchorStateRegistry": "0xc71561F6bb0253b002182e010c872b08d7cedE31",
+    "DelayedWETH": "0x31a6037Dc6589C3d0193528B7c22ccEd10ead64F",
+    "L1UsdcBridge": "0xb90bD4400c98f2000b59b6F060545a12D3562122",
+    "L2OutputOracle": "0x80E5eAcB781F350af87b660294006dd3D31c38b1",
+    "Mips": "0xAd6393175bBF5333A73E58b9fAC311F2202Fe397",
+    "PermissionedDelayedWETH": "0x6507f40588BB3141083Ba4E3C91A4Ee313Bf5f83",
+    "PreimageOracle": "0x45D82ec80257c477B86D2b3b0EAc4DeEaE8fC7F5",
+    "ProtocolVersions": "0xfB6763006b407A66283137FCD805A7Fd378Af563",
+    "SafeProxyFactory": "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
+    "SafeSingleton": "0x01050De596150dE0550491DF9a749db740E8b3a9",
+    "SystemOwnerSafe": "0x734d605C971Cfa8936E599Eb46dA89952425Ab2D"
+  },
+  "l2Contracts": {
+    "NativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+    "WETH": "0x4200000000000000000000000000000000000006",
+    "L2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "DeployerWhitelist": "0x4200000000000000000000000000000000000002",
+    "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "GasPriceOracle": "0x420000000000000000000000000000000000000F",
+    "L2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "SequencerFeeVault": "0x4200000000000000000000000000000000000011",
+    "OptimismMintableERC20Factory": "0x4200000000000000000000000000000000000012",
+    "L1BlockNumber": "0x4200000000000000000000000000000000000013",
+    "L1Block": "0x4200000000000000000000000000000000000015",
+    "GovernanceToken": "0x4200000000000000000000000000000000000042",
+    "LegacyMessagePasser": "0x4200000000000000000000000000000000000000",
+    "L2ERC721Bridge": "0x4200000000000000000000000000000000000014",
+    "OptimismMintableERC721Factory": "0x4200000000000000000000000000000000000017",
+    "ProxyAdmin": "0x4200000000000000000000000000000000000018",
+    "BaseFeeVault": "0x4200000000000000000000000000000000000019",
+    "L1FeeVault": "0x420000000000000000000000000000000000001a",
+    "ETH": "0x4200000000000000000000000000000000000486"
+  },
+  "bridges": [
+    {
+      "name": "Example Bridge",
+      "type": "native",
+      "url": "http://k8s-bridge-9ed0522d1c-1945345744.ap-northeast-2.elb.amazonaws.com",
+      "status": "active",
+      "supportedTokens": [
+        {
+          "symbol": "TON",
+          "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044",
+          "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+          "decimals": 18,
+          "isNativeToken": true
+        },
+        {
+          "symbol": "ETH",
+          "l1Address": "0x0000000000000000000000000000000000000000",
+          "l2Address": "0x4200000000000000000000000000000000000486",
+          "decimals": 18,
+          "isWrappedETH": true
+        }
+      ]
+    }
+  ],
+  "explorers": [
+    {
+      "name": "Example Explorer",
+      "url": "https://explorer.example-l2.com",
+      "type": "blockscout",
+      "status": "inactive"
+    }
+  ],
+  "sequencer": {
+    "address": "0x1955db02B57E716Dbd0D540b8f99F7a888e8E460",
+    "batcherAddress": "0xF33827175e9414dfa1E4f0827F106359F6b52AB7",
+    "proposerAddress": "0xd5c127Cb35A18be80CDD2fBD3490C33c826799C8"
+  },
+  "staking": {
+    "isCandidate": true,
+    "candidateRegisteredAt": "2025-08-20T09:34:12Z",
+    "candidateStatus": "active",
+    "registrationTxHash": "0x93cba75a6483c85d0b0c9ca3689045e1ca8dded54c7f19e9b65085e4548800ee",
+    "candidateAddress": "0x1b6fd89F4456dff8Ac21785D99E9a129CcD8Eba5"
+  },
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "0x1c9c380",
+    "baseFeePerGas": "0x3b9aca00",
+    "priorityFeePerGas": "1000000000"
+  },
+  "withdrawalConfig": {
+    "challengePeriod": 12,
+    "expectedWithdrawalDelay": 1452,
+    "monitoringInfo": {
+      "l2OutputOracleAddress": "0x80E5eAcB781F350af87b660294006dd3D31c38b1",
+      "outputProposedEventTopic": "0x4ee37ac2c786ec85e87e0fe95c7b7bde0e7e2e1a6a20f3e9eba10b7f97c12345"
+    },
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
+  },
+  "supportResources": {
+    "statusPageUrl": "https://status.example-l2.com",
+    "supportContactUrl": "https://discord.gg/example-support",
+    "documentationUrl": "https://docs.example-l2.com",
+    "communityUrl": "https://t.me/example_community",
+    "helpCenterUrl": "https://help.example-l2.com",
+    "announcementUrl": "https://twitter.com/example_l2"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0xdedfea9aa377d8052ce463e73b6871673070cde826a5b917b8a24f9e2044449d3f6ba3a0aba19fd50195d595891b794edfc468ce685cc1500946b7e14328bb631c",
+    "signedBy": "0x1955db02B57E716Dbd0D540b8f99F7a888e8E460"
+  }
+}
