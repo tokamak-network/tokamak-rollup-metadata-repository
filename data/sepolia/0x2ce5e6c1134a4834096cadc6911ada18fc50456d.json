@@ -21,7 +21,7 @@
   },
   "status": "active",
   "createdAt": "2025-08-30T14:53:42Z",
-  "lastUpdated": "2025-08-30T14:53:42Z",
+  "lastUpdated": "2025-08-30T15:37:35Z",
   "l1Contracts": {
     "ProxyAdmin": "0xba1995ef6109E11d66887c3f8a89c0886ea4773e",
     "SystemConfig": "0x2ce5E6c1134A4834096caDC6911ada18fC50456D",
@@ -136,7 +136,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xd8e454e1855d6e7b6192a0fe0e799229fe16f0ea66296106300d99c982497dbb48e4aa36a71f1179d8bb2833ec05d818ce31363c186f79774350bda84d87aee01c",
+    "signature": "0xdbae75fb99797ad404774e6ae0a3b2f0e19935c0170eee548d98264d49adf9da6bc02f5fc096a948d19746d188d8370bba9639fa6b5567688defffd841abbc221b",
     "signedBy": "0xd9293D31dd2DE78823ABbe2A634872F2A5D31A6E"
   }
 }
