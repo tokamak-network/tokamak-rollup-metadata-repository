@@ -2,7 +2,7 @@
   "l1ChainId": 11155111,
   "l2ChainId": 111551150259,
   "name": "shailu06",
-  "description": "Example rollup deployed with TRH SDK",
+  "description": "Chain to test the final docker deployement",
   "logo": "https://example.com/logo.png",
   "website": "https://example-l2.com",
   "rollupType": "optimistic",
@@ -20,8 +20,8 @@
     "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
   },
   "status": "active",
-  "createdAt": "2025-09-02T13:14:17Z",
-  "lastUpdated": "2025-09-02T13:14:17Z",
+  "createdAt": "2025-09-02T13:47:03Z",
+  "lastUpdated": "2025-09-02T13:47:03Z",
   "l1Contracts": {
     "ProxyAdmin": "0x4B64a59A0bE9A603647b25933781eCE70cA54A84",
     "SystemConfig": "0xAe7366e508fE8643D9Ee7a1dF0B1b6905224e7B3",
@@ -68,7 +68,7 @@
   },
   "bridges": [
     {
-      "name": "Example Bridge",
+      "name": "Docker Deployement Bridge",
       "type": "native",
       "url": "http://k8s-bridge-3a8eb9d4d5-155513442.ap-south-1.elb.amazonaws.com",
       "status": "active",
@@ -132,7 +132,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xdf4e673d5cac777f1d280f1ec11fd3a5efca455f74856c0b7d70088ab43570532f488a62a3c23f0ce2852c01cf2e5a8e10f2246c19588a5cd04511c64f3262a91c",
+    "signature": "0x6a9ababd4639549ded3811de2eeb3eb16c4df8a7d85dda1134e3b268d363408f4ba1cf19e4387f116439b512b9761bbbd17629ea893d2239f9224465f1983d6f1c",
     "signedBy": "0xf90432b76A23bC7bB50b868dC4257C5F5B401742"
   }
 }
