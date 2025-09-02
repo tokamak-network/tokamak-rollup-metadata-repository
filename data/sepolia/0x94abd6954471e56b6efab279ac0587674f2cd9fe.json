@@ -8,7 +8,7 @@
   "rollupType": "optimistic",
   "stack": {
     "name": "thanos",
-    "version": "v1.0.1-0.20250901091104-2c4519894649"
+    "version": ""
   },
   "rpcUrl": "http://k8s-opgeth-391ecdf473-30104145.eu-west-2.elb.amazonaws.com",
   "wsUrl": "ws://k8s-opgeth-391ecdf473-30104145.eu-west-2.elb.amazonaws.com",
@@ -21,7 +21,7 @@
   },
   "status": "active",
   "createdAt": "2025-09-02T08:12:59Z",
-  "lastUpdated": "2025-09-02T08:12:59Z",
+  "lastUpdated": "2025-09-02T08:52:23Z",
   "l1Contracts": {
     "ProxyAdmin": "0xc541f153cC673470F85b06797B8819a5E1B54334",
     "SystemConfig": "0x94abD6954471E56b6efab279Ac0587674F2cD9FE",
@@ -136,7 +136,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x841a6f79d613f93e8466e9a37c9dbfb55509c06316c955e75d0b040cdcb7531f5cc5e15d151426330b98cf53910251f0a7943efd85cb9f3f6a0bd1aecb62ebdd1c",
+    "signature": "0x14f17582175979d19969a1683ad148afd9274c3e29f258fe1bf89f9de36213b959ed8d58b6c0d848bcb6202aaa145fb6861627210229960faea57670ae81a8001b",
     "signedBy": "0x676A953cA8Cfb8A72E6Ce3C68263AeE9d14C35b4"
   }
 }
