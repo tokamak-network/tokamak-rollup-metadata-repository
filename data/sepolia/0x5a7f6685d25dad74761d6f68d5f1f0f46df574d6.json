@@ -2,9 +2,9 @@
   "l1ChainId": 11155111,
   "l2ChainId": 111551177355,
   "name": "v827",
-  "description": "A proof-of-stake blockchain optimized for scalability.",
-  "logo": "https://example.com/assets/chain-logo.png",
-  "website": "https://example-chain.org",
+  "description": "Example rollup deployed with TRH SDK",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example-l2.com",
   "rollupType": "optimistic",
   "stack": {
     "name": "thanos",
@@ -21,7 +21,7 @@
   },
   "status": "active",
   "createdAt": "2025-08-28T11:46:18Z",
-  "lastUpdated": "2025-08-28T11:46:18Z",
+  "lastUpdated": "2025-08-28T17:09:29Z",
   "l1Contracts": {
     "ProxyAdmin": "0x5151b1f76327fb7109F9A21aa15cE1788c381996",
     "SystemConfig": "0x5A7F6685D25dAD74761d6F68D5F1f0f46DF574D6",
@@ -123,16 +123,16 @@
     "outputRootFrequency": 240
   },
   "supportResources": {
-    "statusPageUrl": "https://status.example-chain.org",
-    "supportContactUrl": "https://support.example-chain.org/contact",
-    "documentationUrl": "https://docs.example-chain.org",
-    "communityUrl": "https://community.example-chain.org",
-    "helpCenterUrl": "https://help.example-chain.org",
-    "announcementUrl": "https://blog.example-chain.org/announcements"
+    "statusPageUrl": "https://status.example-l2.com",
+    "supportContactUrl": "https://discord.gg/example-support",
+    "documentationUrl": "https://docs.example-l2.com",
+    "communityUrl": "https://t.me/example_community",
+    "helpCenterUrl": "https://help.com",
+    "announcementUrl": "https://twitter.com/example_l2"
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xa2acb72c738bb2ac603ac89d9ec4913a9a9d19350a02beb471775fd53e039bf52243d35496d9b8c400dbdeea0513d393c412e92a06a1d6c0b88fd40192322d501b",
+    "signature": "0x5a5f9afcaa1c894b5dd8de4b25031b2e2189684f36f543f079860eee5b52e229748bafb9db442acd60b8efd3876dd2ef11c0e490bf733ef26347b0987dc3aedb1c",
     "signedBy": "0xd9293D31dd2DE78823ABbe2A634872F2A5D31A6E"
   }
 }
