@@ -21,7 +21,7 @@
   },
   "status": "active",
   "createdAt": "2025-09-02T13:47:03Z",
-  "lastUpdated": "2025-09-19T21:53:49Z",
+  "lastUpdated": "2025-09-19T21:55:54Z",
   "l1Contracts": {
     "ProxyAdmin": "0x4B64a59A0bE9A603647b25933781eCE70cA54A84",
     "SystemConfig": "0xAe7366e508fE8643D9Ee7a1dF0B1b6905224e7B3",
@@ -132,7 +132,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x793c6782e9ee3d8ac0f126548c4b888a08348fe4335cebf79413218e464010e044e2d56c966a7819e5d2fc578b304045c2600f89c39827baeaed9ba9841e0dd21c",
+    "signature": "0x411485b452c410d9eb017d07bfdb399fe82d790dc931ff41d6ba76dc5142cbc07569258b612045dd7f284e82c5b92c91051b07278dad39ed3827f1f7bd96d53d1c",
     "signedBy": "0xf90432b76A23bC7bB50b868dC4257C5F5B401742"
   }
 }
