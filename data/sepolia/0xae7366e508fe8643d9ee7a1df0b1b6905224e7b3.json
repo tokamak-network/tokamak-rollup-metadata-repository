@@ -10,8 +10,8 @@
     "name": "thanos",
     "version": "(devel)"
   },
-  "rpcUrl": "http://k8s-opgeth-67a7c29596-1271216826.ap-northeast-2.elb.amazonaws.com",
-  "wsUrl": "ws://k8s-opgeth-67a7c29596-1271216826.ap-northeast-2.elb.amazonaws.com",
+  "rpcUrl": "http://k8s-opgeth-ae6b6df5a3-1759678076.ap-northeast-2.elb.amazonaws.com",
+  "wsUrl": "ws://k8s-opgeth-ae6b6df5a3-1759678076.ap-northeast-2.elb.amazonaws.com",
   "nativeToken": {
     "type": "erc20",
     "symbol": "TON",
@@ -21,7 +21,7 @@
   },
   "status": "active",
   "createdAt": "2025-09-02T13:47:03Z",
-  "lastUpdated": "2025-09-19T21:55:54Z",
+  "lastUpdated": "2025-09-24T07:19:43Z",
   "l1Contracts": {
     "ProxyAdmin": "0x4B64a59A0bE9A603647b25933781eCE70cA54A84",
     "SystemConfig": "0xAe7366e508fE8643D9Ee7a1dF0B1b6905224e7B3",
@@ -70,7 +70,7 @@
     {
       "name": "Docker Deployement Bridge",
       "type": "native",
-      "url": "http://k8s-bridge-3023c80f3c-1697660718.ap-northeast-2.elb.amazonaws.com",
+      "url": "http://k8s-bridge-73ef33c65f-1887397135.ap-northeast-2.elb.amazonaws.com",
       "status": "active",
       "supportedTokens": [
         {
@@ -132,7 +132,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x411485b452c410d9eb017d07bfdb399fe82d790dc931ff41d6ba76dc5142cbc07569258b612045dd7f284e82c5b92c91051b07278dad39ed3827f1f7bd96d53d1c",
+    "signature": "0x5751cf91afb2570780760d9813453d02b3456a844da82c0ffd8cc3b0d429675d0161c438995d92adda0c449e6a5c4baccb720784d64250499c2c031d64aedf6c1b",
     "signedBy": "0xf90432b76A23bC7bB50b868dC4257C5F5B401742"
   }
 }
