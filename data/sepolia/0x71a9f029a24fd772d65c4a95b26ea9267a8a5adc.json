@@ -10,8 +10,8 @@
     "name": "thanos",
     "version": "(devel)"
   },
-  "rpcUrl": "http://k8s-opgeth-724e78893c-764184371.ap-northeast-2.elb.amazonaws.com",
-  "wsUrl": "ws://k8s-opgeth-724e78893c-764184371.ap-northeast-2.elb.amazonaws.com",
+  "rpcUrl": "http://k8s-opgeth-d37da409c1-483478091.ap-northeast-2.elb.amazonaws.com",
+  "wsUrl": "ws://k8s-opgeth-d37da409c1-483478091.ap-northeast-2.elb.amazonaws.com",
   "nativeToken": {
     "type": "erc20",
     "symbol": "TON",
@@ -20,8 +20,8 @@
     "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
   },
   "status": "active",
-  "createdAt": "2025-09-23T08:02:23Z",
-  "lastUpdated": "2025-09-23T08:02:23Z",
+  "createdAt": "2025-09-24T06:45:17Z",
+  "lastUpdated": "2025-09-24T06:45:17Z",
   "l1Contracts": {
     "ProxyAdmin": "0x3657c352f255F472bf257d01b3485C977d58471f",
     "SystemConfig": "0x71a9F029A24Fd772d65c4a95b26EA9267a8a5aDc",
@@ -70,7 +70,7 @@
     {
       "name": "Example Bridge",
       "type": "native",
-      "url": "http://k8s-bridge-009e508f40-2128137304.ap-northeast-2.elb.amazonaws.com",
+      "url": "http://k8s-bridge-a6247154ff-816947661.ap-northeast-2.elb.amazonaws.com",
       "status": "active",
       "supportedTokens": [
         {
@@ -136,7 +136,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xef95bc7d5502ae416e7752ff96d3254ce3a100ebc5c272e5754f4e46e6a30c5e3b2d6fbe065c21089b526b76e58fe09541d4d8b92b228bd2b8a0458117ccec451b",
+    "signature": "0xcdf7366e5ee8b2f61168ed593616f987facb3d30658e155db5112df4a57530c421da7c21be4df7a27bd9334aa080ec271834532b196474c34c0706afe51d59141c",
     "signedBy": "0xf90432b76A23bC7bB50b868dC4257C5F5B401742"
   }
 }
