@@ -1,7 +1,7 @@
 {
   "l1ChainId": 11155111,
   "l2ChainId": 111551150259,
-  "name": "shailu06",
+  "name": "shailu11",
   "description": "Chain to test the final docker deployement",
   "logo": "https://example.com/logo.png",
   "website": "https://example-l2.com",
@@ -10,8 +10,8 @@
     "name": "thanos",
     "version": "(devel)"
   },
-  "rpcUrl": "http://k8s-opgeth-5e4bd05810-730550129.ap-south-1.elb.amazonaws.com",
-  "wsUrl": "ws://k8s-opgeth-5e4bd05810-730550129.ap-south-1.elb.amazonaws.com",
+  "rpcUrl": "http://k8s-opgeth-ae6b6df5a3-1759678076.ap-northeast-2.elb.amazonaws.com",
+  "wsUrl": "ws://k8s-opgeth-ae6b6df5a3-1759678076.ap-northeast-2.elb.amazonaws.com",
   "nativeToken": {
     "type": "erc20",
     "symbol": "TON",
@@ -21,7 +21,7 @@
   },
   "status": "active",
   "createdAt": "2025-09-02T13:47:03Z",
-  "lastUpdated": "2025-09-02T13:47:03Z",
+  "lastUpdated": "2025-09-24T07:19:43Z",
   "l1Contracts": {
     "ProxyAdmin": "0x4B64a59A0bE9A603647b25933781eCE70cA54A84",
     "SystemConfig": "0xAe7366e508fE8643D9Ee7a1dF0B1b6905224e7B3",
@@ -35,12 +35,12 @@
     "OptimismPortal": "0x4E270bd34c12B74129a786256053a0451186098A",
     "AnchorStateRegistry": "0xC0a0D4c24Cf567ADe8fF31C3B492b34Aa48705E0",
     "DelayedWETH": "0xc96d5E89E1131A7A4DF32DAdAfa95A1Dc67A73B9",
-    "L1UsdcBridge": "0x19DC0a38e566200212992Fd0956cbCeACA8042EE",
+    "L1UsdcBridge": "0x71A830D626576d208483b6C8F920Ba4f05a70297",
     "L2OutputOracle": "0x3e97BA2247dAC0d02635407811914C5e1bDC34b6",
     "Mips": "0x6EfC03FEEF7246F759A48755b85D0C4Bd71BEdf2",
     "PermissionedDelayedWETH": "0xc04BffdC8bAcB692e8ad5E988e1Ed09b618Fa262",
     "PreimageOracle": "0xBc0552400DeC4BAf03D36006104cC51E962E1C16",
-    "ProtocolVersions": "0xa8FF6Ea5E92c35B1137B543c4a8F99F867A79F52",
+    "ProtocolVersions": "0x7c4f20b0667C1cD632619684061cf74E138Cb192",
     "SafeProxyFactory": "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
     "SafeSingleton": "0xf3305609aA64AbFf7347774d6f2cfC600A30C055",
     "SystemOwnerSafe": "0x02d740d9A094d6870A5dBfd2E337D5c3913A5486"
@@ -70,7 +70,7 @@
     {
       "name": "Docker Deployement Bridge",
       "type": "native",
-      "url": "http://k8s-bridge-3a8eb9d4d5-155513442.ap-south-1.elb.amazonaws.com",
+      "url": "http://k8s-bridge-73ef33c65f-1887397135.ap-northeast-2.elb.amazonaws.com",
       "status": "active",
       "supportedTokens": [
         {
@@ -132,7 +132,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x6a9ababd4639549ded3811de2eeb3eb16c4df8a7d85dda1134e3b268d363408f4ba1cf19e4387f116439b512b9761bbbd17629ea893d2239f9224465f1983d6f1c",
+    "signature": "0x5751cf91afb2570780760d9813453d02b3456a844da82c0ffd8cc3b0d429675d0161c438995d92adda0c449e6a5c4baccb720784d64250499c2c031d64aedf6c1b",
     "signedBy": "0xf90432b76A23bC7bB50b868dC4257C5F5B401742"
   }
 }
