@@ -3,8 +3,8 @@
  * Unified validation logic that can be used by different scripts
  */
 
-import { readMetadataFile, getFileInfo } from './file-utils';
-import { getRpcConfig, getLayer2ManagerProxy } from './rpc-config';
+import { readMetadataFile, getFileInfo, isAppchainPath } from './file-utils';
+import { getRpcConfig, getLayer2ManagerProxy, getRpcForChainId } from './rpc-config';
 import { RollupMetadataValidator } from '../../validators/rollup-validator';
 
 export interface ValidationOptions {
@@ -70,34 +70,52 @@ export async function validateRollupFile(
 
     // 4. Setup validator with RPC
     const validator = new RollupMetadataValidator();
-    validator.setProvider(rpcConfig.url);
 
-    // 5. Run validation
-    const validationResult = await validator.validateRollupMetadata(
-      metadata,
-      fileInfo.filepath,
-      options.prTitle,
-    );
+    // 5. Run validation — route based on path type
+    if (isAppchainPath(fileInfo.filepath)) {
+      // Appchain validation — uses validateMetadata routing
+      const rpcConfig = getRpcForChainId(metadata.l1ChainId);
+      result.rpcInfo = { url: rpcConfig.url, isCustom: rpcConfig.isCustom };
+      validator.setProvider(rpcConfig.url);
 
-    result.valid = validationResult.valid;
-    result.errors = validationResult.errors;
+      const validationResult = await validator.validateAppchainMetadata(
+        metadata,
+        fileInfo.filepath,
+        options.prTitle,
+      );
 
-    // 6. Run staking validation if candidate
-    if (metadata.staking.isCandidate) {
-      const layer2ManagerProxy = getLayer2ManagerProxy(fileInfo.network);
-      if (layer2ManagerProxy) {
-        const stakingResult = await validator.validateStakingRegistration(
-          metadata,
-          layer2ManagerProxy,
-        );
-        if (!stakingResult.valid) {
-          result.errors.push(`Staking validation failed: ${stakingResult.error}`);
-          result.valid = false;
+      result.valid = validationResult.valid;
+      result.errors = validationResult.errors;
+    } else {
+      // Legacy validation
+      validator.setProvider(rpcConfig.url);
+
+      const validationResult = await validator.validateRollupMetadata(
+        metadata,
+        fileInfo.filepath,
+        options.prTitle,
+      );
+
+      result.valid = validationResult.valid;
+      result.errors = validationResult.errors;
+
+      // Run staking validation if candidate (legacy only)
+      if (metadata.staking?.isCandidate) {
+        const layer2ManagerProxy = getLayer2ManagerProxy(fileInfo.network);
+        if (layer2ManagerProxy) {
+          const stakingResult = await validator.validateStakingRegistration(
+            metadata,
+            layer2ManagerProxy,
+          );
+          if (!stakingResult.valid) {
+            result.errors.push(`Staking validation failed: ${stakingResult.error}`);
+            result.valid = false;
+          }
+        } else {
+          result.warnings.push(
+            `No Layer2ManagerProxy address configured for network ${fileInfo.network}. Skipping staking validation.`,
+          );
         }
-      } else {
-        result.warnings.push(
-          `No Layer2ManagerProxy address configured for network ${fileInfo.network}. Skipping staking validation.`,
-        );
       }
     }
 

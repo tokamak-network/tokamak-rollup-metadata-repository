@@ -1,0 +1,121 @@
+{
+  "l1ChainId": 11155111,
+  "l2ChainId": 123456789,
+  "name": "Example Thanos Rollup",
+  "description": "Example rollup deployed with Thanos stack on Sepolia",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example-thanos.com",
+
+  "stackType": "thanos",
+  "stackVersion": "1.0.0",
+  "rollupType": "optimistic",
+
+  "rpcUrl": "https://rpc.example-thanos.com",
+  "wsUrl": "wss://ws.example-thanos.com",
+
+  "nativeToken": {
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "Tokamak Network Token",
+    "decimals": 18,
+    "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
+  },
+
+  "status": "active",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "lastUpdated": "2026-01-15T10:00:00Z",
+
+  "l1Contracts": {
+    "SystemConfig": "0x1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+    "ProxyAdmin": "0x1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+    "AddressManager": "0x1111111111111111111111111111111111111111",
+    "SuperchainConfig": "0x2222222222222222222222222222222222222222",
+    "L1CrossDomainMessenger": "0x8888888888888888888888888888888888888888",
+    "L1StandardBridge": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "OptimismPortal": "0x1515151515151515151515151515151515151515",
+    "L2OutputOracle": "0x1010101010101010101010101010101010101010",
+    "DisputeGameFactory": "0x6666666666666666666666666666666666666666"
+  },
+
+  "l2Contracts": {
+    "NativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+    "WETH": "0x4200000000000000000000000000000000000006",
+    "L2ToL1MessagePasser": "0x4200000000000000000000000000000000000016",
+    "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "L2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "GasPriceOracle": "0x420000000000000000000000000000000000000F",
+    "L1Block": "0x4200000000000000000000000000000000000015"
+  },
+
+  "operator": {
+    "address": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+    "batcherAddress": "0xbcdefabcdefabcdefabcdefabcdefabcdefabcdef",
+    "proposerAddress": "0xcdefabcdefabcdefabcdefabcdefabcdefabcdefab"
+  },
+
+  "bridges": [
+    {
+      "name": "Thanos Bridge",
+      "type": "native",
+      "url": "https://bridge.example-thanos.com",
+      "status": "active",
+      "supportedTokens": [
+        {
+          "symbol": "TON",
+          "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044",
+          "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+          "decimals": 18,
+          "isNativeToken": true
+        },
+        {
+          "symbol": "ETH",
+          "l1Address": "0x0000000000000000000000000000000000000000",
+          "l2Address": "0x4200000000000000000000000000000000000486",
+          "decimals": 18,
+          "isWrappedETH": true
+        }
+      ]
+    }
+  ],
+
+  "explorers": [
+    {
+      "name": "Thanos Explorer",
+      "url": "https://explorer.example-thanos.com",
+      "type": "blockscout",
+      "status": "active"
+    }
+  ],
+
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "30000000",
+    "baseFeePerGas": "1000000000",
+    "priorityFeePerGas": "1000000000"
+  },
+
+  "withdrawalConfig": {
+    "challengePeriod": 120,
+    "expectedWithdrawalDelay": 1560,
+    "monitoringInfo": {
+      "l2OutputOracleAddress": "0x1010101010101010101010101010101010101010"
+    },
+    "batchSubmissionFrequency": 1440,
+    "outputRootFrequency": 240
+  },
+
+  "staking": {
+    "isCandidate": false
+  },
+
+  "supportResources": {
+    "documentationUrl": "https://docs.example-thanos.com",
+    "communityUrl": "https://discord.gg/example-thanos"
+  },
+
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x[GENERATED_BY_SEQUENCER_SIGNATURE]",
+    "signedBy": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+  }
+}

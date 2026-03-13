@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'data/**/*.json'
+      - 'tokamak-appchain-data/**/*.json'
   # 수동 실행을 위한 이벤트 추가
   workflow_dispatch:
     inputs:
@@ -55,6 +56,7 @@ jobs:
       with:
         files: |
           data/**/*.json
+          tokamak-appchain-data/**/*.json
 
     - name: Set files for manual execution
       if: github.event_name == 'workflow_dispatch'
@@ -129,19 +131,46 @@ jobs:
           echo "PR Title: $PR_TITLE"
         fi
 
-        # PR 제목 형식: [Rollup] <network> <systemConfig_address> - <rollup_name> 또는 [Update] <network> <systemConfig_address> - <rollup_name>
-        if [[ ! "$PR_TITLE" =~ ^\[(Rollup|Update)\]\ (mainnet|sepolia)\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
-          echo "❌ Error: PR title must follow format:"
-          echo "   [Rollup] <network> <systemConfig_address> - <rollup_name> (for new rollups)"
-          echo "   [Update] <network> <systemConfig_address> - <rollup_name> (for updates)"
-          echo "   Example: [Rollup] sepolia 0x5678901234567890123456789012345678901234 - Example L2"
-          echo "   Example: [Update] mainnet 0x1234567890123456789012345678901234567890 - Updated L2"
-          echo "   Your title: $PR_TITLE"
-          exit 1
+        # Detect metadata type from changed files
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          FILE="${{ github.event.inputs.file_path }}"
+        else
+          FILE="${{ steps.changed-files.outputs.all_changed_files }}"
+        fi
+
+        if [[ "$FILE" == tokamak-appchain-data/* ]]; then
+          METADATA_TYPE="appchain"
+        else
+          METADATA_TYPE="legacy"
+        fi
+        echo "metadata_type=$METADATA_TYPE" >> $GITHUB_OUTPUT
+
+        # Validate PR title format based on metadata type
+        if [ "$METADATA_TYPE" = "appchain" ]; then
+          # Appchain format: [Appchain] {chainId}/{stackType} 0xaddr - Name
+          #                  [Update] {chainId}/{stackType} 0xaddr - Name
+          if [[ ! "$PR_TITLE" =~ ^\[(Appchain|Update)\]\ [0-9]+/[a-z0-9-]+\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
+            echo "❌ Error: PR title must follow format:"
+            echo "   [Appchain] {chainId}/{stackType} 0xaddr - Name (for new appchains)"
+            echo "   [Update] {chainId}/{stackType} 0xaddr - Name (for updates)"
+            echo "   Example: [Appchain] 11155111/tokamak-appchain 0x1234...abcd - My Appchain"
+            echo "   Your title: $PR_TITLE"
+            exit 1
+          fi
+        else
+          # Legacy format: [Rollup] <network> <systemConfig_address> - <rollup_name>
+          if [[ ! "$PR_TITLE" =~ ^\[(Rollup|Update)\]\ (mainnet|sepolia)\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
+            echo "❌ Error: PR title must follow format:"
+            echo "   [Rollup] <network> <systemConfig_address> - <rollup_name> (for new rollups)"
+            echo "   [Update] <network> <systemConfig_address> - <rollup_name> (for updates)"
+            echo "   Example: [Rollup] sepolia 0x5678901234567890123456789012345678901234 - Example L2"
+            echo "   Your title: $PR_TITLE"
+            exit 1
+          fi
         fi
 
         # Extract operation type from PR title
-        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
+        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]] || [[ "$PR_TITLE" =~ ^\[Appchain\] ]]; then
           PR_OPERATION="register"
         elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
           PR_OPERATION="update"
@@ -213,8 +242,12 @@ jobs:
           echo "  └── Metadata integrity validation"
           echo ""
 
-          # 통합 검증 스크립트 실행
-          npm run validate -- --pr-title "$PR_TITLE" "$file"
+          # 메타데이터 타입에 따라 검증 스크립트 선택
+          if [[ "$file" == tokamak-appchain-data/* ]]; then
+            npm run validate:appchain -- --pr-title "$PR_TITLE" "$file"
+          else
+            npm run validate -- --pr-title "$PR_TITLE" "$file"
+          fi
 
           if [ $? -eq 0 ]; then
             echo "✅ All validations passed for $file"
@@ -272,7 +305,7 @@ jobs:
 
           // 기존 봇 댓글 삭제
           for (const comment of comments) {
-            if (comment.user.login === 'github-actions[bot]' && comment.body.includes('Rollup Metadata Validation')) {
+            if (comment.user.login === 'github-actions[bot]' && (comment.body.includes('Rollup Metadata Validation') || comment.body.includes('Appchain Metadata Validation'))) {
               await github.rest.issues.deleteComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,

@@ -1,4 +1,5 @@
 import { L2RollupMetadata } from '../schemas/rollup-metadata';
+import { TokamakAppchainMetadata, getImmutableFields } from '../schemas/tokamak-appchain-metadata';
 
 /**
  * File validation module
@@ -100,6 +101,45 @@ export class FileValidator {
     return path.split('.').reduce((current, key) => {
       return current && typeof current === 'object' && current !== null && key in current ? (current as Record<string, unknown>)[key] : undefined;
     }, obj);
+  }
+  /**
+   * Validate immutable fields for appchain metadata during update operations.
+   */
+  public validateAppchainImmutableFields(
+    newMetadata: TokamakAppchainMetadata,
+    existingFilepath: string,
+  ): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    const fs = require('fs');
+
+    try {
+      if (!fs.existsSync(existingFilepath)) {
+        return { valid: true, errors: [] };
+      }
+
+      const existingContent = fs.readFileSync(existingFilepath, 'utf8');
+      const existingMetadata: TokamakAppchainMetadata = JSON.parse(existingContent);
+
+      const immutableFieldPaths = getImmutableFields(newMetadata.stackType);
+      for (const fieldPath of immutableFieldPaths) {
+        const existingValue = this.getNestedValue(existingMetadata, fieldPath);
+        const newValue = this.getNestedValue(newMetadata, fieldPath);
+
+        if (existingValue !== undefined && newValue !== existingValue) {
+          errors.push(
+            `Immutable field '${fieldPath}' cannot be changed during update. ` +
+            `Existing: ${existingValue}, New: ${newValue}`,
+          );
+        }
+      }
+    } catch (error) {
+      errors.push(`Failed to validate immutable fields: ${(error as Error).message}`);
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
   }
 }
 
