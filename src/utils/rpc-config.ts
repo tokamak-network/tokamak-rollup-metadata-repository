@@ -108,7 +108,7 @@ export function getNetworkConfig(network: string): NetworkConfig | null {
 }
 
 // Chain ID → network name mapping
-const CHAIN_ID_TO_NETWORK: Record<number, string> = {
+export const CHAIN_ID_TO_NETWORK: Record<number, string> = {
   1: 'mainnet',
   11155111: 'sepolia',
   17000: 'holesky',

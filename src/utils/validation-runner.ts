@@ -57,23 +57,16 @@ export async function validateRollupFile(
       return result;
     }
 
-    // 2. Get RPC configuration
-    const rpcConfig = getRpcConfig(fileInfo.network);
-    result.rpcInfo = {
-      url: rpcConfig.url,
-      isCustom: rpcConfig.isCustom,
-    };
-
-    // 3. Read and parse metadata
+    // 2. Read and parse metadata
     const metadata = await readMetadataFile(fileInfo.filepath);
     result.metadata = metadata;
 
-    // 4. Setup validator with RPC
+    // 3. Setup validator with RPC
     const validator = new RollupMetadataValidator();
 
-    // 5. Run validation — route based on path type
+    // 4. Run validation — route based on path type
     if (isAppchainPath(fileInfo.filepath)) {
-      // Appchain validation — uses validateMetadata routing
+      // Appchain validation — RPC resolved from l1ChainId
       const rpcConfig = getRpcForChainId(metadata.l1ChainId);
       result.rpcInfo = { url: rpcConfig.url, isCustom: rpcConfig.isCustom };
       validator.setProvider(rpcConfig.url);
@@ -87,7 +80,9 @@ export async function validateRollupFile(
       result.valid = validationResult.valid;
       result.errors = validationResult.errors;
     } else {
-      // Legacy validation
+      // Legacy validation — RPC resolved from network name
+      const rpcConfig = getRpcConfig(fileInfo.network);
+      result.rpcInfo = { url: rpcConfig.url, isCustom: rpcConfig.isCustom };
       validator.setProvider(rpcConfig.url);
 
       const validationResult = await validator.validateRollupMetadata(
@@ -120,7 +115,7 @@ export async function validateRollupFile(
     }
 
     // 7. Add helpful warnings
-    if (!rpcConfig.isCustom) {
+    if (!result.rpcInfo.isCustom && result.rpcInfo.url) {
       result.warnings.push(
         `Using public RPC for ${fileInfo.network}. Set ${fileInfo.network.toUpperCase()}_RPC_URL for higher rate limits.`,
       );

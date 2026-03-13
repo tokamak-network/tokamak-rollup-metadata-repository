@@ -12,7 +12,7 @@
     "validate:onchain": "ts-node scripts/validate-onchain.ts",
     "validate:signature:register": "ts-node scripts/validate-signature.ts --operation register",
     "validate:signature:update": "ts-node scripts/validate-signature.ts --operation update",
-    "validate:appchain": "ts-node scripts/validate-appchain.ts"
+    "validate:appchain": "ts-node scripts/validate-metadata.ts"
   },
   "keywords": [
     "tokamak",

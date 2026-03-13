@@ -113,11 +113,15 @@ export class FileValidator {
     const fs = require('fs');
 
     try {
-      if (!fs.existsSync(existingFilepath)) {
-        return { valid: true, errors: [] };
+      let existingContent: string;
+      try {
+        existingContent = fs.readFileSync(existingFilepath, 'utf8');
+      } catch (e: any) {
+        if (e.code === 'ENOENT') {
+          return { valid: true, errors: [] };
+        }
+        throw e;
       }
-
-      const existingContent = fs.readFileSync(existingFilepath, 'utf8');
       const existingMetadata: TokamakAppchainMetadata = JSON.parse(existingContent);
 
       const immutableFieldPaths = getImmutableFields(newMetadata.stackType);

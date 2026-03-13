@@ -5,6 +5,7 @@
 
 import { promises as fs } from 'fs';
 import path from 'path';
+import { CHAIN_ID_TO_NETWORK } from './rpc-config';
 
 export interface FileInfo {
   filepath: string;
@@ -48,14 +49,11 @@ export async function getFileInfo(filepath: string): Promise<FileInfo> {
   let network: string | null = null;
 
   if (isAppchainPath(absolutePath)) {
-    // For appchain paths, derive a pseudo-network from the chain ID
+    // For appchain paths, derive network from the chain ID using shared mapping
     const chainIdMatch = absolutePath.match(/tokamak-appchain-data\/(\d+)\//);
     if (chainIdMatch) {
       const chainId = parseInt(chainIdMatch[1]);
-      if (chainId === 1) network = 'mainnet';
-      else if (chainId === 11155111) network = 'sepolia';
-      else if (chainId === 17000) network = 'holesky';
-      else network = `chain-${chainId}`;
+      network = CHAIN_ID_TO_NETWORK[chainId] || `chain-${chainId}`;
     }
   } else {
     network = extractNetworkFromPath(absolutePath);

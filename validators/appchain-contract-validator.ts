@@ -14,6 +14,21 @@ const L1_RPC_TIMEOUT = 15_000;
 const L2_RPC_TIMEOUT = 10_000;
 
 /**
+ * Race a promise against a timeout, clearing the timer on resolution.
+ */
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`timeout: ${label}`)), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timer!);
+  }
+}
+
+/**
  * On-chain contract validator for appchain metadata.
  * Verifies contract existence, ownership, and L2 chain ID per stack type.
  */
@@ -39,12 +54,11 @@ export class AppchainContractValidator {
       if (!this.provider) {
         this.setProviderForChainId(chainId);
       }
-      const code = await Promise.race([
+      const code = await withTimeout(
         this.provider!.getCode(address),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), L1_RPC_TIMEOUT),
-        ),
-      ]);
+        L1_RPC_TIMEOUT,
+        `eth_getCode on chain ${chainId}`,
+      );
 
       if (code === '0x' || code === '0x0') {
         return {
@@ -54,7 +68,7 @@ export class AppchainContractValidator {
       }
       return { valid: true };
     } catch (err: any) {
-      if (err.message === 'timeout') {
+      if (err.message?.startsWith('timeout:')) {
         return {
           valid: false,
           error: `L1 RPC call to chain ${chainId} timed out after ${L1_RPC_TIMEOUT / 1000}s`,
@@ -104,23 +118,21 @@ export class AppchainContractValidator {
 
     try {
       const contract = new ethers.Contract(proposerAddress, ON_CHAIN_PROPOSER_ABI, this.provider!);
-      const owner: string = await Promise.race([
+      const owner: string = await withTimeout(
         contract.owner(),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), L1_RPC_TIMEOUT),
-        ),
-      ]);
+        L1_RPC_TIMEOUT,
+        'OnChainProposer.owner()',
+      );
 
       // Check if owner is a Timelock (has admin() function)
       let finalOwner = owner;
       try {
         const timelockContract = new ethers.Contract(owner, TIMELOCK_ABI, this.provider!);
-        const admin: string = await Promise.race([
+        const admin: string = await withTimeout(
           timelockContract.admin(),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), L1_RPC_TIMEOUT),
-          ),
-        ]);
+          L1_RPC_TIMEOUT,
+          'Timelock.admin()',
+        );
         finalOwner = admin;
       } catch {
         // Not a Timelock — owner is the direct owner
@@ -136,7 +148,7 @@ export class AppchainContractValidator {
 
       return { valid: true, onChainOwner: finalOwner };
     } catch (err: any) {
-      if (err.message === 'timeout') {
+      if (err.message?.startsWith('timeout:')) {
         return {
           valid: false,
           error: `L1 RPC call timed out while checking OnChainProposer.owner()`,
@@ -162,12 +174,11 @@ export class AppchainContractValidator {
 
     try {
       const contract = new ethers.Contract(systemConfigAddress, SYSTEM_CONFIG_ABI, this.provider!);
-      const signer: string = await Promise.race([
+      const signer: string = await withTimeout(
         contract.unsafeBlockSigner(),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), L1_RPC_TIMEOUT),
-        ),
-      ]);
+        L1_RPC_TIMEOUT,
+        'SystemConfig.unsafeBlockSigner()',
+      );
 
       if (signer.toLowerCase() !== metadata.metadata.signedBy.toLowerCase()) {
         return {
@@ -179,7 +190,11 @@ export class AppchainContractValidator {
 
       // Validate native token address if ERC20
       if (metadata.nativeToken.type === 'erc20' && metadata.nativeToken.l1Address) {
-        const nativeTokenAddress: string = await contract.nativeTokenAddress();
+        const nativeTokenAddress: string = await withTimeout(
+          contract.nativeTokenAddress(),
+          L1_RPC_TIMEOUT,
+          'SystemConfig.nativeTokenAddress()',
+        );
         if (nativeTokenAddress.toLowerCase() !== metadata.nativeToken.l1Address.toLowerCase()) {
           return {
             valid: false,
@@ -190,7 +205,7 @@ export class AppchainContractValidator {
 
       return { valid: true, onChainOwner: signer };
     } catch (err: any) {
-      if (err.message === 'timeout') {
+      if (err.message?.startsWith('timeout:')) {
         return {
           valid: false,
           error: `L1 RPC call timed out while checking SystemConfig.unsafeBlockSigner()`,
@@ -209,14 +224,14 @@ export class AppchainContractValidator {
   public async validateL2ChainId(
     metadata: TokamakAppchainMetadata,
   ): Promise<{ valid: boolean; error?: string }> {
+    let l2Provider: ethers.JsonRpcProvider | null = null;
     try {
-      const l2Provider = new ethers.JsonRpcProvider(metadata.rpcUrl);
-      const network = await Promise.race([
+      l2Provider = new ethers.JsonRpcProvider(metadata.rpcUrl);
+      const network = await withTimeout(
         l2Provider.getNetwork(),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), L2_RPC_TIMEOUT),
-        ),
-      ]);
+        L2_RPC_TIMEOUT,
+        `L2 RPC at ${metadata.rpcUrl}`,
+      );
 
       const actualChainId = Number(network.chainId);
       if (actualChainId !== metadata.l2ChainId) {
@@ -228,7 +243,7 @@ export class AppchainContractValidator {
 
       return { valid: true };
     } catch (err: any) {
-      if (err.message === 'timeout') {
+      if (err.message?.startsWith('timeout:')) {
         return {
           valid: false,
           error: `L2 RPC at ${metadata.rpcUrl} is unreachable (timeout ${L2_RPC_TIMEOUT / 1000}s)`,
@@ -238,6 +253,8 @@ export class AppchainContractValidator {
         valid: false,
         error: `L2 RPC error at ${metadata.rpcUrl}: ${err.message}`,
       };
+    } finally {
+      l2Provider?.destroy();
     }
   }
 
@@ -251,7 +268,7 @@ export class AppchainContractValidator {
 
     this.setProviderForChainId(metadata.l1ChainId);
 
-    // 1. Identity contract existence
+    // 1. Check identity contract exists
     const identityField = getIdentityContractField(metadata.stackType);
     const identityAddress = metadata.l1Contracts[identityField];
     if (!identityAddress) {
@@ -259,21 +276,20 @@ export class AppchainContractValidator {
       return { valid: false, errors };
     }
 
-    const existenceResult = await this.validateContractExistence(identityAddress, metadata.l1ChainId);
+    // 2. Run all three checks in parallel (they use independent RPC calls)
+    const [existenceResult, ownershipResult, l2ChainIdResult] = await Promise.all([
+      this.validateContractExistence(identityAddress, metadata.l1ChainId),
+      this.validateOwnership(metadata),
+      this.validateL2ChainId(metadata),
+    ]);
+
     if (!existenceResult.valid) {
       errors.push(existenceResult.error!);
     }
-
-    // 2. On-chain ownership verification
-    const ownershipResult = await this.validateOwnership(metadata);
     if (!ownershipResult.valid) {
       errors.push(ownershipResult.error!);
     }
-
-    // 3. L2 chain ID verification (non-blocking for updates — warn only)
-    const l2ChainIdResult = await this.validateL2ChainId(metadata);
     if (!l2ChainIdResult.valid) {
-      // L2 RPC failures are warnings for updates, errors for registration
       errors.push(l2ChainIdResult.error!);
     }
 

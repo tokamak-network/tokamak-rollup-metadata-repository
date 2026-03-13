@@ -1,3 +1,6 @@
+import { isAppchainPath } from '../src/utils/file-utils';
+import { STACK_IDENTITY_CONTRACT } from '../schemas/tokamak-appchain-metadata';
+
 /**
  * Network validation module
  */
@@ -157,7 +160,7 @@ export class NetworkValidator {
       return { valid: false, error: `Invalid appchain-data path: ${filepath}` };
     }
 
-    const validStackTypes = ['tokamak-appchain', 'tokamak-private-app-channel', 'thanos', 'py-ethclient'];
+    const validStackTypes = Object.keys(STACK_IDENTITY_CONTRACT);
     if (!validStackTypes.includes(match[2])) {
       return { valid: false, error: `Unknown stack type: ${match[2]}` };
     }
@@ -174,7 +177,7 @@ export class NetworkValidator {
    * Check if a filepath is an appchain-data path.
    */
   public isAppchainPath(filepath: string): boolean {
-    return filepath.includes('tokamak-appchain-data/');
+    return isAppchainPath(filepath);
   }
 
   /**
