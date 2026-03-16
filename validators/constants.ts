@@ -103,7 +103,7 @@ export const PUBLIC_RPC_PROVIDERS = {
 
 // Network chain ID mappings
 export const NETWORK_CHAIN_IDS = {
-  mainnet: [1, 42161, 10, 137, 8453] as readonly number[], // Ethereum mainnet and popular L2s
+  mainnet: [1] as readonly number[], // Ethereum mainnet L1 only
   sepolia: [11155111] as readonly number[], // Sepolia testnet
   goerli: [5] as readonly number[], // Goerli testnet (deprecated)
   holesky: [17000] as readonly number[], // Holesky testnet
@@ -131,8 +131,9 @@ export function getRpcProviderForChainId(chainId: number): string {
     return customUrl;
   }
 
-  // Default to mainnet for unknown chain IDs
-  return PUBLIC_RPC_PROVIDERS.mainnet;
+  throw new Error(
+    `No RPC provider configured for chain ID ${chainId}. Set L1_RPC_${chainId} env var.`
+  );
 }
 
 // Helper function to get RPC provider for network name

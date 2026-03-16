@@ -15,7 +15,7 @@ export interface RpcConfig {
 const DEFAULT_RPC_URLS = {
   mainnet: 'https://eth.llamarpc.com',
   sepolia: 'https://ethereum-sepolia-rpc.publicnode.com',
-  holesky: 'https://holesky.infura.io/v3/' // Future support
+  holesky: 'https://ethereum-holesky-rpc.publicnode.com'
 } as const;
 
 /**
@@ -48,6 +48,13 @@ export const NETWORK_CONFIGS: Record<string, NetworkConfig> = {
       'https://sepolia.drpc.org'
     ],
     layer2ManagerProxy: '0x58B4C2FEf19f5CDdd944AadD8DC99cCC71bfeFDc'
+  },
+  holesky: {
+    name: 'Holesky Testnet',
+    chainId: 17000,
+    rpcUrls: [
+      'https://ethereum-holesky-rpc.publicnode.com',
+    ],
   }
 };
 

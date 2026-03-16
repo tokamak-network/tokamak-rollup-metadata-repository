@@ -122,12 +122,15 @@ jobs:
       id: file-analysis
 
     - name: Validate PR title format and operation consistency
+      env:
+        INPUT_PR_TITLE: ${{ github.event.inputs.pr_title }}
+        PR_TITLE_FROM_EVENT: ${{ github.event.pull_request.title }}
       run: |
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          PR_TITLE="${{ github.event.inputs.pr_title }}"
+          PR_TITLE="$INPUT_PR_TITLE"
           echo "Manual execution - using provided PR title: $PR_TITLE"
         else
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_TITLE="$PR_TITLE_FROM_EVENT"
           echo "PR Title: $PR_TITLE"
         fi
 
@@ -200,25 +203,30 @@ jobs:
 
     - name: Validate rollup metadata with onchain verification
       if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
+      env:
+        INPUT_FILE_PATH: ${{ github.event.inputs.file_path }}
+        INPUT_PR_TITLE: ${{ github.event.inputs.pr_title }}
+        PR_TITLE_FROM_EVENT: ${{ github.event.pull_request.title }}
+        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       run: |
         echo "🔍 Starting comprehensive rollup metadata validation..."
 
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          FILES="${{ github.event.inputs.file_path }}"
-          PR_TITLE="${{ github.event.inputs.pr_title }}"
+          FILES="$INPUT_FILE_PATH"
+          PR_TITLE="$INPUT_PR_TITLE"
           echo "Manual execution mode"
           echo "File to validate: $FILES"
           echo "PR Title: $PR_TITLE"
         else
-          FILES="${{ steps.changed-files.outputs.all_changed_files }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          FILES="$CHANGED_FILES"
+          PR_TITLE="$PR_TITLE_FROM_EVENT"
           echo "PR mode"
           echo "Changed files: $FILES"
           echo "PR Title: $PR_TITLE"
         fi
 
         # Extract operation type from PR title for display
-        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
+        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]] || [[ "$PR_TITLE" =~ ^\[Appchain\] ]]; then
           OPERATION="register"
         elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
           OPERATION="update"

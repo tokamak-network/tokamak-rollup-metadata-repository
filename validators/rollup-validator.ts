@@ -300,8 +300,10 @@ export class RollupMetadataValidator {
         errors.push(...immutableResult.errors);
       }
 
+      // validateUpdateTimestamp only reads `lastUpdated` — safe to pass appchain metadata
+      // since both types share this field
       const timestampResult = await timestampValidator.validateUpdateTimestamp(
-        metadata as unknown as L2RollupMetadata,
+        { lastUpdated: metadata.lastUpdated } as L2RollupMetadata,
         filepath,
         operation,
       );
@@ -352,7 +354,7 @@ export class RollupMetadataValidator {
         operation = prResult.operation!;
 
         // Verify SystemConfig address match
-        if (prResult.systemConfigAddress !== metadata.l1Contracts.SystemConfig?.toLowerCase()) {
+        if (prResult.systemConfigAddress?.toLowerCase() !== metadata.l1Contracts.SystemConfig?.toLowerCase()) {
           errors.push(`PR title SystemConfig address (${prResult.systemConfigAddress}) does not match metadata SystemConfig address (${metadata.l1Contracts.SystemConfig})`);
         }
 

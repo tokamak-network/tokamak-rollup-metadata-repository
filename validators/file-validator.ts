@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { L2RollupMetadata } from '../schemas/rollup-metadata';
 import { TokamakAppchainMetadata, getImmutableFields } from '../schemas/tokamak-appchain-metadata';
 
@@ -35,8 +36,6 @@ export class FileValidator {
     existingFilepath: string,
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
-    const fs = require('fs');
-
     try {
       if (!fs.existsSync(existingFilepath)) {
         // If file doesn't exist, this validation doesn't apply
@@ -110,7 +109,6 @@ export class FileValidator {
     existingFilepath: string,
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
-    const fs = require('fs');
 
     try {
       let existingContent: string;

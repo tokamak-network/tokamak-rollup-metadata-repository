@@ -34,13 +34,27 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
  */
 export class AppchainContractValidator {
   private provider: ethers.JsonRpcProvider | null = null;
+  private currentChainId: number | null = null;
 
   /**
    * Set L1 RPC provider for the given chain ID.
+   * Reuses existing provider if chain ID hasn't changed; destroys old provider otherwise.
    */
   public setProviderForChainId(chainId: number): void {
+    if (this.currentChainId === chainId && this.provider) return;
+    this.provider?.destroy();
     const rpcConfig = getRpcForChainId(chainId);
     this.provider = new ethers.JsonRpcProvider(rpcConfig.url);
+    this.currentChainId = chainId;
+  }
+
+  /**
+   * Destroy the L1 provider and reset state.
+   */
+  public destroy(): void {
+    this.provider?.destroy();
+    this.provider = null;
+    this.currentChainId = null;
   }
 
   /**
@@ -51,7 +65,7 @@ export class AppchainContractValidator {
     chainId: number,
   ): Promise<{ valid: boolean; error?: string }> {
     try {
-      if (!this.provider) {
+      if (!this.provider || this.currentChainId !== chainId) {
         this.setProviderForChainId(chainId);
       }
       const code = await withTimeout(
@@ -95,7 +109,7 @@ export class AppchainContractValidator {
       case 'tokamak-appchain':
         return this.validateTokamakAppchainOwnership(metadata);
       case 'thanos':
-        return this.validateThanosOwnership(metadata);
+        return this.validateThanosSigner(metadata);
       case 'tokamak-private-app-channel':
       case 'py-ethclient':
         // No specific ownership verification until identity contracts are defined
@@ -162,9 +176,10 @@ export class AppchainContractValidator {
   }
 
   /**
-   * thanos: SystemConfig.unsafeBlockSigner() must match signedBy
+   * thanos: SystemConfig.unsafeBlockSigner() must match signedBy.
+   * Note: uses unsafeBlockSigner (not owner) for consistency with legacy Thanos validation.
    */
-  private async validateThanosOwnership(
+  private async validateThanosSigner(
     metadata: TokamakAppchainMetadata,
   ): Promise<{ valid: boolean; error?: string; onChainOwner?: string }> {
     const systemConfigAddress = metadata.l1Contracts['SystemConfig'];
@@ -292,6 +307,8 @@ export class AppchainContractValidator {
     if (!l2ChainIdResult.valid) {
       errors.push(l2ChainIdResult.error!);
     }
+
+    this.destroy();
 
     return {
       valid: errors.length === 0,

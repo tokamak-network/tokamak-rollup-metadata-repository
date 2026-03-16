@@ -34,7 +34,7 @@ const appchainMetadataSchema = {
       enum: ['optimistic', 'zk', 'sovereign'],
     },
     rpcUrl: { type: 'string', format: 'uri' },
-    wsUrl: { type: 'string' }, // ws:// not supported by ajv-formats uri
+    wsUrl: { type: 'string', pattern: '^wss?://.+' }, // ws:// not supported by ajv-formats uri
     nativeToken: {
       type: 'object',
       required: ['type', 'symbol', 'name', 'decimals'],

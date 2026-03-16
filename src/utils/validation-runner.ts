@@ -173,10 +173,17 @@ export function displayValidationResults(result: ValidationResult, verbose: bool
       console.log(`   L2 Chain ID: ${result.metadata.l2ChainId}`);
       console.log(`   Name: ${result.metadata.name}`);
       console.log(`   Type: ${result.metadata.rollupType}`);
-      console.log(`   Stack: ${result.metadata.stack.name} v${result.metadata.stack.version}`);
       console.log(`   Status: ${result.metadata.status}`);
-      console.log(`   Sequencer: ${result.metadata.sequencer.address}`);
-      console.log(`   Staking Candidate: ${result.metadata.staking.isCandidate ? 'Yes' : 'No'}`);
+      if (result.metadata.stackType) {
+        // Appchain metadata
+        console.log(`   Stack: ${result.metadata.stackType}${result.metadata.stackVersion ? ' v' + result.metadata.stackVersion : ''}`);
+        console.log(`   Operator: ${result.metadata.operator?.address}`);
+      } else if (result.metadata.stack) {
+        // Legacy metadata
+        console.log(`   Stack: ${result.metadata.stack.name} v${result.metadata.stack.version}`);
+        console.log(`   Sequencer: ${result.metadata.sequencer.address}`);
+        console.log(`   Staking Candidate: ${result.metadata.staking?.isCandidate ? 'Yes' : 'No'}`);
+      }
     }
   } else {
     console.error('❌ Validation failed with the following errors:');
