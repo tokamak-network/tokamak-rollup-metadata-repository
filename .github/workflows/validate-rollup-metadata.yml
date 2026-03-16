@@ -3,9 +3,6 @@ name: Validate Rollup Metadata
 on:
   pull_request:
     branches: [ main ]
-    paths:
-      - 'data/**/*.json'
-      - 'tokamak-appchain-data/**/*.json'
   # 수동 실행을 위한 이벤트 추가
   workflow_dispatch:
     inputs:
