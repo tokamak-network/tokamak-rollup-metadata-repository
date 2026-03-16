@@ -83,7 +83,10 @@
 
   "supportResources": {
     "documentationUrl": "https://docs.example-appchain.com",
-    "communityUrl": "https://discord.gg/example"
+    "communityUrl": "https://discord.gg/example",
+    "xUrl": "https://x.com/example_appchain",
+    "telegramUrl": "https://t.me/example_appchain",
+    "dashboardUrl": "https://dashboard.example-appchain.com"
   },
 
   "staking": {

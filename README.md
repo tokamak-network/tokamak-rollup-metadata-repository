@@ -51,7 +51,7 @@ tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 
 # 2. Validate locally
 npm install && npm run build
-npm run validate -- \
+npm run validate:appchain -- \
   --pr-title "[Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain" \
   tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 
@@ -61,8 +61,7 @@ npm run validate -- \
 
 > See [Tokamak Appchain Registration Guide](docs/tokamak-appchain-registration.md) for full details.
 
-### Thanos Stack (legacy)
-
+### Thanos Stack 
 ```bash
 # 1. Create metadata file
 data/sepolia/0x5678901234567890123456789012345678901234.json
@@ -81,8 +80,7 @@ tokamak-appchain-data/   # Tokamak Appchain stack metadata (new)
   {l1ChainId}/
     {stackType}/
       {identityContract}.json
-data/                    # Thanos stack metadata (legacy)
-  mainnet/
+data/                    # Thanos stack metadata   mainnet/
   sepolia/
 docs/                    # Documentation
 schemas/                 # JSON schemas and TypeScript types
@@ -100,22 +98,22 @@ validators/              # Core validation logic
 Local validation ensures data integrity before submission:
 
 ```bash
-# Complete validation (recommended)
-npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
+# Tokamak Appchain
+npm run validate:appchain -- \
+  --pr-title "[Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain" \
+  tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 
-# Individual validation steps
-npm run validate:schema <file>                # Schema validation only
-npm run validate:onchain <file>               # On-chain validation only
-npm run validate:signature:register <file>    # Signature validation (register operation)
-npm run validate:signature:update <file>      # Signature validation (update operation)
+# Thanos
+npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
 ```
 
 **Available Commands:**
-- `npm run validate` - Complete validation (all steps)
-- `npm run validate:schema` - JSON schema validation
-- `npm run validate:onchain` - Contract existence and sequencer verification
-- `npm run validate:signature:register` - Cryptographic signature verification for register operations
-- `npm run validate:signature:update` - Cryptographic signature verification for update operations
+- `npm run validate:appchain` - Tokamak Appchain validation (schema, signature, on-chain)
+- `npm run validate` - Thanos complete validation (all steps)
+- `npm run validate:schema` - Thanos schema validation only
+- `npm run validate:onchain` - Thanos contract existence and sequencer verification
+- `npm run validate:signature:register` - Signature verification for register operations
+- `npm run validate:signature:update` - Signature verification for update operations
 
 ## 🛠️ Development Tools
 

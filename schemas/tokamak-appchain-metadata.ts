@@ -11,21 +11,18 @@
 export type StackType =
   | 'tokamak-appchain'
   | 'tokamak-private-app-channel'
-  | 'thanos'
   | 'py-ethclient';
 
 // Stack display names (for UI rendering)
 export const STACK_DISPLAY_NAMES: Record<StackType, string> = {
   'tokamak-appchain': 'Tokamak Appchain',
   'tokamak-private-app-channel': 'Tokamak Private App Channel',
-  'thanos': 'Thanos',
   'py-ethclient': 'py-ethclient',
 };
 
 // Identity contract field per stack type (used as filename)
 export const STACK_IDENTITY_CONTRACT: Record<StackType, string> = {
   'tokamak-appchain': 'OnChainProposer',
-  'thanos': 'SystemConfig',
   'tokamak-private-app-channel': 'IdentityContract', // TBD
   'py-ethclient': 'IdentityContract', // TBD
 };
@@ -33,7 +30,6 @@ export const STACK_IDENTITY_CONTRACT: Record<StackType, string> = {
 // Required l1Contracts fields per stack type
 export const STACK_REQUIRED_L1_CONTRACTS: Record<StackType, string[]> = {
   'tokamak-appchain': ['OnChainProposer'],
-  'thanos': ['SystemConfig'],
   'tokamak-private-app-channel': [], // TBD
   'py-ethclient': [], // TBD
 };
@@ -101,39 +97,12 @@ export interface TokamakAppchainL1Contracts {
   [contractName: string]: string | undefined;
 }
 
-export interface ThanosL1Contracts {
-  SystemConfig: string; // Identity contract (= filename)
-  AddressManager?: string;
-  L1CrossDomainMessenger?: string;
-  L1StandardBridge?: string;
-  L1ERC721Bridge?: string;
-  OptimismPortal?: string;
-  L2OutputOracle?: string;
-  DisputeGameFactory?: string;
-  OptimismMintableERC20Factory?: string;
-  OptimismMintableERC721Factory?: string;
-  SuperchainConfig?: string;
-  L1UsdcBridge?: string;
-  AnchorStateRegistry?: string;
-  DelayedWETH?: string;
-  Mips?: string;
-  PermissionedDelayedWETH?: string;
-  PreimageOracle?: string;
-  ProtocolVersions?: string;
-  SafeProxyFactory?: string;
-  SafeSingleton?: string;
-  SystemOwnerSafe?: string;
-  ProxyAdmin?: string;
-  [contractName: string]: string | undefined;
-}
-
 export interface GenericL1Contracts {
   [contractName: string]: string | undefined;
 }
 
 export type AppchainL1Contracts =
   | TokamakAppchainL1Contracts
-  | ThanosL1Contracts
   | GenericL1Contracts;
 
 // --- Main metadata interface ---
@@ -230,6 +199,9 @@ export interface TokamakAppchainMetadata {
     communityUrl?: string;
     helpCenterUrl?: string;
     announcementUrl?: string;
+    xUrl?: string;
+    telegramUrl?: string;
+    dashboardUrl?: string;
   };
 
   // Staking information (Tokamak Staking V2)

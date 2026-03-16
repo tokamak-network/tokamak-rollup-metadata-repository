@@ -6,7 +6,6 @@ import {
 import {
   ON_CHAIN_PROPOSER_ABI,
   TIMELOCK_ABI,
-  SYSTEM_CONFIG_ABI,
 } from './constants';
 import { getRpcForChainId } from '../src/utils/rpc-config';
 
@@ -108,8 +107,6 @@ export class AppchainContractValidator {
     switch (metadata.stackType) {
       case 'tokamak-appchain':
         return this.validateTokamakAppchainOwnership(metadata);
-      case 'thanos':
-        return this.validateThanosSigner(metadata);
       case 'tokamak-private-app-channel':
       case 'py-ethclient':
         // No specific ownership verification until identity contracts are defined
@@ -171,64 +168,6 @@ export class AppchainContractValidator {
       return {
         valid: false,
         error: `Failed to call owner() on OnChainProposer: ${err.message}`,
-      };
-    }
-  }
-
-  /**
-   * thanos: SystemConfig.unsafeBlockSigner() must match signedBy.
-   * Note: uses unsafeBlockSigner (not owner) for consistency with legacy Thanos validation.
-   */
-  private async validateThanosSigner(
-    metadata: TokamakAppchainMetadata,
-  ): Promise<{ valid: boolean; error?: string; onChainOwner?: string }> {
-    const systemConfigAddress = metadata.l1Contracts['SystemConfig'];
-    if (!systemConfigAddress) {
-      return { valid: false, error: 'Missing l1Contracts.SystemConfig' };
-    }
-
-    try {
-      const contract = new ethers.Contract(systemConfigAddress, SYSTEM_CONFIG_ABI, this.provider!);
-      const signer: string = await withTimeout(
-        contract.unsafeBlockSigner(),
-        L1_RPC_TIMEOUT,
-        'SystemConfig.unsafeBlockSigner()',
-      );
-
-      if (signer.toLowerCase() !== metadata.metadata.signedBy.toLowerCase()) {
-        return {
-          valid: false,
-          error: `Signer ${metadata.metadata.signedBy} does not match SystemConfig.unsafeBlockSigner(). On-chain: ${signer}`,
-          onChainOwner: signer,
-        };
-      }
-
-      // Validate native token address if ERC20
-      if (metadata.nativeToken.type === 'erc20' && metadata.nativeToken.l1Address) {
-        const nativeTokenAddress: string = await withTimeout(
-          contract.nativeTokenAddress(),
-          L1_RPC_TIMEOUT,
-          'SystemConfig.nativeTokenAddress()',
-        );
-        if (nativeTokenAddress.toLowerCase() !== metadata.nativeToken.l1Address.toLowerCase()) {
-          return {
-            valid: false,
-            error: `Native token address mismatch: metadata says ${metadata.nativeToken.l1Address}, on-chain says ${nativeTokenAddress}`,
-          };
-        }
-      }
-
-      return { valid: true, onChainOwner: signer };
-    } catch (err: any) {
-      if (err.message?.startsWith('timeout:')) {
-        return {
-          valid: false,
-          error: `L1 RPC call timed out while checking SystemConfig.unsafeBlockSigner()`,
-        };
-      }
-      return {
-        valid: false,
-        error: `Failed to call unsafeBlockSigner() on SystemConfig: ${err.message}`,
       };
     }
   }

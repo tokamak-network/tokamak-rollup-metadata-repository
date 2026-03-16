@@ -41,7 +41,7 @@ tokamak-appchain-data/{l1ChainId}/{stackType}/{identityContract}.json
 | Field | Description | Example |
 |-------|-------------|---------|
 | `l1ChainId` | L1 chain where contracts are deployed | `11155111` (Sepolia), `1` (Mainnet) |
-| `stackType` | Stack used to deploy | `tokamak-appchain`, `thanos`, `py-ethclient` |
+| `stackType` | Stack used to deploy | `tokamak-appchain`, `py-ethclient` |
 | `identityContract` | Primary identity contract address | `0x1234...abcd` (lowercase) |
 
 **Identity contract per stack type:**
@@ -49,7 +49,6 @@ tokamak-appchain-data/{l1ChainId}/{stackType}/{identityContract}.json
 | Stack Type | Identity Contract | Description |
 |------------|------------------|-------------|
 | `tokamak-appchain` | `OnChainProposer` | Batch commitment + proof verification |
-| `thanos` | `SystemConfig` | System configuration contract |
 | `tokamak-private-app-channel` | TBD | Private application channel |
 | `py-ethclient` | TBD | Python Ethereum client |
 
@@ -129,7 +128,7 @@ cp schemas/example-tokamak-appchain.json \
 | `bridges` | array | Bridge endpoints and supported tokens |
 | `explorers` | array | Block explorer URLs |
 | `networkConfig` | object | Block time, gas limit |
-| `supportResources` | object | Documentation, community links |
+| `supportResources` | object | Documentation, community, X, Telegram links |
 | `staking` | object | Tokamak Staking V2 candidate info |
 | `withdrawalConfig` | object | Challenge period, monitoring |
 

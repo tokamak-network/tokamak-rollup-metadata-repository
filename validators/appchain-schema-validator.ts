@@ -26,7 +26,7 @@ const appchainMetadataSchema = {
     website: { type: 'string', format: 'uri' },
     stackType: {
       type: 'string',
-      enum: ['tokamak-appchain', 'tokamak-private-app-channel', 'thanos', 'py-ethclient'],
+      enum: ['tokamak-appchain', 'tokamak-private-app-channel', 'py-ethclient'],
     },
     stackVersion: { type: 'string' },
     rollupType: {
@@ -132,6 +132,9 @@ const appchainMetadataSchema = {
         communityUrl: { type: 'string', format: 'uri' },
         helpCenterUrl: { type: 'string', format: 'uri' },
         announcementUrl: { type: 'string', format: 'uri' },
+        xUrl: { type: 'string', format: 'uri' },
+        telegramUrl: { type: 'string', format: 'uri' },
+        dashboardUrl: { type: 'string', format: 'uri' },
       },
     },
     staking: {
