@@ -1,0 +1,101 @@
+{
+  "l1ChainId": 11155111,
+  "l2ChainId": 49201,
+  "name": "Example Tokamak Appchain",
+  "description": "Example appchain deployed with Tokamak Appchain stack on Sepolia",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example-appchain.com",
+
+  "stackType": "tokamak-appchain",
+  "stackVersion": "1.0.0",
+  "rollupType": "zk",
+
+  "rpcUrl": "https://rpc.example-appchain.com",
+  "wsUrl": "wss://ws.example-appchain.com",
+
+  "nativeToken": {
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "Tokamak Network Token",
+    "decimals": 18,
+    "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044"
+  },
+
+  "status": "active",
+  "createdAt": "2026-03-01T10:00:00Z",
+  "lastUpdated": "2026-03-01T10:00:00Z",
+
+  "l1Contracts": {
+    "OnChainProposer": "0x1234567890abcdef1234567890abcdef12345678",
+    "CommonBridge": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+    "Timelock": "0x2222222222222222222222222222222222222222",
+    "SP1Verifier": "0x3333333333333333333333333333333333333333",
+    "GuestProgramRegistry": "0x4444444444444444444444444444444444444444"
+  },
+
+  "l2Contracts": {
+    "NativeToken": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000"
+  },
+
+  "operator": {
+    "address": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+    "proposerAddress": "0xbcdefabcdefabcdefabcdefabcdefabcdefabcdef"
+  },
+
+  "bridges": [
+    {
+      "name": "Tokamak Bridge",
+      "type": "native",
+      "url": "https://bridge.example-appchain.com",
+      "status": "active",
+      "supportedTokens": [
+        {
+          "symbol": "TON",
+          "l1Address": "0xa30fe40285b8f5c0457dbc3b7c8a280373c40044",
+          "l2Address": "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000",
+          "decimals": 18,
+          "isNativeToken": true
+        },
+        {
+          "symbol": "ETH",
+          "l1Address": "0x0000000000000000000000000000000000000000",
+          "l2Address": "0x4200000000000000000000000000000000000486",
+          "decimals": 18,
+          "isWrappedETH": true
+        }
+      ]
+    }
+  ],
+
+  "explorers": [
+    {
+      "name": "Appchain Explorer",
+      "url": "https://explorer.example-appchain.com",
+      "type": "blockscout",
+      "status": "active"
+    }
+  ],
+
+  "networkConfig": {
+    "blockTime": 2,
+    "gasLimit": "30000000"
+  },
+
+  "supportResources": {
+    "documentationUrl": "https://docs.example-appchain.com",
+    "communityUrl": "https://discord.gg/example",
+    "xUrl": "https://x.com/example_appchain",
+    "telegramUrl": "https://t.me/example_appchain",
+    "dashboardUrl": "https://dashboard.example-appchain.com"
+  },
+
+  "staking": {
+    "isCandidate": false
+  },
+
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x[GENERATED_BY_DEPLOYER_SIGNATURE]",
+    "signedBy": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+  }
+}

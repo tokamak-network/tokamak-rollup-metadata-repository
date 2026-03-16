@@ -1,10 +1,13 @@
 import { L2RollupMetadata } from '../schemas/rollup-metadata';
+import { TokamakAppchainMetadata, getIdentityContractField } from '../schemas/tokamak-appchain-metadata';
 import { getRpcProviderForChainId } from './constants';
 
 // Import modular validators
 import { schemaValidator } from './schema-validator';
+import { appchainSchemaValidator } from './appchain-schema-validator';
 import { addressValidator } from './address-validator';
 import { contractValidator } from './contract-validator';
+import { appchainContractValidator } from './appchain-contract-validator';
 import { networkValidator } from './network-validator';
 import { timestampValidator } from './timestamp-validator';
 import { signatureValidator } from './signature-validator';
@@ -187,7 +190,136 @@ export class RollupMetadataValidator {
   }
 
   /**
-   * Complete metadata validation
+   * Route validation based on file path (legacy vs appchain).
+   */
+  public async validateMetadata(
+    metadata: L2RollupMetadata | TokamakAppchainMetadata,
+    filepath: string,
+    prTitle?: string,
+  ): Promise<{ valid: boolean; errors: string[] }> {
+    if (networkValidator.isAppchainPath(filepath)) {
+      return this.validateAppchainMetadata(
+        metadata as TokamakAppchainMetadata,
+        filepath,
+        prTitle,
+      );
+    }
+    return this.validateRollupMetadata(metadata as L2RollupMetadata, filepath, prTitle);
+  }
+
+  /**
+   * Validate appchain metadata (tokamak-appchain-data/ paths).
+   * 10 validation steps.
+   */
+  public async validateAppchainMetadata(
+    metadata: TokamakAppchainMetadata,
+    filepath: string,
+    prTitle?: string,
+  ): Promise<{ valid: boolean; errors: string[] }> {
+    const errors: string[] = [];
+    let operation: 'register' | 'update' = 'register';
+
+    // Step 1: Parse path
+    const pathInfo = networkValidator.parseAppchainPath(filepath);
+    if (!pathInfo.valid) {
+      errors.push(pathInfo.error!);
+      return { valid: false, errors };
+    }
+
+    // Step 2: Schema validation
+    const schemaResult = appchainSchemaValidator.validateSchema(metadata);
+    if (!schemaResult.valid) {
+      errors.push(`Schema validation failed: ${JSON.stringify(schemaResult.errors, null, 2)}`);
+    }
+
+    // Step 3: PR title validation
+    if (prTitle) {
+      const prResult = networkValidator.parseAppchainPRTitle(prTitle);
+      if (!prResult.valid) {
+        errors.push(prResult.error!);
+      } else {
+        operation = prResult.operation!;
+
+        // Consistency checks: PR title vs path vs JSON
+        if (prResult.l1ChainId !== pathInfo.l1ChainId) {
+          errors.push(`PR title l1ChainId (${prResult.l1ChainId}) does not match path (${pathInfo.l1ChainId})`);
+        }
+        if (prResult.stackType !== pathInfo.stackType) {
+          errors.push(`PR title stackType (${prResult.stackType}) does not match path (${pathInfo.stackType})`);
+        }
+        if (prResult.identityContract?.toLowerCase() !== pathInfo.identityContract?.toLowerCase()) {
+          errors.push(`PR title contract (${prResult.identityContract}) does not match path (${pathInfo.identityContract})`);
+        }
+        if (prResult.appchainName !== metadata.name) {
+          errors.push(`PR title name (${prResult.appchainName}) does not match metadata name (${metadata.name})`);
+        }
+      }
+    }
+
+    // Step 4: Filename matches identity contract in JSON
+    const identityField = getIdentityContractField(metadata.stackType);
+    const identityAddress = metadata.l1Contracts[identityField];
+    if (identityAddress && pathInfo.identityContract) {
+      if (identityAddress.toLowerCase() !== pathInfo.identityContract.toLowerCase()) {
+        errors.push(
+          `Filename (${pathInfo.identityContract}) does not match l1Contracts.${identityField} (${identityAddress})`
+        );
+      }
+    }
+
+    // Step 5: l1ChainId from path matches JSON
+    if (pathInfo.l1ChainId !== metadata.l1ChainId) {
+      errors.push(
+        `Path l1ChainId (${pathInfo.l1ChainId}) does not match metadata l1ChainId (${metadata.l1ChainId})`
+      );
+    }
+
+    // Step 6: stackType from path matches JSON
+    if (pathInfo.stackType !== metadata.stackType) {
+      errors.push(
+        `Path stackType (${pathInfo.stackType}) does not match metadata stackType (${metadata.stackType})`
+      );
+    }
+
+    // Step 7 & 8: On-chain contract verification + ownership
+    const contractResult = await appchainContractValidator.validateContracts(metadata);
+    if (!contractResult.valid) {
+      errors.push(...contractResult.errors);
+    }
+
+    // Step 9: Signature verification (new message format)
+    const signatureResult = await signatureValidator.validateAppchainSignature(metadata, operation);
+    if (!signatureResult.valid) {
+      errors.push(signatureResult.error!);
+    }
+
+    // Step 10: Update-specific validations
+    if (operation === 'update') {
+      const immutableResult = await fileValidator.validateAppchainImmutableFields(metadata, filepath);
+      if (!immutableResult.valid) {
+        errors.push(...immutableResult.errors);
+      }
+
+      // validateUpdateTimestamp only reads `lastUpdated` — safe to pass appchain metadata
+      // since both types share this field
+      const timestampResult = await timestampValidator.validateUpdateTimestamp(
+        { lastUpdated: metadata.lastUpdated } as L2RollupMetadata,
+        filepath,
+        operation,
+      );
+      if (!timestampResult.valid) {
+        errors.push(timestampResult.error!);
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
+  }
+
+  /**
+   * Complete metadata validation (legacy data/ paths)
    */
   public async validateRollupMetadata(
     metadata: L2RollupMetadata,
@@ -222,7 +354,7 @@ export class RollupMetadataValidator {
         operation = prResult.operation!;
 
         // Verify SystemConfig address match
-        if (prResult.systemConfigAddress !== metadata.l1Contracts.SystemConfig?.toLowerCase()) {
+        if (prResult.systemConfigAddress?.toLowerCase() !== metadata.l1Contracts.SystemConfig?.toLowerCase()) {
           errors.push(`PR title SystemConfig address (${prResult.systemConfigAddress}) does not match metadata SystemConfig address (${metadata.l1Contracts.SystemConfig})`);
         }
 

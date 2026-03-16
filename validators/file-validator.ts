@@ -1,4 +1,7 @@
+import * as fs from 'fs';
 import { L2RollupMetadata } from '../schemas/rollup-metadata';
+import { TokamakAppchainMetadata, getImmutableFields } from '../schemas/tokamak-appchain-metadata';
+import { GITHUB_RAW_BASE_URL } from './constants';
 
 /**
  * File validation module
@@ -34,8 +37,6 @@ export class FileValidator {
     existingFilepath: string,
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
-    const fs = require('fs');
-
     try {
       if (!fs.existsSync(existingFilepath)) {
         // If file doesn't exist, this validation doesn't apply
@@ -100,6 +101,55 @@ export class FileValidator {
     return path.split('.').reduce((current, key) => {
       return current && typeof current === 'object' && current !== null && key in current ? (current as Record<string, unknown>)[key] : undefined;
     }, obj);
+  }
+  /**
+   * Validate immutable fields for appchain metadata during update operations.
+   * Fetches existing file from main branch via GitHub raw URL (works in CI).
+   */
+  public async validateAppchainImmutableFields(
+    newMetadata: TokamakAppchainMetadata,
+    existingFilepath: string,
+  ): Promise<{ valid: boolean; errors: string[] }> {
+    const errors: string[] = [];
+
+    try {
+      // Fetch existing file from the main branch on GitHub
+      const dataPath = existingFilepath.includes('tokamak-appchain-data/')
+        ? existingFilepath.substring(existingFilepath.indexOf('tokamak-appchain-data/'))
+        : existingFilepath;
+      const response = await fetch(`${GITHUB_RAW_BASE_URL}${dataPath}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // New file — no immutable fields to check
+          return { valid: true, errors: [] };
+        }
+        throw new Error(`Failed to fetch existing file from main branch: ${response.statusText}`);
+      }
+
+      const existingContent = await response.text();
+      const existingMetadata: TokamakAppchainMetadata = JSON.parse(existingContent);
+
+      const immutableFieldPaths = getImmutableFields(newMetadata.stackType);
+      for (const fieldPath of immutableFieldPaths) {
+        const existingValue = this.getNestedValue(existingMetadata, fieldPath);
+        const newValue = this.getNestedValue(newMetadata, fieldPath);
+
+        if (existingValue !== undefined && JSON.stringify(newValue) !== JSON.stringify(existingValue)) {
+          errors.push(
+            `Immutable field '${fieldPath}' cannot be changed during update. ` +
+            `Existing: ${JSON.stringify(existingValue)}, New: ${JSON.stringify(newValue)}`,
+          );
+        }
+      }
+    } catch (error) {
+      errors.push(`Failed to validate immutable fields: ${(error as Error).message}`);
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
   }
 }
 

@@ -3,8 +3,8 @@
  * Unified validation logic that can be used by different scripts
  */
 
-import { readMetadataFile, getFileInfo } from './file-utils';
-import { getRpcConfig, getLayer2ManagerProxy } from './rpc-config';
+import { readMetadataFile, getFileInfo, isAppchainPath } from './file-utils';
+import { getRpcConfig, getLayer2ManagerProxy, getRpcForChainId } from './rpc-config';
 import { RollupMetadataValidator } from '../../validators/rollup-validator';
 
 export interface ValidationOptions {
@@ -57,52 +57,65 @@ export async function validateRollupFile(
       return result;
     }
 
-    // 2. Get RPC configuration
-    const rpcConfig = getRpcConfig(fileInfo.network);
-    result.rpcInfo = {
-      url: rpcConfig.url,
-      isCustom: rpcConfig.isCustom,
-    };
-
-    // 3. Read and parse metadata
+    // 2. Read and parse metadata
     const metadata = await readMetadataFile(fileInfo.filepath);
     result.metadata = metadata;
 
-    // 4. Setup validator with RPC
+    // 3. Setup validator with RPC
     const validator = new RollupMetadataValidator();
-    validator.setProvider(rpcConfig.url);
 
-    // 5. Run validation
-    const validationResult = await validator.validateRollupMetadata(
-      metadata,
-      fileInfo.filepath,
-      options.prTitle,
-    );
+    // 4. Run validation — route based on path type
+    if (isAppchainPath(fileInfo.filepath)) {
+      // Appchain validation — RPC resolved from l1ChainId
+      const rpcConfig = getRpcForChainId(metadata.l1ChainId);
+      result.rpcInfo = { url: rpcConfig.url, isCustom: rpcConfig.isCustom };
+      validator.setProvider(rpcConfig.url);
 
-    result.valid = validationResult.valid;
-    result.errors = validationResult.errors;
+      const validationResult = await validator.validateAppchainMetadata(
+        metadata,
+        fileInfo.filepath,
+        options.prTitle,
+      );
 
-    // 6. Run staking validation if candidate
-    if (metadata.staking.isCandidate) {
-      const layer2ManagerProxy = getLayer2ManagerProxy(fileInfo.network);
-      if (layer2ManagerProxy) {
-        const stakingResult = await validator.validateStakingRegistration(
-          metadata,
-          layer2ManagerProxy,
-        );
-        if (!stakingResult.valid) {
-          result.errors.push(`Staking validation failed: ${stakingResult.error}`);
-          result.valid = false;
+      result.valid = validationResult.valid;
+      result.errors = validationResult.errors;
+    } else {
+      // Legacy validation — RPC resolved from network name
+      const rpcConfig = getRpcConfig(fileInfo.network);
+      result.rpcInfo = { url: rpcConfig.url, isCustom: rpcConfig.isCustom };
+      validator.setProvider(rpcConfig.url);
+
+      const validationResult = await validator.validateRollupMetadata(
+        metadata,
+        fileInfo.filepath,
+        options.prTitle,
+      );
+
+      result.valid = validationResult.valid;
+      result.errors = validationResult.errors;
+
+      // Run staking validation if candidate (legacy only)
+      if (metadata.staking?.isCandidate) {
+        const layer2ManagerProxy = getLayer2ManagerProxy(fileInfo.network);
+        if (layer2ManagerProxy) {
+          const stakingResult = await validator.validateStakingRegistration(
+            metadata,
+            layer2ManagerProxy,
+          );
+          if (!stakingResult.valid) {
+            result.errors.push(`Staking validation failed: ${stakingResult.error}`);
+            result.valid = false;
+          }
+        } else {
+          result.warnings.push(
+            `No Layer2ManagerProxy address configured for network ${fileInfo.network}. Skipping staking validation.`,
+          );
         }
-      } else {
-        result.warnings.push(
-          `No Layer2ManagerProxy address configured for network ${fileInfo.network}. Skipping staking validation.`,
-        );
       }
     }
 
     // 7. Add helpful warnings
-    if (!rpcConfig.isCustom) {
+    if (!result.rpcInfo.isCustom && result.rpcInfo.url) {
       result.warnings.push(
         `Using public RPC for ${fileInfo.network}. Set ${fileInfo.network.toUpperCase()}_RPC_URL for higher rate limits.`,
       );
@@ -160,10 +173,17 @@ export function displayValidationResults(result: ValidationResult, verbose: bool
       console.log(`   L2 Chain ID: ${result.metadata.l2ChainId}`);
       console.log(`   Name: ${result.metadata.name}`);
       console.log(`   Type: ${result.metadata.rollupType}`);
-      console.log(`   Stack: ${result.metadata.stack.name} v${result.metadata.stack.version}`);
       console.log(`   Status: ${result.metadata.status}`);
-      console.log(`   Sequencer: ${result.metadata.sequencer.address}`);
-      console.log(`   Staking Candidate: ${result.metadata.staking.isCandidate ? 'Yes' : 'No'}`);
+      if (result.metadata.stackType) {
+        // Appchain metadata
+        console.log(`   Stack: ${result.metadata.stackType}${result.metadata.stackVersion ? ' v' + result.metadata.stackVersion : ''}`);
+        console.log(`   Operator: ${result.metadata.operator?.address}`);
+      } else if (result.metadata.stack) {
+        // Legacy metadata
+        console.log(`   Stack: ${result.metadata.stack.name} v${result.metadata.stack.version}`);
+        console.log(`   Sequencer: ${result.metadata.sequencer.address}`);
+        console.log(`   Staking Candidate: ${result.metadata.staking?.isCandidate ? 'Yes' : 'No'}`);
+      }
     }
   } else {
     console.error('❌ Validation failed with the following errors:');

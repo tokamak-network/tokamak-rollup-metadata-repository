@@ -1,3 +1,6 @@
+import { isAppchainPath } from '../src/utils/file-utils';
+import { STACK_IDENTITY_CONTRACT } from '../schemas/tokamak-appchain-metadata';
+
 /**
  * Network validation module
  */
@@ -112,6 +115,111 @@ export class NetworkValidator {
       network,
       systemConfigAddress,
       rollupName: trimmedName,
+    };
+  }
+
+  // --- Appchain path support ---
+
+  /**
+   * Parse appchain-data file path.
+   * Expected format: tokamak-appchain-data/{l1ChainId}/{stackType}/{identityContract}.json
+   */
+  public parseAppchainPath(filepath: string): {
+    valid: boolean;
+    l1ChainId?: number;
+    stackType?: string;
+    identityContract?: string;
+    error?: string;
+  } {
+    const match = filepath.match(
+      /(?:^|\/)tokamak-appchain-data\/(\d+)\/([a-z0-9-]+)\/(0x[a-f0-9]{40})\.json$/
+    );
+
+    if (!match) {
+      // Check specific error cases for better messages
+      const partialMatch = filepath.match(
+        /(?:^|\/)tokamak-appchain-data\/([^/]+)\/([^/]+)\/([^/]+)\.json$/
+      );
+      if (partialMatch) {
+        const [, chainIdPart, stackPart, filenamePart] = partialMatch;
+        if (!/^\d+$/.test(chainIdPart)) {
+          return { valid: false, error: `L1 chain ID folder must be a number, got: ${chainIdPart}` };
+        }
+        if (!/^0x[a-f0-9]{40}$/.test(filenamePart)) {
+          return { valid: false, error: `Filename must be a valid lowercase Ethereum address, got: ${filenamePart}` };
+        }
+      }
+
+      const missingStack = filepath.match(
+        /(?:^|\/)tokamak-appchain-data\/\d+\/(0x[a-f0-9]{40})\.json$/
+      );
+      if (missingStack) {
+        return { valid: false, error: 'Missing stack type folder in path' };
+      }
+
+      return { valid: false, error: `Invalid appchain-data path: ${filepath}` };
+    }
+
+    const validStackTypes = Object.keys(STACK_IDENTITY_CONTRACT);
+    if (!validStackTypes.includes(match[2])) {
+      return { valid: false, error: `Unknown stack type: ${match[2]}` };
+    }
+
+    return {
+      valid: true,
+      l1ChainId: parseInt(match[1]),
+      stackType: match[2],
+      identityContract: match[3],
+    };
+  }
+
+  /**
+   * Check if a filepath is an appchain-data path.
+   */
+  public isAppchainPath(filepath: string): boolean {
+    return isAppchainPath(filepath);
+  }
+
+  /**
+   * Parse and validate appchain PR title.
+   * Format: [Appchain] {l1ChainId}/{stackType} 0x1234...abcd - Name
+   *         [Update] {l1ChainId}/{stackType} 0x1234...abcd - Name
+   */
+  public parseAppchainPRTitle(title: string): {
+    valid: boolean;
+    operation?: 'register' | 'update';
+    l1ChainId?: number;
+    stackType?: string;
+    identityContract?: string;
+    appchainName?: string;
+    error?: string;
+  } {
+    const formatMatch = title.match(
+      /^\[(Appchain|Update)\]\s+(\d+)\/([\w-]+)\s+(0[xX][a-fA-F0-9]{40})\s+-\s+(.+)$/
+    );
+
+    if (!formatMatch) {
+      return {
+        valid: false,
+        error: 'PR title must follow format: [Appchain] {chainId}/{stackType} 0x1234...abcd - Name or [Update] {chainId}/{stackType} 0x1234...abcd - Name',
+      };
+    }
+
+    const [, operationType, chainId, stackType, identityContract, appchainName] = formatMatch;
+    const operation = operationType === 'Appchain' ? 'register' : 'update';
+
+    const trimmedName = appchainName.trim();
+    if (!trimmedName) {
+      return { valid: false, error: 'Appchain name cannot be empty' };
+    }
+
+    return {
+      valid: true,
+      operation,
+      l1ChainId: parseInt(chainId),
+      stackType,
+      identityContract,
+      appchainName: trimmedName,
     };
   }
 }

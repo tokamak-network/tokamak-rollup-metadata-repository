@@ -56,6 +56,40 @@ export const LAYER2_MANAGER_ABI = [
   },
 ];
 
+// OnChainProposer contract ABI (owner function — for tokamak-appchain stack)
+export const ON_CHAIN_PROPOSER_ABI = [
+  {
+    'inputs': [],
+    'name': 'owner',
+    'outputs': [
+      {
+        'internalType': 'address',
+        'name': '',
+        'type': 'address',
+      },
+    ],
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+];
+
+// Timelock contract ABI (admin function — for tokamak-appchain ownership chain)
+export const TIMELOCK_ABI = [
+  {
+    'inputs': [],
+    'name': 'admin',
+    'outputs': [
+      {
+        'internalType': 'address',
+        'name': '',
+        'type': 'address',
+      },
+    ],
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+];
+
 // GitHub raw API base URL for remote file fetching
 export const GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/tokamak-network/tokamak-rollup-metadata-repository/refs/heads/main/';
 
@@ -69,7 +103,7 @@ export const PUBLIC_RPC_PROVIDERS = {
 
 // Network chain ID mappings
 export const NETWORK_CHAIN_IDS = {
-  mainnet: [1, 42161, 10, 137, 8453] as readonly number[], // Ethereum mainnet and popular L2s
+  mainnet: [1] as readonly number[], // Ethereum mainnet L1 only
   sepolia: [11155111] as readonly number[], // Sepolia testnet
   goerli: [5] as readonly number[], // Goerli testnet (deprecated)
   holesky: [17000] as readonly number[], // Holesky testnet
@@ -90,8 +124,16 @@ export function getRpcProviderForChainId(chainId: number): string {
     return PUBLIC_RPC_PROVIDERS.holesky;
   }
 
-  // Default to mainnet for unknown chain IDs
-  return PUBLIC_RPC_PROVIDERS.mainnet;
+  // Check environment variable: L1_RPC_{chainId}
+  const envKey = `L1_RPC_${chainId}`;
+  const customUrl = process.env[envKey];
+  if (customUrl) {
+    return customUrl;
+  }
+
+  throw new Error(
+    `No RPC provider configured for chain ID ${chainId}. Set L1_RPC_${chainId} env var.`
+  );
 }
 
 // Helper function to get RPC provider for network name

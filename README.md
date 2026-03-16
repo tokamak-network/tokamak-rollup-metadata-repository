@@ -14,15 +14,20 @@ This repository manages information for L2 rollups deployed in the Tokamak Netwo
 - **Third-party Reference**: Provides candidate registration status and L2 detailed information for third-party integration
 - **L2 Termination Management**: Impact tracking on staking when rollups are terminated
 
-## 🏗️ Supported Rollup Types
+## 🏗️ Supported Stack Types
 
-- **Optimistic Rollup**: Tokamak Thanos Stack
-- **ZK Rollup**: Future support planned (zk-EVM, Polygon CDK, etc.)
+| Stack | Identity Contract | Directory | Rollup Types |
+|-------|------------------|-----------|-------------|
+| **Tokamak Appchain** | OnChainProposer | `tokamak-appchain-data/` | ZK, Optimistic |
+| **Thanos** | SystemConfig | `data/` | Optimistic |
+| **Private App Channel** | TBD | `tokamak-appchain-data/` | TBD |
+| **py-ethclient** | TBD | `tokamak-appchain-data/` | TBD |
 
 ## 📚 Documentation Guide
 
 ### 🚀 Getting Started
-- **[Registration Guide](docs/registration-guide.md)** - How to register new rollups
+- **[Tokamak Appchain Registration](docs/tokamak-appchain-registration.md)** - Register Tokamak Appchain stack rollups (new)
+- **[Thanos Registration Guide](docs/registration-guide.md)** - Register Thanos stack rollups
 - **[Metadata Schema](docs/metadata-schema.md)** - Metadata structure and field descriptions
 - **[Validation System](docs/validation-system.md)** - Automated validation and security systems
 
@@ -37,41 +42,55 @@ This repository manages information for L2 rollups deployed in the Tokamak Netwo
 
 ## 🚀 Quick Start
 
-### 1. Create Metadata File
+### Tokamak Appchain Stack (new)
+
 ```bash
-# Filename: <systemConfig_address>.json (lowercase)
-# Location: data/<network>/
+# 1. Create metadata file
+#    Path: tokamak-appchain-data/{l1ChainId}/{stackType}/{identityContract}.json
+tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
+
+# 2. Validate locally
+npm install && npm run build
+npm run validate:appchain -- \
+  --pr-title "[Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain" \
+  tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
+
+# 3. Submit PR
+#    Title: [Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain
+```
+
+> See [Tokamak Appchain Registration Guide](docs/tokamak-appchain-registration.md) for full details.
+
+### Thanos Stack 
+```bash
+# 1. Create metadata file
 data/sepolia/0x5678901234567890123456789012345678901234.json
-```
 
-### 2. Local Validation
-```bash
-npm install
+# 2. Validate locally
 npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
-```
 
-> 💡 **No setup required!** Validation works immediately with public RPCs
-
-### 3. Submit PR
-```
-Title: [Rollup] sepolia - 0x5678901234567890123456789012345678901234 - Example L2
+# 3. Submit PR
+#    Title: [Rollup] sepolia - 0x5678...1234 - Example L2
 ```
 
 ## 📋 Directory Structure
 
 ```
-data/
-  mainnet/           # Mainnet rollup metadata
-  sepolia/           # Sepolia testnet rollup metadata
-docs/                # Documentation
-schemas/             # JSON schemas and TypeScript types
-src/                 # Source utilities
-  sign/              # HTML signers for metadata
-  utils/             # Validation utilities and RPC config
-scripts/             # CLI tools and utilities
-tests/               # Test files
-validators/          # Core validation logic
-.github/workflows/   # GitHub Actions workflows
+tokamak-appchain-data/   # Tokamak Appchain stack metadata (new)
+  {l1ChainId}/
+    {stackType}/
+      {identityContract}.json
+data/                    # Thanos stack metadata   mainnet/
+  sepolia/
+docs/                    # Documentation
+schemas/                 # JSON schemas and TypeScript types
+src/                     # Source utilities
+  sign/                  # HTML signers for metadata
+  utils/                 # Validation utilities and RPC config
+scripts/                 # CLI tools and utilities
+tests/                   # Test files
+validators/              # Core validation logic
+.github/workflows/       # GitHub Actions workflows
 ```
 
 ## 🔍 Validation
@@ -79,22 +98,22 @@ validators/          # Core validation logic
 Local validation ensures data integrity before submission:
 
 ```bash
-# Complete validation (recommended)
-npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
+# Tokamak Appchain
+npm run validate:appchain -- \
+  --pr-title "[Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain" \
+  tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 
-# Individual validation steps
-npm run validate:schema <file>                # Schema validation only
-npm run validate:onchain <file>               # On-chain validation only
-npm run validate:signature:register <file>    # Signature validation (register operation)
-npm run validate:signature:update <file>      # Signature validation (update operation)
+# Thanos
+npm run validate data/sepolia/0x5678901234567890123456789012345678901234.json
 ```
 
 **Available Commands:**
-- `npm run validate` - Complete validation (all steps)
-- `npm run validate:schema` - JSON schema validation
-- `npm run validate:onchain` - Contract existence and sequencer verification
-- `npm run validate:signature:register` - Cryptographic signature verification for register operations
-- `npm run validate:signature:update` - Cryptographic signature verification for update operations
+- `npm run validate:appchain` - Tokamak Appchain validation (schema, signature, on-chain)
+- `npm run validate` - Thanos complete validation (all steps)
+- `npm run validate:schema` - Thanos schema validation only
+- `npm run validate:onchain` - Thanos contract existence and sequencer verification
+- `npm run validate:signature:register` - Signature verification for register operations
+- `npm run validate:signature:update` - Signature verification for update operations
 
 ## 🛠️ Development Tools
 

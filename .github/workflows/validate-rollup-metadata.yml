@@ -3,8 +3,6 @@ name: Validate Rollup Metadata
 on:
   pull_request:
     branches: [ main ]
-    paths:
-      - 'data/**/*.json'
   # 수동 실행을 위한 이벤트 추가
   workflow_dispatch:
     inputs:
@@ -55,6 +53,7 @@ jobs:
       with:
         files: |
           data/**/*.json
+          tokamak-appchain-data/**/*.json
 
     - name: Set files for manual execution
       if: github.event_name == 'workflow_dispatch'
@@ -119,29 +118,66 @@ jobs:
         fi
       id: file-analysis
 
+    - name: Skip validation (no metadata changes)
+      if: github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed != 'true'
+      run: |
+        echo "✅ No metadata JSON files changed — skipping validation."
+
     - name: Validate PR title format and operation consistency
+      if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
+      id: pr-validation
+      env:
+        INPUT_PR_TITLE: ${{ github.event.inputs.pr_title }}
+        PR_TITLE_FROM_EVENT: ${{ github.event.pull_request.title }}
       run: |
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          PR_TITLE="${{ github.event.inputs.pr_title }}"
+          PR_TITLE="$INPUT_PR_TITLE"
           echo "Manual execution - using provided PR title: $PR_TITLE"
         else
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_TITLE="$PR_TITLE_FROM_EVENT"
           echo "PR Title: $PR_TITLE"
         fi
 
-        # PR 제목 형식: [Rollup] <network> <systemConfig_address> - <rollup_name> 또는 [Update] <network> <systemConfig_address> - <rollup_name>
-        if [[ ! "$PR_TITLE" =~ ^\[(Rollup|Update)\]\ (mainnet|sepolia)\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
-          echo "❌ Error: PR title must follow format:"
-          echo "   [Rollup] <network> <systemConfig_address> - <rollup_name> (for new rollups)"
-          echo "   [Update] <network> <systemConfig_address> - <rollup_name> (for updates)"
-          echo "   Example: [Rollup] sepolia 0x5678901234567890123456789012345678901234 - Example L2"
-          echo "   Example: [Update] mainnet 0x1234567890123456789012345678901234567890 - Updated L2"
-          echo "   Your title: $PR_TITLE"
-          exit 1
+        # Detect metadata type from changed files
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          FILE="${{ github.event.inputs.file_path }}"
+        else
+          FILE="${{ steps.changed-files.outputs.all_changed_files }}"
+        fi
+
+        if [[ "$FILE" == tokamak-appchain-data/* ]]; then
+          METADATA_TYPE="appchain"
+        else
+          METADATA_TYPE="legacy"
+        fi
+        echo "metadata_type=$METADATA_TYPE" >> $GITHUB_OUTPUT
+
+        # Validate PR title format based on metadata type
+        if [ "$METADATA_TYPE" = "appchain" ]; then
+          # Appchain format: [Appchain] {chainId}/{stackType} 0xaddr - Name
+          #                  [Update] {chainId}/{stackType} 0xaddr - Name
+          if [[ ! "$PR_TITLE" =~ ^\[(Appchain|Update)\]\ [0-9]+/[a-z0-9-]+\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
+            echo "❌ Error: PR title must follow format:"
+            echo "   [Appchain] {chainId}/{stackType} 0xaddr - Name (for new appchains)"
+            echo "   [Update] {chainId}/{stackType} 0xaddr - Name (for updates)"
+            echo "   Example: [Appchain] 11155111/tokamak-appchain 0x1234...abcd - My Appchain"
+            echo "   Your title: $PR_TITLE"
+            exit 1
+          fi
+        else
+          # Legacy format: [Rollup] <network> <systemConfig_address> - <rollup_name>
+          if [[ ! "$PR_TITLE" =~ ^\[(Rollup|Update)\]\ (mainnet|sepolia)\ 0x[a-fA-F0-9]{40}\ -\ .+$ ]]; then
+            echo "❌ Error: PR title must follow format:"
+            echo "   [Rollup] <network> <systemConfig_address> - <rollup_name> (for new rollups)"
+            echo "   [Update] <network> <systemConfig_address> - <rollup_name> (for updates)"
+            echo "   Example: [Rollup] sepolia 0x5678901234567890123456789012345678901234 - Example L2"
+            echo "   Your title: $PR_TITLE"
+            exit 1
+          fi
         fi
 
         # Extract operation type from PR title
-        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
+        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]] || [[ "$PR_TITLE" =~ ^\[Appchain\] ]]; then
           PR_OPERATION="register"
         elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
           PR_OPERATION="update"
@@ -171,25 +207,30 @@ jobs:
 
     - name: Validate rollup metadata with onchain verification
       if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
+      env:
+        INPUT_FILE_PATH: ${{ github.event.inputs.file_path }}
+        INPUT_PR_TITLE: ${{ github.event.inputs.pr_title }}
+        PR_TITLE_FROM_EVENT: ${{ github.event.pull_request.title }}
+        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       run: |
         echo "🔍 Starting comprehensive rollup metadata validation..."
 
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          FILES="${{ github.event.inputs.file_path }}"
-          PR_TITLE="${{ github.event.inputs.pr_title }}"
+          FILES="$INPUT_FILE_PATH"
+          PR_TITLE="$INPUT_PR_TITLE"
           echo "Manual execution mode"
           echo "File to validate: $FILES"
           echo "PR Title: $PR_TITLE"
         else
-          FILES="${{ steps.changed-files.outputs.all_changed_files }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          FILES="$CHANGED_FILES"
+          PR_TITLE="$PR_TITLE_FROM_EVENT"
           echo "PR mode"
           echo "Changed files: $FILES"
           echo "PR Title: $PR_TITLE"
         fi
 
         # Extract operation type from PR title for display
-        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]]; then
+        if [[ "$PR_TITLE" =~ ^\[Rollup\] ]] || [[ "$PR_TITLE" =~ ^\[Appchain\] ]]; then
           OPERATION="register"
         elif [[ "$PR_TITLE" =~ ^\[Update\] ]]; then
           OPERATION="update"
@@ -213,8 +254,12 @@ jobs:
           echo "  └── Metadata integrity validation"
           echo ""
 
-          # 통합 검증 스크립트 실행
-          npm run validate -- --pr-title "$PR_TITLE" "$file"
+          # 메타데이터 타입에 따라 검증 스크립트 선택
+          if [[ "$file" == tokamak-appchain-data/* ]]; then
+            npm run validate:appchain -- --pr-title "$PR_TITLE" "$file"
+          else
+            npm run validate -- --pr-title "$PR_TITLE" "$file"
+          fi
 
           if [ $? -eq 0 ]; then
             echo "✅ All validations passed for $file"
@@ -272,7 +317,7 @@ jobs:
 
           // 기존 봇 댓글 삭제
           for (const comment of comments) {
-            if (comment.user.login === 'github-actions[bot]' && comment.body.includes('Rollup Metadata Validation')) {
+            if (comment.user.login === 'github-actions[bot]' && (comment.body.includes('Rollup Metadata Validation') || comment.body.includes('Appchain Metadata Validation'))) {
               await github.rest.issues.deleteComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -285,41 +330,71 @@ jobs:
           const conclusion = '${{ job.status }}';
           let message = '## 🤖 Rollup Metadata Validation Results\n\n';
 
+          const metadataType = '${{ steps.pr-validation.outputs.metadata_type || 'legacy' }}';
+          const isAppchain = metadataType === 'appchain';
+
           if (conclusion === 'success') {
-            message += '✅ **All validations passed!** Your rollup metadata is ready to be merged.\n\n';
+            message += '✅ **All validations passed!** Your metadata is ready to be merged.\n\n';
             message += '### What was validated:\n';
             message += '- ✅ JSON schema validation\n';
-            message += '- ✅ **OnChain SystemConfig.unsafeBlockSigner() verification**\n';
-            message += '- ✅ Sequencer signature verification with onchain sequencer address\n';
+            if (isAppchain) {
+              message += '- ✅ **OnChain identity contract verification (e.g. OnChainProposer.owner())**\n';
+              message += '- ✅ Operator signature verification with onchain owner address\n';
+            } else {
+              message += '- ✅ **OnChain SystemConfig.unsafeBlockSigner() verification**\n';
+              message += '- ✅ Sequencer signature verification with onchain sequencer address\n';
+            }
             message += '- ✅ **Timestamp-based replay protection (24-hour validity)**\n';
             message += '- ✅ **Update timestamp validation (1-hour window, sequential)**\n';
             message += '- ✅ Contract address format validation\n';
             message += '- ✅ PR title format and consistency validation\n';
-            message += '- ✅ Filename validation (SystemConfig address match)\n';
-            message += '- ✅ Network and chainId consistency validation\n';
+            if (isAppchain) {
+              message += '- ✅ Filename validation (identity contract address match)\n';
+              message += '- ✅ L1 chain ID and stack type consistency validation\n';
+            } else {
+              message += '- ✅ Filename validation (SystemConfig address match)\n';
+              message += '- ✅ Network and chainId consistency validation\n';
+            }
             message += '- ✅ File existence validation (register vs update)\n';
             message += '- ✅ Immutable fields protection (for updates)\n';
             message += '- ✅ Native token address verification (ERC20)\n';
-            message += '- ✅ Staking registration validation (if candidate)\n';
+            if (!isAppchain) {
+              message += '- ✅ Staking registration validation (if candidate)\n';
+            }
             message += '- ✅ Single file change enforcement\n\n';
-            message += '**Note**: The sequencer address in your metadata was verified against the actual `SystemConfig.unsafeBlockSigner()` function on the blockchain. This ensures only legitimate sequencers can register their rollups.\n';
+            if (isAppchain) {
+              message += '**Note**: The operator address in your metadata was verified against the identity contract on the blockchain. This ensures only legitimate operators can register their appchains.\n';
+            } else {
+              message += '**Note**: The sequencer address in your metadata was verified against the actual `SystemConfig.unsafeBlockSigner()` function on the blockchain. This ensures only legitimate sequencers can register their rollups.\n';
+            }
           } else {
             message += '❌ **Validation failed.** Please check the errors above and fix them.\n\n';
             message += '### Common issues:\n';
-            message += '- **Invalid sequencer address**: The sequencer address in metadata doesn\'t match `SystemConfig.unsafeBlockSigner()`\n';
-            message += '- **Invalid signature**: The signature was not created by the actual onchain sequencer\n';
+            if (isAppchain) {
+              message += '- **Invalid operator address**: The operator address in metadata doesn\'t match the identity contract owner\n';
+              message += '- **Invalid signature**: The signature was not created by the actual onchain operator\n';
+            } else {
+              message += '- **Invalid sequencer address**: The sequencer address in metadata doesn\'t match `SystemConfig.unsafeBlockSigner()`\n';
+              message += '- **Invalid signature**: The signature was not created by the actual onchain sequencer\n';
+            }
             message += '- **Signature expiration**: The signature is older than 24 hours\n';
             message += '- **Update timestamp issues**: For updates, lastUpdated not within 1-hour window or not sequential\n';
             message += '- Invalid JSON format or missing required fields\n';
-            message += '- SystemConfig address mismatch between PR title and metadata\n';
+            if (isAppchain) {
+              message += '- Identity contract address mismatch between PR title, filename, and metadata\n';
+            } else {
+              message += '- SystemConfig address mismatch between PR title and metadata\n';
+            }
             message += '- Incorrect PR title format\n';
-            message += '- Filename doesn\'t match SystemConfig address\n';
-            message += '- Network/chainId inconsistency\n';
             message += '- File existence issues (register vs update operations)\n';
             message += '- Immutable field changes in updates\n';
             message += '- Multiple files changed in one PR\n\n';
             message += '### Onchain Verification:\n';
-            message += 'This repository uses **real onchain verification** by calling `SystemConfig.unsafeBlockSigner()` to ensure only legitimate L2 sequencers can register their rollup metadata.\n';
+            if (isAppchain) {
+              message += 'This repository uses **real onchain verification** to ensure only legitimate operators can register their appchain metadata.\n';
+            } else {
+              message += 'This repository uses **real onchain verification** by calling `SystemConfig.unsafeBlockSigner()` to ensure only legitimate L2 sequencers can register their rollup metadata.\n';
+            }
           }
 
           message += '\n### Need help?\n';

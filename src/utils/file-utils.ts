@@ -5,6 +5,7 @@
 
 import { promises as fs } from 'fs';
 import path from 'path';
+import { CHAIN_ID_TO_NETWORK } from './rpc-config';
 
 export interface FileInfo {
   filepath: string;
@@ -28,7 +29,15 @@ export function extractNetworkFromPath(filepath: string): string | null {
 }
 
 /**
- * Get file information including network detection
+ * Check if a file path is an appchain-data path.
+ */
+export function isAppchainPath(filepath: string): boolean {
+  return filepath.includes('tokamak-appchain-data/');
+}
+
+/**
+ * Get file information including network detection.
+ * Supports both legacy (data/{network}/) and appchain (tokamak-appchain-data/{chainId}/{stack}/) paths.
  */
 export async function getFileInfo(filepath: string): Promise<FileInfo> {
   const absolutePath = path.isAbsolute(filepath)
@@ -36,10 +45,22 @@ export async function getFileInfo(filepath: string): Promise<FileInfo> {
     : path.resolve(process.cwd(), filepath);
 
   const filename = path.basename(absolutePath);
-  const network = extractNetworkFromPath(absolutePath);
+
+  let network: string | null = null;
+
+  if (isAppchainPath(absolutePath)) {
+    // For appchain paths, derive network from the chain ID using shared mapping
+    const chainIdMatch = absolutePath.match(/tokamak-appchain-data\/(\d+)\//);
+    if (chainIdMatch) {
+      const chainId = parseInt(chainIdMatch[1]);
+      network = CHAIN_ID_TO_NETWORK[chainId] || `chain-${chainId}`;
+    }
+  } else {
+    network = extractNetworkFromPath(absolutePath);
+  }
 
   if (!network) {
-    throw new Error(`Cannot determine network from file path: ${filepath}. File should be in data/mainnet/, data/sepolia/, or data/holesky/ directory`);
+    throw new Error(`Cannot determine network from file path: ${filepath}. File should be in data/{network}/ or tokamak-appchain-data/{chainId}/{stackType}/ directory`);
   }
 
   let exists = false;
