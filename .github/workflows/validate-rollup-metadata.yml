@@ -118,7 +118,13 @@ jobs:
         fi
       id: file-analysis
 
+    - name: Skip validation (no metadata changes)
+      if: github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed != 'true'
+      run: |
+        echo "✅ No metadata JSON files changed — skipping validation."
+
     - name: Validate PR title format and operation consistency
+      if: (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true') || github.event_name == 'workflow_dispatch'
       id: pr-validation
       env:
         INPUT_PR_TITLE: ${{ github.event.inputs.pr_title }}
