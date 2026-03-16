@@ -190,7 +190,7 @@ cd src/sign && python3 -m http.server 8000
 npm run build
 
 # Validate your metadata file
-npx ts-node scripts/validate-metadata.ts \
+npm run validate:appchain -- \
   --pr-title "[Appchain] 11155111/tokamak-appchain/0xabcdef...01 - My Appchain" \
   tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef0123456789abcdef0123456789abcdef01.json
 ```

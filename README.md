@@ -51,7 +51,7 @@ tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 
 # 2. Validate locally
 npm install && npm run build
-npx ts-node scripts/validate-metadata.ts \
+npm run validate -- \
   --pr-title "[Appchain] 11155111/tokamak-appchain/0xabcdef...01 - My Appchain" \
   tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 

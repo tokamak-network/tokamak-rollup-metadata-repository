@@ -295,7 +295,7 @@ export class RollupMetadataValidator {
 
     // Step 10: Update-specific validations
     if (operation === 'update') {
-      const immutableResult = fileValidator.validateAppchainImmutableFields(metadata, filepath);
+      const immutableResult = await fileValidator.validateAppchainImmutableFields(metadata, filepath);
       if (!immutableResult.valid) {
         errors.push(...immutableResult.errors);
       }
