@@ -12,8 +12,8 @@
 ### PR Title Format
 
 **Tokamak Appchain stack:**
-- New: `[Appchain] {l1ChainId}/{stackType}/{identityContract} - {name}`
-- Update: `[Update] {l1ChainId}/{stackType}/{identityContract} - {name}`
+- New: `[Appchain] {l1ChainId}/{stackType} {identityContract} - {name}`
+- Update: `[Update] {l1ChainId}/{stackType} {identityContract} - {name}`
 
 **Thanos stack:**
 - New: `[Rollup] <network> <systemConfig_address> - <rollup_name>`

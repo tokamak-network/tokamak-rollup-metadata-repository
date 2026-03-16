@@ -208,12 +208,12 @@ The validator checks:
 ### PR Title Format
 
 ```
-[Appchain] {l1ChainId}/{stackType}/{identityContract} - {name}
+[Appchain] {l1ChainId}/{stackType} {identityContract} - {name}
 ```
 
 Example:
 ```
-[Appchain] 11155111/tokamak-appchain/0xabcdef0123456789abcdef0123456789abcdef01 - My Appchain
+[Appchain] 11155111/tokamak-appchain 0xabcdef0123456789abcdef0123456789abcdef01 - My Appchain
 ```
 
 ### What Happens After PR
@@ -229,7 +229,7 @@ Example:
 1. Edit your existing JSON file
 2. Update `lastUpdated` to current ISO 8601 timestamp
 3. Generate new signature with `Operation: update`
-4. Submit PR with title: `[Update] {l1ChainId}/{stackType}/{identityContract} - {name}`
+4. Submit PR with title: `[Update] {l1ChainId}/{stackType} {identityContract} - {name}`
 
 ### Immutable Fields (cannot change after registration)
 
@@ -244,7 +244,7 @@ Example:
 To remove your appchain from the Platform:
 
 1. Delete your JSON file
-2. Submit PR with title: `[Remove] {l1ChainId}/{stackType}/{identityContract} - {name}`
+2. Submit PR with title: `[Remove] {l1ChainId}/{stackType} {identityContract} - {name}`
 3. After merge, the Platform removes the listing within 5 minutes
 
 ## Troubleshooting

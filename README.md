@@ -52,11 +52,11 @@ tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 # 2. Validate locally
 npm install && npm run build
 npm run validate -- \
-  --pr-title "[Appchain] 11155111/tokamak-appchain/0xabcdef...01 - My Appchain" \
+  --pr-title "[Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain" \
   tokamak-appchain-data/11155111/tokamak-appchain/0xabcdef...01.json
 
 # 3. Submit PR
-#    Title: [Appchain] 11155111/tokamak-appchain/0xabcdef...01 - My Appchain
+#    Title: [Appchain] 11155111/tokamak-appchain 0xabcdef...01 - My Appchain
 ```
 
 > See [Tokamak Appchain Registration Guide](docs/tokamak-appchain-registration.md) for full details.
