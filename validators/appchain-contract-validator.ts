@@ -4,8 +4,8 @@ import {
   getIdentityContractField,
 } from '../schemas/tokamak-appchain-metadata';
 import {
-  ON_CHAIN_PROPOSER_ABI,
   TIMELOCK_ABI,
+  SECURITY_COUNCIL_ROLE,
 } from './constants';
 import { getRpcForChainId } from '../src/utils/rpc-config';
 
@@ -117,57 +117,62 @@ export class AppchainContractValidator {
   }
 
   /**
-   * tokamak-appchain: OnChainProposer.owner() → Timelock.admin() or direct owner
+   * tokamak-appchain: Timelock.hasRole(SECURITY_COUNCIL, signer) must be true
    */
   private async validateTokamakAppchainOwnership(
     metadata: TokamakAppchainMetadata,
   ): Promise<{ valid: boolean; error?: string; onChainOwner?: string }> {
-    const proposerAddress = metadata.l1Contracts['OnChainProposer'];
-    if (!proposerAddress) {
-      return { valid: false, error: 'Missing l1Contracts.OnChainProposer' };
+    const timelockAddress = metadata.l1Contracts['Timelock'];
+    if (!timelockAddress) {
+      return { valid: false, error: 'Missing l1Contracts.Timelock' };
     }
 
     try {
-      const contract = new ethers.Contract(proposerAddress, ON_CHAIN_PROPOSER_ABI, this.provider!);
-      const owner: string = await withTimeout(
-        contract.owner(),
+      const timelock = new ethers.Contract(timelockAddress, TIMELOCK_ABI, this.provider!);
+      const signer = metadata.metadata.signedBy;
+
+      const hasRole: boolean = await withTimeout(
+        timelock.hasRole(SECURITY_COUNCIL_ROLE, signer),
         L1_RPC_TIMEOUT,
-        'OnChainProposer.owner()',
+        'Timelock.hasRole(SECURITY_COUNCIL)',
       );
 
-      // Check if owner is a Timelock (has admin() function)
-      let finalOwner = owner;
-      try {
-        const timelockContract = new ethers.Contract(owner, TIMELOCK_ABI, this.provider!);
-        const admin: string = await withTimeout(
-          timelockContract.admin(),
-          L1_RPC_TIMEOUT,
-          'Timelock.admin()',
-        );
-        finalOwner = admin;
-      } catch {
-        // Not a Timelock — owner is the direct owner
-      }
+      if (!hasRole) {
+        // Try to get the actual SECURITY_COUNCIL member for error message
+        let actualOwner = 'unknown';
+        try {
+          const count = await withTimeout(
+            timelock.getRoleMemberCount(SECURITY_COUNCIL_ROLE),
+            L1_RPC_TIMEOUT,
+            'Timelock.getRoleMemberCount(SECURITY_COUNCIL)',
+          );
+          if (count > 0n) {
+            actualOwner = await withTimeout(
+              timelock.getRoleMember(SECURITY_COUNCIL_ROLE, 0),
+              L1_RPC_TIMEOUT,
+              'Timelock.getRoleMember(SECURITY_COUNCIL, 0)',
+            );
+          }
+        } catch { /* ignore */ }
 
-      if (finalOwner.toLowerCase() !== metadata.metadata.signedBy.toLowerCase()) {
         return {
           valid: false,
-          error: `Signer ${metadata.metadata.signedBy} does not match OnChainProposer owner chain. On-chain owner: ${finalOwner}`,
-          onChainOwner: finalOwner,
+          error: `Signer ${signer} does not have SECURITY_COUNCIL role on Timelock. On-chain SECURITY_COUNCIL: ${actualOwner}`,
+          onChainOwner: actualOwner,
         };
       }
 
-      return { valid: true, onChainOwner: finalOwner };
+      return { valid: true, onChainOwner: signer };
     } catch (err: any) {
       if (err.message?.startsWith('timeout:')) {
         return {
           valid: false,
-          error: `L1 RPC call timed out while checking OnChainProposer.owner()`,
+          error: `L1 RPC call timed out while checking Timelock.hasRole(SECURITY_COUNCIL)`,
         };
       }
       return {
         valid: false,
-        error: `Failed to call owner() on OnChainProposer: ${err.message}`,
+        error: `Failed to call hasRole() on Timelock: ${err.message}`,
       };
     }
   }

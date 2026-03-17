@@ -73,22 +73,47 @@ export const ON_CHAIN_PROPOSER_ABI = [
   },
 ];
 
-// Timelock contract ABI (admin function — for tokamak-appchain ownership chain)
+// Timelock contract ABI (AccessControlEnumerable — for tokamak-appchain ownership)
 export const TIMELOCK_ABI = [
   {
-    'inputs': [],
-    'name': 'admin',
+    'inputs': [
+      { 'internalType': 'bytes32', 'name': 'role', 'type': 'bytes32' },
+      { 'internalType': 'address', 'name': 'account', 'type': 'address' },
+    ],
+    'name': 'hasRole',
     'outputs': [
-      {
-        'internalType': 'address',
-        'name': '',
-        'type': 'address',
-      },
+      { 'internalType': 'bool', 'name': '', 'type': 'bool' },
+    ],
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+  {
+    'inputs': [
+      { 'internalType': 'bytes32', 'name': 'role', 'type': 'bytes32' },
+      { 'internalType': 'uint256', 'name': 'index', 'type': 'uint256' },
+    ],
+    'name': 'getRoleMember',
+    'outputs': [
+      { 'internalType': 'address', 'name': '', 'type': 'address' },
+    ],
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+  {
+    'inputs': [
+      { 'internalType': 'bytes32', 'name': 'role', 'type': 'bytes32' },
+    ],
+    'name': 'getRoleMemberCount',
+    'outputs': [
+      { 'internalType': 'uint256', 'name': '', 'type': 'uint256' },
     ],
     'stateMutability': 'view',
     'type': 'function',
   },
 ];
+
+// SECURITY_COUNCIL role hash: keccak256("SECURITY_COUNCIL")
+export const SECURITY_COUNCIL_ROLE = '0x43f2f87353a389b882a4a57f769726e87f292d6a40a03d75d5beeed3bc6b936f';
 
 // GitHub raw API base URL for remote file fetching
 export const GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/tokamak-network/tokamak-rollup-metadata-repository/refs/heads/main/';
