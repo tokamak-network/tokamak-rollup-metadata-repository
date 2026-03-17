@@ -129,7 +129,7 @@ export const CHAIN_ID_TO_NETWORK: Record<number, string> = {
  * 2. Known network config (mainnet, sepolia, holesky)
  * 3. Throws error if chain ID is unknown and no env var is set
  */
-export function getRpcForChainId(chainId: number): RpcConfig {
+export function getRpcForChainId(chainId: number, metadataL1RpcUrl?: string): RpcConfig {
   // 1. Check env var: L1_RPC_{chainId}
   const envKey = `L1_RPC_${chainId}`;
   const customUrl = process.env[envKey];
@@ -154,8 +154,17 @@ export function getRpcForChainId(chainId: number): RpcConfig {
     }
   }
 
+  // 3. Fallback to l1RpcUrl from metadata (for non-standard L1 chains)
+  if (metadataL1RpcUrl) {
+    return {
+      url: metadataL1RpcUrl,
+      isCustom: true,
+      network: `chain-${chainId}`,
+    };
+  }
+
   throw new Error(
     `No RPC provider configured for L1 chain ID ${chainId}. ` +
-    `Set the ${envKey} environment variable to provide one.`
+    `Set the ${envKey} environment variable or include l1RpcUrl in metadata.`
   );
 }

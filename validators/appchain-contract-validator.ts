@@ -39,10 +39,10 @@ export class AppchainContractValidator {
    * Set L1 RPC provider for the given chain ID.
    * Reuses existing provider if chain ID hasn't changed; destroys old provider otherwise.
    */
-  public setProviderForChainId(chainId: number): void {
+  public setProviderForChainId(chainId: number, l1RpcUrl?: string): void {
     if (this.currentChainId === chainId && this.provider) return;
     this.provider?.destroy();
-    const rpcConfig = getRpcForChainId(chainId);
+    const rpcConfig = getRpcForChainId(chainId, l1RpcUrl);
     this.provider = new ethers.JsonRpcProvider(rpcConfig.url);
     this.currentChainId = chainId;
   }
@@ -101,7 +101,7 @@ export class AppchainContractValidator {
     metadata: TokamakAppchainMetadata,
   ): Promise<{ valid: boolean; error?: string; onChainOwner?: string }> {
     if (!this.provider) {
-      this.setProviderForChainId(metadata.l1ChainId);
+      this.setProviderForChainId(metadata.l1ChainId, metadata.l1RpcUrl);
     }
 
     switch (metadata.stackType) {
@@ -225,7 +225,7 @@ export class AppchainContractValidator {
   ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 
-    this.setProviderForChainId(metadata.l1ChainId);
+    this.setProviderForChainId(metadata.l1ChainId, metadata.l1RpcUrl);
 
     // 1. Check identity contract exists
     const identityField = getIdentityContractField(metadata.stackType);

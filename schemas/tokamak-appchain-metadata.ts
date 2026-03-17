@@ -126,6 +126,7 @@ export interface TokamakAppchainMetadata {
   // Network endpoints
   rpcUrl: string;
   wsUrl?: string;
+  l1RpcUrl?: string; // L1 RPC URL for on-chain verification (required for non-standard L1 chains)
 
   // Native token configuration
   nativeToken: {

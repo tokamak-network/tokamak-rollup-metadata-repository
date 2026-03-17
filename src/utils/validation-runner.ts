@@ -67,7 +67,7 @@ export async function validateRollupFile(
     // 4. Run validation — route based on path type
     if (isAppchainPath(fileInfo.filepath)) {
       // Appchain validation — RPC resolved from l1ChainId
-      const rpcConfig = getRpcForChainId(metadata.l1ChainId);
+      const rpcConfig = getRpcForChainId(metadata.l1ChainId, metadata.l1RpcUrl);
       result.rpcInfo = { url: rpcConfig.url, isCustom: rpcConfig.isCustom };
       validator.setProvider(rpcConfig.url);
 
