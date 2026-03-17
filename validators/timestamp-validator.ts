@@ -17,9 +17,11 @@ export class TimestampValidator {
       // For register operations, check that file does NOT exist in main branch
       try {
         // Extract the data/ part from the full path
-        const dataPath = existingFilepath.includes('data/')
-          ? existingFilepath.substring(existingFilepath.indexOf('data/'))
-          : existingFilepath;
+        const dataPath = existingFilepath.includes('tokamak-appchain-data/')
+          ? existingFilepath.substring(existingFilepath.indexOf('tokamak-appchain-data/'))
+          : existingFilepath.includes('data/')
+            ? existingFilepath.substring(existingFilepath.indexOf('data/'))
+            : existingFilepath;
 
         const response = await fetch(`${GITHUB_RAW_BASE_URL}${dataPath}`);
         if (response.ok) {
@@ -38,10 +40,12 @@ export class TimestampValidator {
 
     // For update operations, validate timestamp
     try {
-      // Extract the data/ part from the full path
-      const dataPath = existingFilepath.includes('data/')
-        ? existingFilepath.substring(existingFilepath.indexOf('data/'))
-        : existingFilepath;
+      // Extract the relative path from the full path
+      const dataPath = existingFilepath.includes('tokamak-appchain-data/')
+        ? existingFilepath.substring(existingFilepath.indexOf('tokamak-appchain-data/'))
+        : existingFilepath.includes('data/')
+          ? existingFilepath.substring(existingFilepath.indexOf('data/'))
+          : existingFilepath;
 
       const response = await fetch(`${GITHUB_RAW_BASE_URL}${dataPath}`);
       if (!response.ok) {
