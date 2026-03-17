@@ -1,22 +1,23 @@
 {
   "l1ChainId": 9,
-  "l2ChainId": 65536999,
+  "l2ChainId": 66131151,
   "name": "Test test",
-  "description": "ZK-DEX appchain on AWS (updated)",
+  "description": "L2 On-Demand Tailored Ethereum ",
+  "website": "https://www.tokamak.network/",
   "stackType": "tokamak-appchain",
   "stackVersion": "0.1.0",
   "rollupType": "zk",
   "rpcUrl": "http://54.180.160.159:1729",
   "l1RpcUrl": "http://54.180.160.159:8545",
   "nativeToken": {
-    "type": "eth",
-    "symbol": "ETH",
-    "name": "Ether",
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "TON",
     "decimals": 18
   },
   "status": "active",
   "createdAt": "2026-03-17T13:39:48.000Z",
-  "lastUpdated": "2026-03-17T14:09:12.000Z",
+  "lastUpdated": "2026-03-17T14:53:32.000Z",
   "l1Contracts": {
     "Timelock": "0x0563d9405d49bed01069ca55ccfb2add3646ba17",
     "OnChainProposer": "0x6165585a50205d19d8cc229e413759399ad16f65",
@@ -24,11 +25,14 @@
     "SP1Verifier": "0xa1f57d51bfd76f3f11eed1419d0287f86ec9969a"
   },
   "operator": {
-    "address": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+    "address": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  },
+  "supportResources": {
+    "documentationUrl": "https://github.com/tokamak-network/"
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xd24867579cb0c0d78a0208b1af9130db7fdcb2f07517cf488af09d53ffe2e02f32c08fb01916c893359c85b680d1a5adab5d4c52c1207aab823429df4609cc671b",
-    "signedBy": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+    "signature": "0xe81b2ea2c7be11a4a2b68b8e0d6ee1bf056c5301a68643af3c9af22c8fff314405fb1c360870ec86d418606d82b2bebd5d47736138c6c6710b8067ae888c45b61b",
+    "signedBy": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
   }
 }
