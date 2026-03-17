@@ -2,7 +2,7 @@
   "l1ChainId": 9,
   "l2ChainId": 65536999,
   "name": "Test test",
-  "description": "ZK-DEX appchain on AWS",
+  "description": "ZK-DEX appchain on AWS (updated)",
   "stackType": "tokamak-appchain",
   "stackVersion": "0.1.0",
   "rollupType": "zk",
@@ -16,7 +16,7 @@
   },
   "status": "active",
   "createdAt": "2026-03-17T13:39:48.000Z",
-  "lastUpdated": "2026-03-17T13:39:48.000Z",
+  "lastUpdated": "2026-03-17T14:09:12.000Z",
   "l1Contracts": {
     "Timelock": "0x0563d9405d49bed01069ca55ccfb2add3646ba17",
     "OnChainProposer": "0x6165585a50205d19d8cc229e413759399ad16f65",
@@ -28,7 +28,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xd4d70a2e2d7d0e30c67498c2de35f18b57ee36ab8fe12719b9f04835d69c495353764026c98432888daeac7b6d4b67a70f51e0ff7a8d7010e2bef30ecc9d73681b",
+    "signature": "0xd24867579cb0c0d78a0208b1af9130db7fdcb2f07517cf488af09d53ffe2e02f32c08fb01916c893359c85b680d1a5adab5d4c52c1207aab823429df4609cc671b",
     "signedBy": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
   }
 }
