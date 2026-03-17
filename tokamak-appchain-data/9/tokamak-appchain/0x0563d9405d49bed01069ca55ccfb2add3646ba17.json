@@ -1,0 +1,33 @@
+{
+  "l1ChainId": 9,
+  "l2ChainId": 66131151,
+  "name": "Test test",
+  "description": "E2E test appchain on AWS",
+  "stackType": "tokamak-appchain",
+  "stackVersion": "0.1.0",
+  "rollupType": "zk",
+  "rpcUrl": "http://54.180.160.159:1729",
+  "nativeToken": {
+    "type": "eth",
+    "symbol": "ETH",
+    "name": "Ether",
+    "decimals": 18
+  },
+  "status": "active",
+  "createdAt": "2026-03-17T13:21:32.000Z",
+  "lastUpdated": "2026-03-17T13:21:32.000Z",
+  "l1Contracts": {
+    "Timelock": "0x0563d9405d49bed01069ca55ccfb2add3646ba17",
+    "OnChainProposer": "0x6165585a50205d19d8cc229e413759399ad16f65",
+    "CommonBridge": "0x0118b919074e6958abf3ad592379c4d550def3bc",
+    "SP1Verifier": "0xa1f57d51bfd76f3f11eed1419d0287f86ec9969a"
+  },
+  "operator": {
+    "address": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x305549850660114524aa8552231b1a832199ce555143b3122cfda6c23a7d2c886f5e4064d518cbde6916467c378c58f135ea7bfa561c5399d4138044882c91751c",
+    "signedBy": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+  }
+}
