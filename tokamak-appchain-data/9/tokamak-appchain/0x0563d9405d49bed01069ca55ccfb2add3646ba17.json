@@ -1,0 +1,33 @@
+{
+  "l1ChainId": 9,
+  "l2ChainId": 66131151,
+  "name": "Test test",
+  "description": "ZK-DEX appchain on AWS",
+  "stackType": "tokamak-appchain",
+  "stackVersion": "0.1.0",
+  "rollupType": "zk",
+  "rpcUrl": "http://54.180.160.159:1729",
+  "nativeToken": {
+    "type": "eth",
+    "symbol": "ETH",
+    "name": "Ether",
+    "decimals": 18
+  },
+  "status": "active",
+  "createdAt": "2026-03-17T13:26:28.000Z",
+  "lastUpdated": "2026-03-17T13:26:28.000Z",
+  "l1Contracts": {
+    "Timelock": "0x0563d9405d49bed01069ca55ccfb2add3646ba17",
+    "OnChainProposer": "0x6165585a50205d19d8cc229e413759399ad16f65",
+    "CommonBridge": "0x0118b919074e6958abf3ad592379c4d550def3bc",
+    "SP1Verifier": "0xa1f57d51bfd76f3f11eed1419d0287f86ec9969a"
+  },
+  "operator": {
+    "address": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x08fab74707e739befa9ddf17be8233b6762dd5172c6438733c2b266540651474549c112163b8af5284ea9566ae5f7387738ed2d8a517be1851696252331102ee1b",
+    "signedBy": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+  }
+}
