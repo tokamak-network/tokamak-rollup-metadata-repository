@@ -1,22 +1,22 @@
 {
   "l1ChainId": 9,
-  "l2ChainId": 65536999,
+  "l2ChainId": 66131151,
   "name": "Test test",
-  "description": "ZK-DEX appchain on AWS (updated)",
+  "description": "소개글 입니다. ",
   "stackType": "tokamak-appchain",
   "stackVersion": "0.1.0",
   "rollupType": "zk",
   "rpcUrl": "http://54.180.160.159:1729",
   "l1RpcUrl": "http://54.180.160.159:8545",
   "nativeToken": {
-    "type": "eth",
-    "symbol": "ETH",
-    "name": "Ether",
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "TON",
     "decimals": 18
   },
   "status": "active",
-  "createdAt": "2026-03-17T13:39:48.000Z",
-  "lastUpdated": "2026-03-17T14:09:12.000Z",
+  "createdAt": "2026-03-17T14:30:22.000Z",
+  "lastUpdated": "2026-03-17T14:30:22.000Z",
   "l1Contracts": {
     "Timelock": "0x0563d9405d49bed01069ca55ccfb2add3646ba17",
     "OnChainProposer": "0x6165585a50205d19d8cc229e413759399ad16f65",
@@ -24,11 +24,22 @@
     "SP1Verifier": "0xa1f57d51bfd76f3f11eed1419d0287f86ec9969a"
   },
   "operator": {
-    "address": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+    "address": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  },
+  "bridges": [
+    {
+      "name": "Native Bridge",
+      "type": "native",
+      "url": "",
+      "status": "active"
+    }
+  ],
+  "supportResources": {
+    "website": "http://tokamak.network"
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0xd24867579cb0c0d78a0208b1af9130db7fdcb2f07517cf488af09d53ffe2e02f32c08fb01916c893359c85b680d1a5adab5d4c52c1207aab823429df4609cc671b",
-    "signedBy": "0x4417092B70a3E5f10Dc504d0947DD256B965fc62"
+    "signature": "0xaa4effc102bdb9685c4309f1059195117887d9b2449f2377ff1f25197ab26c936fb6a10247851ad381a13f2a8b95e1a683e0d6df6ee4db23389d538455f2d04c1c",
+    "signedBy": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
   }
 }
