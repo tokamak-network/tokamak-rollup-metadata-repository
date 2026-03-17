@@ -15,8 +15,8 @@
     "decimals": 18
   },
   "status": "active",
-  "createdAt": "2026-03-17T17:29:40.000Z",
-  "lastUpdated": "2026-03-17T17:29:40.000Z",
+  "createdAt": "2026-03-17T17:29:52.000Z",
+  "lastUpdated": "2026-03-17T17:29:52.000Z",
   "l1Contracts": {
     "Timelock": "0x6dfab2fc509c776ee134382e509fdf78121a4454",
     "OnChainProposer": "0x0a7034773535c9606c9f33d978879c4119cf4e19",
@@ -39,7 +39,7 @@
   },
   "metadata": {
     "version": "1.0.0",
-    "signature": "0x02261a08b42c4c9454b284ec504a5b30be465310c87508dbcaee53d656b1f1666c7e5d4fb4f087895573abcfc2d0575d1a4f3f9abaf19af16a6b2b89f9f58e791b",
+    "signature": "0xc18f857821d55af3073fc1c56b99417d1238d72b2e6192b288bf40de8224d97e49884c7f2d286859a18a427f00070af6e89ada852ee169b5c52c64f760fd8bea1b",
     "signedBy": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
   }
 }
