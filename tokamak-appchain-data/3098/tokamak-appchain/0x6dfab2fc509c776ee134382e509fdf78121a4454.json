@@ -1,0 +1,45 @@
+{
+  "l1ChainId": 3098,
+  "l2ChainId": 66422921,
+  "name": "Sunny",
+  "description": "써니의 웹체인입니다. ",
+  "stackType": "tokamak-appchain",
+  "stackVersion": "0.1.0",
+  "rollupType": "zk",
+  "rpcUrl": "http://13.124.190.197:1729",
+  "l1RpcUrl": "http://13.124.190.197:8545",
+  "nativeToken": {
+    "type": "erc20",
+    "symbol": "TON",
+    "name": "TON",
+    "decimals": 18
+  },
+  "status": "active",
+  "createdAt": "2026-03-17T17:24:18.000Z",
+  "lastUpdated": "2026-03-17T17:24:18.000Z",
+  "l1Contracts": {
+    "Timelock": "0x6dfab2fc509c776ee134382e509fdf78121a4454",
+    "OnChainProposer": "0x0a7034773535c9606c9f33d978879c4119cf4e19",
+    "CommonBridge": "0xff0081f741c8fa7775e282499f9ec97ee9fc6495",
+    "SP1Verifier": "0x8a3a3bf55a642f2f6fbfecc7312d425a4301e08d"
+  },
+  "operator": {
+    "address": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  },
+  "bridges": [
+    {
+      "name": "Native Bridge",
+      "type": "native",
+      "url": "http://13.124.190.197:3000",
+      "status": "active"
+    }
+  ],
+  "supportResources": {
+    "dashboardUrl": "http://13.124.190.197:3000"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x717d1e66dc86120c91162fc91f40f92ce5bace69c2be68870a7bdee8ea5d7aa2112fa9084492da867a99d7b95b90b5d370235aae6b731df1f044cc8ed0042f471b",
+    "signedBy": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  }
+}
