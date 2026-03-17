@@ -22,14 +22,14 @@ export const STACK_DISPLAY_NAMES: Record<StackType, string> = {
 
 // Identity contract field per stack type (used as filename)
 export const STACK_IDENTITY_CONTRACT: Record<StackType, string> = {
-  'tokamak-appchain': 'OnChainProposer',
+  'tokamak-appchain': 'Timelock',
   'tokamak-private-app-channel': 'IdentityContract', // TBD
   'py-ethclient': 'IdentityContract', // TBD
 };
 
 // Required l1Contracts fields per stack type
 export const STACK_REQUIRED_L1_CONTRACTS: Record<StackType, string[]> = {
-  'tokamak-appchain': ['OnChainProposer'],
+  'tokamak-appchain': ['Timelock', 'OnChainProposer'],
   'tokamak-private-app-channel': [], // TBD
   'py-ethclient': [], // TBD
 };
@@ -89,9 +89,9 @@ export function getImmutableFields(stackType: string): string[] {
 // --- L1 Contracts interfaces per stack ---
 
 export interface TokamakAppchainL1Contracts {
-  OnChainProposer: string; // Identity contract (= filename)
+  Timelock: string; // Identity contract (= filename)
+  OnChainProposer: string;
   CommonBridge?: string;
-  Timelock?: string;
   SP1Verifier?: string;
   GuestProgramRegistry?: string;
   [contractName: string]: string | undefined;
