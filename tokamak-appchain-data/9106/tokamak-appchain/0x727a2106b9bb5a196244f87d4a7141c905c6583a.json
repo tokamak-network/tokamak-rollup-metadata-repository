@@ -1,0 +1,59 @@
+{
+  "l1ChainId": 9106,
+  "l2ChainId": 66196107,
+  "name": "ZK-DEX L2",
+  "description": "ZK-DEX L2 appchain",
+  "stackType": "tokamak-appchain",
+  "stackVersion": "0.1.0",
+  "rollupType": "zk",
+  "rpcUrl": "http://13.125.234.71:1729",
+  "l1RpcUrl": "http://13.125.234.71:8545",
+  "nativeToken": {
+    "type": "eth",
+    "symbol": "ETH",
+    "name": "Ether",
+    "decimals": 18
+  },
+  "status": "active",
+  "createdAt": "2026-03-18T06:52:33.000Z",
+  "lastUpdated": "2026-03-18T06:52:33.000Z",
+  "l1Contracts": {
+    "Timelock": "0x727a2106b9bb5a196244f87d4a7141c905c6583a",
+    "OnChainProposer": "0x147478dae18ca792a67eed9db693877783bc22ae",
+    "CommonBridge": "0xd8ae58d2fe4e553e7d29056f49ea7a70097613e7",
+    "SP1Verifier": "0xe065951e9c7dd64d38f8bb4194c8136b73f63de0"
+  },
+  "operator": {
+    "address": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  },
+  "explorers": [
+    {
+      "name": "L2 Explorer",
+      "url": "http://13.125.234.71:8082",
+      "type": "blockscout",
+      "status": "active"
+    },
+    {
+      "name": "L1 Explorer",
+      "url": "http://13.125.234.71:8083",
+      "type": "blockscout",
+      "status": "active"
+    }
+  ],
+  "bridges": [
+    {
+      "name": "Native Bridge",
+      "type": "native",
+      "url": "http://13.125.234.71:3000",
+      "status": "active"
+    }
+  ],
+  "supportResources": {
+    "dashboardUrl": "http://13.125.234.71:3000"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x0091e79af89d9ecc495708af387314f1e6785f54a5ed7cf28f7c1d1a8d0917b45644cc781a102968ee35ba91b22d828c6d480a5fbb2e2001c3cc0fbe2f7ca6161b",
+    "signedBy": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  }
+}
