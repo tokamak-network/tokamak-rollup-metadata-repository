@@ -1,0 +1,45 @@
+{
+  "l1ChainId": 7286,
+  "l2ChainId": 65578193,
+  "name": "ZK-DEX L2",
+  "description": "3월 1일 오픈 체인 ",
+  "stackType": "tokamak-appchain",
+  "stackVersion": "0.1.0",
+  "rollupType": "zk",
+  "rpcUrl": "http://15.164.212.168:1729",
+  "l1RpcUrl": "http://15.164.212.168:8545",
+  "nativeToken": {
+    "type": "eth",
+    "symbol": "ETH",
+    "name": "Ether",
+    "decimals": 18
+  },
+  "status": "active",
+  "createdAt": "2026-03-18T04:00:04.000Z",
+  "lastUpdated": "2026-03-18T04:00:04.000Z",
+  "l1Contracts": {
+    "Timelock": "0xe8df9f7bbec2f3d43820383617349613959d2406",
+    "OnChainProposer": "0x0c2806d33ed4831c059f7f02e3115f283a10993f",
+    "CommonBridge": "0x33e10dcc45060617c044005e5fbb9fefae95625d",
+    "SP1Verifier": "0x09fffd146510320d3b8f11115c21eedef799f193"
+  },
+  "operator": {
+    "address": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  },
+  "bridges": [
+    {
+      "name": "Native Bridge",
+      "type": "native",
+      "url": "http://15.164.212.168:3000",
+      "status": "active"
+    }
+  ],
+  "supportResources": {
+    "dashboardUrl": "http://15.164.212.168:3000"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "signature": "0x2c2c3a0024c0ac7501debda3bb4b893ab164af3f61115302c9fad668af5c040f3a227f34dbe01288263b2e60a62e0c8981cc3a9665fce8ff57a27d9cb669e1051b",
+    "signedBy": "0x4417092b70a3e5f10dc504d0947dd256b965fc62"
+  }
+}
